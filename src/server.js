@@ -1,7 +1,6 @@
 require('dotenv').config();
 
-const app = require('./app');
-const { testConnection } = require('./config/db');
+const { connectMySQL } = require('./config/mysql');
 
 const PORT = process.env.PORT || 3000;
 
@@ -14,8 +13,10 @@ async function startServer() {
       throw new Error(`Faltan variables de entorno: ${missing.join(', ')}`);
     }
 
-    await testConnection();
-    console.log('Database connection successful');
+    await connectMySQL();
+    console.log('MySQL connection established');
+
+    const app = require('./app');
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
