@@ -78,7 +78,7 @@ src/
   app.js
   server.js
   config/
-    db.js
+    mysql.js
     env.js
   modules/
     users/
