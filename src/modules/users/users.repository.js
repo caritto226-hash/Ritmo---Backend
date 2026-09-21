@@ -1,91 +1,114 @@
 const { pool } = require('../../config/mysql');
 
-async function findByEmail(correo) {
+async function findByEmail(email) {
 	const [rows] = await pool.query(
-		'SELECT id, nombre, correo, id_rol FROM users WHERE correo = ? LIMIT 1',
-		[correo],
+		'SELECT id, name, email, role_id AS roleId FROM users WHERE email = ? LIMIT 1',
+		[email],
 	);
 
 	return rows[0] || null;
 }
 
-async function findRoleById(idRol) {
+async function findRoleById(roleId) {
 	const [rows] = await pool.query(
 		'SELECT id FROM roles WHERE id = ? LIMIT 1',
-		[idRol],
+		[roleId],
 	);
 
 	return rows[0] || null;
 }
 
 async function create(userData) {
-	const { nombre, correo, passwordHash, idRol } = userData;
+	const { name, email, passwordHash, roleId } = userData;
 	const [result] = await pool.query(
-		'INSERT INTO users (nombre, correo, password_hash, fecha_registro, id_rol) VALUES (?, ?, ?, CURDATE(), ?)',
-		[nombre, correo, passwordHash, idRol],
+		'INSERT INTO users (name, email, password_hash, registration_date, role_id) VALUES (?, ?, ?, CURDATE(), ?)',
+		[name, email, passwordHash, roleId],
 	);
 
 	return {
 		id: result.insertId,
-		nombre,
-		correo,
-		idRol,
+		name,
+		email,
+		roleId,
 	};
 }
 
 async function findAll() {
-  const [rows] = await pool.query(
-    'SELECT id, nombre, correo, id_rol FROM users WHERE deleted_at IS NULL'
-  );
-  return rows;
+	const [rows] = await pool.query(
+		'SELECT id, name, email, role_id AS roleId FROM users WHERE deleted_at IS NULL'
+	);
+	return rows;
 }
 
 async function findById(id) {
-  const [rows] = await pool.query(
-    'SELECT id, nombre, correo, id_rol FROM users WHERE id = ? AND deleted_at IS NULL',
-    [id]
-  );
-  return rows[0] || null;
+	const [rows] = await pool.query(
+		'SELECT id, name, email, role_id AS roleId FROM users WHERE id = ? AND deleted_at IS NULL',
+		[id]
+	);
+	return rows[0] || null;
 }
 
-async function findByEmailExcludingId(correo, id) {
-  const [rows] = await pool.query(
-    'SELECT id FROM users WHERE correo = ? AND id != ? AND deleted_at IS NULL',
-    [correo, id]
-  );
-  return rows[0] || null;
+async function findByEmailWithPassword(email) {
+	const [rows] = await pool.query(
+		'SELECT id, name, email, password_hash, role_id FROM users WHERE email = ? AND deleted_at IS NULL LIMIT 1',
+		[email],
+	);
+
+	return rows[0] || null;
+}
+
+async function findByEmailExcludingId(email, id) {
+	const [rows] = await pool.query(
+		'SELECT id FROM users WHERE email = ? AND id != ? AND deleted_at IS NULL',
+		[email, id]
+	);
+	return rows[0] || null;
 }
 
 async function update(id, data) {
-  const { nombre, correo, idRol } = data;
+	const { name, email, roleId } = data;
 
-  await pool.query(
-    'UPDATE users SET nombre = ?, correo = ?, id_rol = ? WHERE id = ?',
-    [nombre, correo, idRol, id]
-  );
+	await pool.query(
+		'UPDATE users SET name = ?, email = ?, role_id = ? WHERE id = ?',
+		[name, email, roleId, id]
+	);
 
-  const [rows] = await pool.query(
-    'SELECT id, nombre, correo, id_rol FROM users WHERE id = ?',
-    [id]
-  );
-  return rows[0];
+	const [rows] = await pool.query(
+		'SELECT id, name, email, role_id AS roleId FROM users WHERE id = ?',
+		[id]
+	);
+	return rows[0];
+}
+
+async function updatePassword(userId, newPasswordHash) {
+	await pool.query(
+		'UPDATE users SET password_hash = ? WHERE id = ?',
+		[newPasswordHash, userId]
+	);
 }
 
 async function changeStatus(id, status) {
-  await pool.query(
-    'UPDATE users SET estado = ? WHERE id = ?',
-    [status, id]
-  );
+	await pool.query(
+		'UPDATE users SET status = ? WHERE id = ?',
+		[status, id]
+	);
 }
-
 
 async function softDelete(id) {
-  await pool.query(
-    'UPDATE users SET estado = 0, deleted_at = NOW() WHERE id = ?',
-    [id]
-  );
+	await pool.query(
+		'UPDATE users SET status = 0, deleted_at = NOW() WHERE id = ?',
+		[id]
+	);
 }
 
+async function findActiveByEmail(email) {
+	const [rows] = await pool.query(
+		'SELECT id, name, email, role_id AS roleId FROM users WHERE email = ? AND deleted_at IS NULL LIMIT 1',
+		[email],
+	);
+
+	return rows[0] || null;
+}
 
 module.exports = {
 	findByEmail,
@@ -95,6 +118,9 @@ module.exports = {
 	findById,
 	findByEmailExcludingId,
 	update,
+	updatePassword,
 	changeStatus,
 	softDelete,
+	findByEmailWithPassword,
+	findActiveByEmail,
 };
