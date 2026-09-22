@@ -5,6 +5,7 @@ const {
 } = require('./middlewares/error.middleware');
 const usersRouter = require('./modules/users');
 const authRouter = require('./modules/auth');
+const tasksRouter = require('./modules/tasks');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/tasks', tasksRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

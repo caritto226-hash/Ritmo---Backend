@@ -1,7 +1,7 @@
 const usersRepository = require('../users/users.repository');
 
-async function findByEmailWithPassword(correo) {
-	return usersRepository.findByEmailWithPassword(correo);
+async function findByEmailWithPassword(email) {
+	return usersRepository.findByEmailWithPassword(email);
 }
 
 module.exports = {
