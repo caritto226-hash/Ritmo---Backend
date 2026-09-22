@@ -35,6 +35,27 @@ async function findAllByUser(userId) {
 	return rows;
 }
 
+async function findTodayStatsByUser(userId) {
+	const [rows] = await pool.query(
+		"SELECT COUNT(*) AS total, COALESCE(SUM(status = 'completada'), 0) AS completed FROM tasks WHERE user_id = ? AND due_date = CURDATE() AND deleted_at IS NULL",
+		[userId],
+	);
+
+	return {
+		completed: Number(rows[0].completed),
+		total: Number(rows[0].total),
+	};
+}
+
+async function findUpcomingByUser(userId) {
+	const [rows] = await pool.query(
+		"SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE user_id = ? AND due_date >= CURDATE() AND status != 'completada' AND deleted_at IS NULL ORDER BY due_date ASC",
+		[userId],
+	);
+
+	return rows;
+}
+
 async function findByIdAndUser(taskId, userId) {
 	const [rows] = await pool.query(
 		'SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE id = ? AND user_id = ? AND deleted_at IS NULL LIMIT 1',
@@ -92,6 +113,8 @@ async function softDelete(taskId, userId) {
 module.exports = {
 	create,
 	findAllByUser,
+	findTodayStatsByUser,
+	findUpcomingByUser,
 	findByIdAndUser,
 	update,
 	updateStatus,
