@@ -79,9 +79,25 @@ async function updateTask(taskId, userId, data) {
 	return tasksRepository.update(taskId, userId, dataFiltrada);
 }
 
+async function changeStatus(taskId, userId, status) {
+	await getTaskById(taskId, userId);
+
+	await tasksRepository.updateStatus(taskId, userId, status);
+
+	return getTaskById(taskId, userId);
+}
+
+async function deleteTask(taskId, userId) {
+	await getTaskById(taskId, userId);
+
+	await tasksRepository.softDelete(taskId, userId);
+}
+
 module.exports = {
 	create,
 	getTasks,
 	getTaskById,
 	updateTask,
+	changeStatus,
+	deleteTask,
 };

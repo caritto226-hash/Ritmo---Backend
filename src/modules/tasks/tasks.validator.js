@@ -139,6 +139,19 @@ function validateUpdateTask(req, res, next) {
 	return next();
 }
 
+function validateTaskStatus(req, res, next) {
+	const allowedStatuses = new Set(['pendiente', 'en_proceso', 'completada']);
+	const { status } = req.body || {};
+
+	if (typeof status !== 'string' || !allowedStatuses.has(status)) {
+		const error = new Error('El estado debe ser pendiente, en_proceso o completada');
+		error.statusCode = 400;
+		return next(error);
+	}
+
+	return next();
+}
+
 function isValidDateOnly(value) {
 	if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
 		return false;
@@ -164,4 +177,5 @@ function isValidDateTime(value) {
 module.exports = {
 	validateCreateTask,
 	validateUpdateTask,
+	validateTaskStatus,
 };

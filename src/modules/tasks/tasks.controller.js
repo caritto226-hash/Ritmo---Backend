@@ -42,9 +42,33 @@ async function updateTask(req, res, next) {
 	}
 }
 
+async function changeStatus(req, res, next) {
+	try {
+		const taskId = Number(req.params.id);
+		const task = await tasksService.changeStatus(taskId, req.user.id, req.body.status);
+
+		return res.status(200).json({ data: task });
+	} catch (error) {
+		return next(error);
+	}
+}
+
+async function deleteTask(req, res, next) {
+	try {
+		const taskId = Number(req.params.id);
+		await tasksService.deleteTask(taskId, req.user.id);
+
+		return res.status(200).json({ message: 'Tarea eliminada correctamente' });
+	} catch (error) {
+		return next(error);
+	}
+}
+
 module.exports = {
 	create,
 	getTasks,
 	getTaskById,
 	updateTask,
+	changeStatus,
+	deleteTask,
 };

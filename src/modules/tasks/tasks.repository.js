@@ -75,9 +75,25 @@ async function update(taskId, userId, fields) {
 	return findByIdAndUser(taskId, userId);
 }
 
+async function updateStatus(taskId, userId, status) {
+	await pool.query(
+		'UPDATE tasks SET status = ? WHERE id = ? AND user_id = ? AND deleted_at IS NULL',
+		[status, taskId, userId],
+	);
+}
+
+async function softDelete(taskId, userId) {
+	await pool.query(
+		'UPDATE tasks SET deleted_at = NOW() WHERE id = ? AND user_id = ? AND deleted_at IS NULL',
+		[taskId, userId],
+	);
+}
+
 module.exports = {
 	create,
 	findAllByUser,
 	findByIdAndUser,
 	update,
+	updateStatus,
+	softDelete,
 };
