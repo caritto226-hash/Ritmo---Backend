@@ -61,6 +61,13 @@ src/
       users.controller.js
       users.service.js
       users.repository.js
+    expenses/
+      index.js
+      expenses.routes.js
+      expenses.validator.js
+      expenses.controller.js
+      expenses.service.js
+      expenses.repository.js
   utils/
 ```
 
@@ -95,7 +102,6 @@ DB_NAME=ritmo_db
 DB_PORT=3306
 ```
 
-
 ## Ejecutar la aplicación
 
 Modo desarrollo:
@@ -128,6 +134,65 @@ Respuesta esperada:
 {
   "status": "ok"
 }
+```
+
+## Módulo de gastos
+
+El módulo de gastos permite crear, consultar, actualizar y eliminar gastos personales. Todas sus rutas requieren un token JWT válido y cada operación se ejecuta usando el `user_id` del usuario autenticado.
+
+### Endpoints
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| POST | `/api/expenses` | Crear un gasto |
+| GET | `/api/expenses` | Listar los gastos del usuario autenticado |
+| GET | `/api/expenses/:id` | Consultar un gasto propio por ID |
+| PUT | `/api/expenses/:id` | Actualizar uno o varios campos del gasto |
+| DELETE | `/api/expenses/:id` | Eliminar un gasto mediante soft delete |
+
+Todas las rutas requieren el header `Authorization: Bearer <token>`.
+
+### Crear un gasto
+
+```http
+POST /api/expenses
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+Body de ejemplo:
+
+```json
+{
+  "concept": "Supermercado",
+  "category": "Alimentación",
+  "amount": 150.50,
+  "expense_date": "2026-09-21",
+  "notes": "Compra mensual"
+}
+```
+
+### Reglas de validación
+
+- `concept` es obligatorio, debe ser texto y admite hasta 100 caracteres.
+- `category` es obligatoria, debe ser texto y admite hasta 45 caracteres.
+- `amount` es obligatorio, debe ser mayor que cero y tener como máximo dos decimales.
+- `expense_date` es opcional y debe usar el formato `YYYY-MM-DD` cuando se envía. Si se omite, se utiliza la fecha actual.
+- `notes` es opcional y debe ser texto cuando se envía.
+
+### Ownership y eliminación
+
+Cada gasto pertenece a un usuario mediante `user_id`. El usuario autenticado solo puede consultar, actualizar o eliminar sus propios gastos. Si el gasto no existe, pertenece a otra cuenta o fue eliminado, la API responde con `404` genérico.
+
+La eliminación utiliza soft delete: se registra la fecha en `deleted_at` y el gasto deja de aparecer en los listados y consultas normales. El módulo no incluye un endpoint de cambio de estado porque la tabla `expenses` no tiene un campo `status`.
+
+### Tabla `expenses`
+
+La tabla utiliza las siguientes columnas:
+
+```text
+id, user_id, concept, category, amount, expense_date,
+notes, deleted_at, created_at
 ```
 
 ## Módulo de usuarios
