@@ -10,10 +10,17 @@ const eventsRouter = require('./modules/events');
 const expensesRouter = require('./modules/expenses');
 const habitsRouter = require('./modules/habits');
 const dashboardRouter = require('./modules/dashboard');
-
+const cors = require('cors');
 const app = express();
 
+
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+  })
+);
 
 app.get('/health', (req, res) => {
 	res.json({ status: 'ok' });
