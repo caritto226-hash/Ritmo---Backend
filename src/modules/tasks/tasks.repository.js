@@ -19,7 +19,7 @@ async function create(taskData) {
 	);
 
 	const [rows] = await pool.query(
-		'SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE id = ?',
+		'SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, LOWER(priority) AS priority, LOWER(status) AS status, creation_date AS creationDate FROM tasks WHERE id = ?',
 		[result.insertId],
 	);
 
@@ -28,7 +28,7 @@ async function create(taskData) {
 
 async function findAllByUser(userId) {
 	const [rows] = await pool.query(
-		'SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE user_id = ? AND deleted_at IS NULL ORDER BY COALESCE(start_at, creation_date) ASC',
+		'SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, LOWER(priority) AS priority, LOWER(status) AS status, creation_date AS creationDate FROM tasks WHERE user_id = ? AND deleted_at IS NULL ORDER BY COALESCE(start_at, creation_date) ASC',
 		[userId],
 	);
 
@@ -37,7 +37,7 @@ async function findAllByUser(userId) {
 
 async function findTodayStatsByUser(userId) {
 	const [rows] = await pool.query(
-		"SELECT COUNT(*) AS total, COALESCE(SUM(status = 'completada'), 0) AS completed FROM tasks WHERE user_id = ? AND due_date = CURDATE() AND deleted_at IS NULL",
+		"SELECT COUNT(*) AS total, COALESCE(SUM(LOWER(status) = 'completada'), 0) AS completed FROM tasks WHERE user_id = ? AND due_date = CURDATE() AND deleted_at IS NULL",
 		[userId],
 	);
 
@@ -49,7 +49,7 @@ async function findTodayStatsByUser(userId) {
 
 async function findUpcomingByUser(userId) {
 	const [rows] = await pool.query(
-		"SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE user_id = ? AND due_date >= CURDATE() AND status != 'completada' AND deleted_at IS NULL ORDER BY due_date ASC",
+		"SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, LOWER(priority) AS priority, LOWER(status) AS status, creation_date AS creationDate FROM tasks WHERE user_id = ? AND due_date >= CURDATE() AND LOWER(status) != 'completada' AND deleted_at IS NULL ORDER BY due_date ASC",
 		[userId],
 	);
 
@@ -58,7 +58,7 @@ async function findUpcomingByUser(userId) {
 
 async function findByIdAndUser(taskId, userId) {
 	const [rows] = await pool.query(
-		'SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE id = ? AND user_id = ? AND deleted_at IS NULL LIMIT 1',
+		'SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, LOWER(priority) AS priority, LOWER(status) AS status, creation_date AS creationDate FROM tasks WHERE id = ? AND user_id = ? AND deleted_at IS NULL LIMIT 1',
 		[taskId, userId],
 	);
 

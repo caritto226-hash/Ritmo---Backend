@@ -31,8 +31,8 @@ async function create(userId, taskData) {
 		duration: duration ?? null,
 		startAt: startAt ?? null,
 		endAt: endAt ?? null,
-		priority: priority || 'Media',
-		status: 'Pendiente',
+		priority: priority || 'media',
+		status: 'pendiente',
 	});
 }
 

@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   try {
-    const requiredEnv = ['PORT', 'DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+    const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
     const missing = requiredEnv.filter((key) => !process.env[key]);
 
     if (missing.length > 0) {

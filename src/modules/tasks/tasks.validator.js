@@ -1,4 +1,4 @@
-const allowedPriorities = new Set(['Alta', 'Media', 'Baja']);
+const allowedPriorities = new Set(['alta', 'media', 'baja']);
 
 function validateCreateTask(req, res, next) {
 	const {
@@ -47,8 +47,9 @@ function validateCreateTask(req, res, next) {
 		return next(error);
 	}
 
-	if (priority !== undefined && !allowedPriorities.has(priority)) {
-		const error = new Error('La prioridad debe ser Alta, Media o Baja');
+	const normalizedPriority = typeof priority === 'string' ? priority.trim().toLowerCase() : '';
+	if (priority !== undefined && !allowedPriorities.has(normalizedPriority)) {
+		const error = new Error('La prioridad debe ser alta, media o baja');
 		error.statusCode = 400;
 		return next(error);
 	}
@@ -69,7 +70,7 @@ function validateCreateTask(req, res, next) {
 	req.body.description = description.trim();
 	req.body.date = date.trim();
 	req.body.duration = duration === undefined || duration === null ? null : duration;
-	req.body.priority = priority || 'Media';
+	req.body.priority = normalizedPriority || 'media';
 	req.body.start_at = startAt === undefined || startAt === null ? null : startAt;
 	req.body.end_at = endAt === undefined || endAt === null ? null : endAt;
 
@@ -126,7 +127,7 @@ function validateUpdateTask(req, res, next) {
 			return next(error);
 		}
 
-		updateData.priority = normalizedPriority.charAt(0).toUpperCase() + normalizedPriority.slice(1);
+		updateData.priority = normalizedPriority;
 	}
 
 	if (Object.keys(updateData).length === 0) {
@@ -143,12 +144,14 @@ function validateTaskStatus(req, res, next) {
 	const allowedStatuses = new Set(['pendiente', 'en_proceso', 'completada']);
 	const { status } = req.body || {};
 
-	if (typeof status !== 'string' || !allowedStatuses.has(status)) {
+	const normalizedStatus = typeof status === 'string' ? status.trim().toLowerCase() : '';
+	if (!allowedStatuses.has(normalizedStatus)) {
 		const error = new Error('El estado debe ser pendiente, en_proceso o completada');
 		error.statusCode = 400;
 		return next(error);
 	}
 
+	req.body.status = normalizedStatus;
 	return next();
 }
 
