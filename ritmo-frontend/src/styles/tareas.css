@@ -1,0 +1,42 @@
+/* ============================================================
+   tareas.css — Página de Tareas
+   (.task-item / .task-icon / .task-check viven en componentes.css
+   porque también los usan habitos.html y calendario.html)
+   ============================================================ */
+
+/* ── TIRA DE CALENDARIO SEMANAL ── */
+.calendar-strip {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--surface-primary);
+  border-radius: var(--radius, 20px);
+  padding: 14px 16px 10px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.06);
+  margin-bottom: 4px;
+}
+.calendar-strip .cal-nav-btn {
+  border: none; background: transparent; color: var(--text-secondary);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.calendar-strip .cal-nav-btn svg { width: 18px; height: 18px; }
+.calendar-strip-days { display: flex; gap: 4px; flex: 1; justify-content: space-between; }
+.cal-day {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 8px 6px; border-radius: 12px; cursor: pointer;
+  font-size: 11px; font-weight: 700; color: var(--text-secondary);
+  min-width: 34px;
+}
+.cal-day .num { font-size: 14px; color: var(--text-primary); font-weight: 800; }
+.cal-day.today { outline: 1.5px solid var(--accent-solid); }
+.cal-day.selected { background: var(--accent-gradient); }
+.cal-day.selected .num, .cal-day.selected.today { color: #fff; outline: none; }
+.cal-day.selected span:not(.num) { color: rgba(255,255,255,0.85); }
+.cal-strip-label { text-align: center; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 12px; }
+
+/* ── LISTA DE TAREAS ── */
+.task-list { display: flex; flex-direction: column; gap: 12px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 440px) {
+  .calendar-strip-days { gap: 2px; }
+  .cal-day { min-width: 30px; padding: 6px 4px; }
+}

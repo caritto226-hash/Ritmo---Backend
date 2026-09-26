@@ -1,0 +1,498 @@
+/* ============================================================
+   componentes.css — Estilos reutilizables
+   ============================================================ */
+
+
+   /* ── LOGO ── */
+
+   .logo-wrapper .logo {
+    width: 200px;
+    margin-top: 0;
+    margin-bottom: 0;
+   }
+   
+
+/* ── TARJETAS ── */
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 16px rgba(0,0,0,.06);
+  padding: 18px;
+}
+
+/* ── BOTONES ── */
+.btn-primary {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--azul-oscuro);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--blanco);
+    color: var(--azul-oscuro);
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.btn-primary-small {
+    background-color: #1d2b44;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+}
+
+.btn-guardar {
+  width: 100%; padding: 16px; border: none; border-radius: 16px;
+  background: var(--accent-gradient); color: #fff;
+  font-size: 1rem; font-weight: 800; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(135,90,182,.35);
+}
+
+/* ── ICONOS ── */
+.icon {
+    width: 20px;   
+    height: 20px;  
+    object-fit: contain; 
+}
+
+/* ── INPUTS Y FORMULARIOS ── */
+.input-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    color: var(--azul-oscuro);
+    font-weight: 500;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 12px; /* Bordes redondeados de Material 3 */
+    box-sizing: border-box;
+    background: var(--blanco);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--naranja-ritmo);
+}
+
+/* Estilo para campos inválidos */
+input[aria-invalid="true"] {
+    border-color: var(--rojo-error);
+    background-color: #fff9f9;
+    border: 2px solid #e74c3c !important;
+}
+
+.field-error {
+    color: var(--rojo-error);
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+}
+
+.field-hint {
+    color: var(--gris-texto);
+    font-size: 0.75rem;
+    margin-top: 4px;
+    display: block;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--gris-texto);
+    font-size: 18px !important;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gris-texto);
+    display: flex;
+    align-items: center;
+}
+
+/* ── QUICK ACTIONS ──
+   Compartido por dashboard.html, finanzas.html y nueva-tarea.html
+   (categorías). Por eso vive aquí y no en dashboard.css. ── */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+/*.qa-btn {
+  border-radius: var(--radius-sm);
+  padding: 14px 8px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  cursor: pointer; border: none; font-family: inherit;
+  font-size: 12px; font-weight: 700; color: var(--navy);
+  transition: transform .15s, box-shadow .15s;
+  width: 76px; height: 76px;
+}*/
+.qa-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+.qa-btn:active { transform: scale(.97); }
+.qa-btn svg { width: 22px; height: 22px; }
+/*.qa-tarea  { background: var(--orange-light); }
+.qa-habito { background: var(--purple-light); }
+.qa-gasto  { background: var(--green-light); }
+.qa-evento { background: var(--blue-light); }
+.qa-tarea  svg { color: var(--orange); }
+.qa-habito svg { color: var(--purple); }
+.qa-gasto  svg { color: var(--green); }
+.qa-evento svg { color: var(--blue); }*/
+
+
+/* Contenedor de la fila de acciones */
+.quick-actions {
+  display: flex;
+  justify-content: space-around; /* Distribuye los elementos uniformemente */
+  gap: 12px;
+}
+
+/* El enlace completo que alinea todo verticalmente */
+.qa-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px; /* Espacio entre el botón y el texto de abajo */
+  cursor: pointer;
+}
+
+/* El botón físico (solo el círculo del icono) */
+.qa-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;  /* Ajusta el tamaño a tu gusto */
+  height: 50px;
+  border-radius: 50%; /* Botón completamente redondo */
+  background-color: #f0f0f0; /* Cambia por tus colores */
+  transition: transform 0.2s ease;
+}
+
+.qa-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Efecto Hover para el botón */
+.qa-item:hover .qa-btn {
+  transform: scale(1.05);
+}
+
+/* Estilo de la etiqueta de texto */
+.qa-label {
+  font-size: 14px;
+  color: #333;
+}
+
+
+/* Tarjetas de iconos con explicación de efecto transparente se bloqueo con comentario el css anterior que aplicaba colores a cada categoría */
+.qa-tarea {
+  /* 1. Fondo blanco semitransparente */
+  background: rgba(255, 255, 255, 0.4); 
+
+  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
+
+  /* 3. Borde sutil para simular el relieve del vidrio */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  /* 4. Sombra suave para dar profundidad tridimensional */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+
+  /* Estilos estructurales adicionales */
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 350px;
+  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+}
+
+.qa-habito {
+  /* 1. Fondo blanco semitransparente */
+  background: rgba(255, 255, 255, 0.4); 
+
+  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
+
+  /* 3. Borde sutil para simular el relieve del vidrio */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  /* 4. Sombra suave para dar profundidad tridimensional */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+
+  /* Estilos estructurales adicionales */
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 350px;
+  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+}
+
+.qa-gasto {
+  /* 1. Fondo blanco semitransparente */
+  background: rgba(255, 255, 255, 0.4); 
+
+  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
+
+  /* 3. Borde sutil para simular el relieve del vidrio */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  /* 4. Sombra suave para dar profundidad tridimensional */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+
+  /* Estilos estructurales adicionales */
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 350px;
+  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+}
+
+.qa-evento {
+  /* 1. Fondo blanco semitransparente */
+  background: rgba(255, 255, 255, 0.4); 
+
+  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
+
+  /* 3. Borde sutil para simular el relieve del vidrio */
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  /* 4. Sombra suave para dar profundidad tridimensional */
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+
+  /* Estilos estructurales adicionales */
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 350px;
+  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+}
+
+
+.icon-ar {
+  width: 34px; 
+  height: 34px; 
+  object-fit: contain; 
+}
+
+/* ── ITEMS GENÉRICOS ── */
+.item {
+  display: flex; align-items: center; gap: 12px;
+  position: relative;
+}
+.item-dot {
+  position: absolute; left: -9px; top: 50%; transform: translateY(-50%);
+  width: 8px; height: 8px; border-radius: 50%;
+}
+.item-icon {
+  width: 42px; height: 42px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.item-icon svg { width: 20px; height: 20px; }
+.item-icon.orange { background: var(--orange-light); color: var(--orange); }
+.item-icon.purple { background: var(--purple-light); color: var(--purple); }
+.item-icon.green  { background: var(--green-light);  color: var(--green); }
+
+.item-info h4 { font-size: 14px; font-weight: 700; color: var(--navy); }
+.item-info p  { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+.item-info .tag { color: var(--text-muted); }
+
+.timeline {
+  padding-left: 9px;
+  border-left: 2px dashed #e8e0f4;
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+/* ── TASK ITEMS ──
+   Compartido por tareas.html, habitos.html y los "day-events"
+   de calendario.html — por eso vive en componentes, no en tareas.css. ── */
+.task-item {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface-primary);
+  border-radius: var(--radius, 20px);
+  padding: 14px 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.05);
+}
+.task-icon {
+  width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface-secondary);
+}
+.task-icon svg { width: 20px; height: 20px; color: var(--accent-solid); }
+.task-info { flex: 1; }
+.task-info h4 { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+.task-info p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+.task-check {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 2px solid var(--surface-border);
+  background: transparent; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: transparent;
+  transition: background .2s, border-color .2s;
+}
+.task-check svg { width: 14px; height: 14px; }
+.task-check.done { background: var(--accent-gradient); border-color: transparent; color: #fff; }
+.task-item.done .task-info h4 { text-decoration: line-through; color: var(--text-secondary); }
+
+/* ── CALENDARIO (compartido) ── */
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 6px; text-align: center;
+}
+.calendar-grid .weekday { font-size: 11px; font-weight: 700; color: var(--text-secondary); padding-bottom: 4px; }
+.calendar-cell {
+  aspect-ratio: 1; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; color: var(--text-primary);
+  cursor: pointer; background: transparent;
+}
+.calendar-cell.muted { color: var(--text-secondary); opacity: .4; }
+.calendar-cell.in-range { background: var(--surface-secondary); border-radius: 0; }
+.calendar-cell.range-start { background: var(--accent-gradient); color: #fff; border-radius: 50% 0 0 50%; }
+.calendar-cell.range-end { background: var(--accent-gradient); color: #fff; border-radius: 0 50% 50% 0; }
+.calendar-cell.selected { background: var(--accent-gradient); color: #fff; }
+
+.month-picker {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 14px;
+}
+.month-picker button {
+  border: none; background: var(--surface-secondary); color: var(--text-primary);
+  width: 30px; height: 30px; border-radius: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.month-picker button svg { width: 14px; height: 14px; }
+.month-picker select {
+  border: 1px solid var(--surface-border); border-radius: 10px;
+  padding: 6px 10px; font-weight: 700; color: var(--text-primary);
+  background: var(--surface-primary); font-family: inherit; font-size: 13px;
+}
+
+/* Nota: los estilos de Finanzas (.summary-card, .tx-item, etc.)
+   viven únicamente en finanzas.css — esa página es la única que
+   los usa, así que no hace falta repetirlos aquí. */
+
+/* ── OTROS COMPONENTES ── */
+.section-label {
+  font-size: 15px; font-weight: 800; color: var(--navy);
+  letter-spacing: -.1px;
+}
+
+.ritmo-textarea {
+  width: 100%; min-height: 80px; padding: 12px;
+  border: 1px solid var(--surface-border); border-radius: 12px;
+  background: var(--surface-primary); color: var(--text-primary);
+  font-family: inherit; font-size: 14px; resize: vertical;
+}
+
+.time-row { display: flex; gap: 12px; }
+.time-field { flex: 1; }
+.time-field label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 600; }
+.time-field select {
+  width: 100%; padding: 10px; border-radius: 12px;
+  border: 1px solid var(--surface-border); background: var(--surface-primary);
+  color: var(--text-primary); font-family: inherit; font-size: 14px; font-weight: 700;
+}
+
+/* ── ERRORES Y VALIDACIÓN ── */
+.error-banner-container:not([hidden]) {
+    display: block;
+    margin-bottom: 25px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.warning-card {
+    background-color: #fef9ec;
+    border: 1px solid #f9a03f;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+}
+
+.warning-icon { 
+    color: #f9a03f; 
+    font-size: 24px;
+}
+
+.error-text strong { 
+    color: #f9a03f; 
+    display: block; 
+    font-size: 1rem;
+}
+
+.error-text p { 
+    font-size: 0.85rem; 
+    margin: 0; 
+    color: #666; 
+}
+
+.error-list-detail {
+    list-style: none;
+    padding: 15px 0 15px 10px;
+    margin: 0;
+}
+
+.error-list-detail li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.dot {
+    width: 8px;
+    height: 8px;
+    background-color: #e74c3c; 
+    border-radius: 50%;
+    flex-shrink: 0;
+}

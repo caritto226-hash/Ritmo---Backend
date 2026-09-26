@@ -1,0 +1,172 @@
+/* ============================================================
+   auth.css — Página de Login / Registro
+   ============================================================ */
+
+/* ── LOGO ── */
+.logo {
+    width: 200px;
+    margin-top: 0; 
+    margin-bottom: 0;
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.logo-section-p-registro .logo {
+    width: 160px;
+    height: 65px;
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--azul-oscuro);
+}
+
+.slogan {
+    color: var(--gris-texto);
+    font-size: 0.9rem;
+    margin-bottom: 40px;
+    margin-top: 5px;
+}
+
+.welcome-text {
+    color: var(--azul-oscuro);
+    font-size: 1.8rem;
+    margin: 20px 0 10px;
+}
+
+.subtitle {
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+/* ── ERRORES (auth) ── */
+.error-banner {
+    background-color: #fdf0ee;
+    border-left: 4px solid var(--rojo-error);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.error-icon {
+    color: var(--rojo-error);
+    font-size: 20px;
+}
+
+.error-banner strong {
+    font-size: 0.9rem;
+    color: var(--rojo-error);
+    display: block;
+}
+
+.error-banner p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--gris-texto);
+}
+
+/* ── FOOTER ── */
+.footer-links {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    color: var(--gris-texto);
+}
+.footer-links a {
+    color: var(--azul-oscuro);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.forgot-password {
+    font-size: 12px;
+}
+.divider {
+    font-size: 12px;
+}
+
+/* ── RESPONSIVE AUTH ── */
+@media (max-width: 480px) {
+    .logo {
+        width: 180px;       
+        margin-top: -50px;    
+        margin-bottom: 10px;
+    }
+
+    .slogan {
+        font-size: 0.8rem;
+        margin-bottom: 20px;
+        margin-top: -50px;
+    }
+
+    h2.welcome-text {
+        font-size: 20px;
+        margin-block-start: 0.83em;
+        margin-block-end: 0.83em;
+    }
+
+    p.subtitle {
+        font-size: 13px;
+        margin-bottom: 25px;
+    }
+
+    label {
+        font-size: 13px;
+    }
+
+    .btn-primary {
+        padding: 10px;
+        width: 70%;
+        margin-top: 15px;
+    }
+
+    .btn-secondary {
+        width: 70%;
+        margin-top: 15px;
+    }  
+
+    main.content-section {
+        display: flex;
+        flex-direction: column; /* Alinea los elementos uno abajo del otro */
+        align-items: center;    /* Centra todo horizontalmente */
+    }
+
+    form.login-form {
+        width: 100%;
+    }
+
+    .forgot-password {
+        font-size: 12px;
+    }
+
+    .footer-links {
+        font-size: 12px;
+    }
+
+    .divider {
+        font-size: 12px;
+    }
+
+    /* Estilos adicionales de la sección Registro */
+    .main-container {
+        padding: 15px;
+    }
+    
+    .welcome-text {
+        font-size: 1.5rem;
+    }
+
+    .btn-primary {
+        width: 100%; /* En registro, mejor que el botón sea ancho para facilitar el clic */
+    }
+}

@@ -1,0 +1,22 @@
+/* ============================================================
+   calendario.css — Página de Calendario
+   ============================================================ */
+
+.calendar-panel {
+  background: var(--surface-primary);
+  border-radius: var(--radius,20px);
+  padding: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.06);
+}
+.calendar-panel .calendar-cell {
+  aspect-ratio: 1;
+  position: relative;
+}
+.calendar-panel .calendar-cell .evt-dot {
+  position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 5px; height: 5px; border-radius: 50%; background: var(--accent-solid);
+}
+.day-events {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-top: 18px;
+}

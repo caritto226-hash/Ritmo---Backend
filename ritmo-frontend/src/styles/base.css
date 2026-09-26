@@ -1,0 +1,187 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
+
+/* ============================================================
+   base.css — Tokens, reset y sistema de tema (claro/oscuro)
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Fondo de la app (igual en ambos temas) */
+  --app-bg-gradient: linear-gradient(160deg, #FFFFFF 0%, #FFF6F1 72%, #E0DAE5 100%);
+
+  /* Superficies */
+  --surface-primary: #FFFFFF;
+  --surface-secondary: linear-gradient(135deg, #F6EFEF 0%, #ECC8C8 100%);
+  --surface-border: #ece3f0;
+  --surface-blur: none;
+
+  /* Texto */
+  --text-primary: #1D2B44;
+  --text-secondary: #B4B4B4;
+
+  /* Énfasis (acento de marca) */
+  --accent-gradient: linear-gradient(135deg, #D6CBF2 0%, #875AB6 100%);
+  --accent-solid: #875AB6;
+
+  /* Paleta de categorías */
+  --orange: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
+  --orange-light: #fde8d8;
+  --purple: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
+  --purple-light: #ede8f8;
+  --green: linear-gradient(135deg, #FEFEFE , #DDDDDD 58%, #D1CFD2 100%);
+  --green-light: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
+  --blue: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
+  --blue-light: #dbeef8;
+  --pink: #f48fa0;
+  
+
+
+/*
+  --orange: #7566B1;
+  --orange-light: #fde8d8;
+  --purple: #b8a8e8;
+  --purple-light: #ede8f8;
+  --green: #7dd9b8;
+  --green-light: #d8f5eb;
+  --blue: #8ac4e8;
+  --blue-light: #dbeef8;
+  --pink: #f48fa0;*/
+
+
+
+  /* Geometría */
+  --radius: 20px;
+  --radius-sm: 12px;
+
+  /* Alias retro-compatibles (usados por módulos heredados) */
+  --navy: var(--text-primary);
+  --navy-soft: #2d3a5c;
+  --card-bg: var(--surface-primary);
+  --bg: var(--app-bg-gradient);
+  --text-muted: var(--text-secondary);
+  --azul-oscuro: var(--text-primary);
+  --beige-fondo: #f9f6f1;
+  --blanco: var(--surface-primary);
+  --gris-texto: var(--text-secondary);
+  --naranja-ritmo: #f9a03f;
+  --rojo-error: #c0392b;
+}
+
+
+
+[data-theme="dark"] {
+  --surface-primary: rgba(29, 35, 56, 0.78);
+  --surface-secondary: rgba(45, 58, 92, 0.65);
+  --surface-border: rgba(255, 255, 255, 0.10);
+  --surface-blur: blur(18px);
+
+  --text-primary: #ffffff;
+  --text-secondary: #b9c1d6;
+
+  --navy-soft: #d7dcef;
+  --beige-fondo: #11162a;
+  --blanco: rgba(29, 35, 56, 0.78);
+  
+  --app-bg-gradient: linear-gradient(160deg, #1a1a2e 0%, #16213e 72%, #0f3460 100%);
+}
+
+
+
+/* ── BODY  ── */
+body {
+  margin: 0;
+  font-family: 'Nunito', 'Roboto', sans-serif;
+  background: var(--app-bg-gradient);
+  min-height: 100vh;
+  transition: background .3s;
+  
+}
+
+/* main-container (auth) usa flex de centrado; lo activa esa clase, no body,
+   para no afectar al layout de la app (dashboard/tareas/etc). */
+body:has(.main-container) {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ============================================================
+   TEMA OSCURO — overrides de superficie
+   El fondo cálido se mantiene; sólo cambian las superficies a
+   un efecto "vidrio" oscuro y el texto a blanco.
+   ============================================================ */
+.card, .ritmo-card, .motiv-card, .header-btn, .notif-btn,
+.input-wrapper input, input, .item-icon, .qa-btn,
+.bottom-nav, .side-menu, .calendar-cell, .tx-item, .summary-card {
+  transition: background .3s, color .3s, border-color .3s, box-shadow .3s;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .motiv-card,
+[data-theme="dark"] .summary-card {
+  background: var(--surface-primary);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+  border: 1px solid var(--surface-border);
+  box-shadow: 0 8px 30px rgba(0,0,0,.35);
+}
+
+[data-theme="dark"] .header-btn,
+[data-theme="dark"] .notif-btn,
+[data-theme="dark"] .bottom-nav,
+[data-theme="dark"] .calendar-strip,
+[data-theme="dark"] .calendar-panel {
+  background: var(--surface-primary);
+  backdrop-filter: var(--surface-blur);
+  -webkit-backdrop-filter: var(--surface-blur);
+  border-color: var(--surface-border);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .nav-item.active { background: rgba(135, 90, 182, 0.25); }
+[data-theme="dark"] .item-icon.orange { background: rgba(245, 166, 109, 0.18); }
+[data-theme="dark"] .item-icon.purple { background: rgba(184, 168, 232, 0.18); }
+[data-theme="dark"] .item-icon.green  { background: rgba(125, 217, 184, 0.18); }
+[data-theme="dark"] .qa-tarea  { background: rgba(245, 166, 109, 0.18); }
+[data-theme="dark"] .qa-habito { background: rgba(184, 168, 232, 0.18); }
+[data-theme="dark"] .qa-gasto  { background: rgba(125, 217, 184, 0.18); }
+[data-theme="dark"] .qa-evento { background: rgba(138, 196, 232, 0.18); }
+
+[data-theme="dark"] input,
+[data-theme="dark"] .input-wrapper input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: rgba(255,255,255,0.06);
+  color: var(--text-primary);
+  border-color: var(--surface-border);
+}
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder { color: #8893ad; }
+
+[data-theme="dark"] .donut-bg { stroke: rgba(255,255,255,0.10); }
+[data-theme="dark"] .timeline { border-left-color: rgba(255,255,255,0.14); }
+[data-theme="dark"] .footer-links a,
+[data-theme="dark"] .welcome-text,
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4 { color: var(--text-primary); }
+
+/* ── Botón de cambio de tema ── */
+.theme-toggle {
+  width: 40px; height: 40px;
+  border-radius: var(--radius-sm, 12px);
+  border: 1.5px solid var(--surface-border);
+  background: var(--surface-primary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .icon-sun { display: none; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ---------------------------------------------------------------------------------  */

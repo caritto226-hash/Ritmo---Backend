@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import tasksService from "../services/tasks.service";
+import "../styles/tareas.css";
 
 const emptyForm = {
   title: "",
@@ -7,8 +8,6 @@ const emptyForm = {
   date: "",
   duration: "",
   priority: "media",
-  start_at: "",
-  end_at: "",
 };
 
 function Tasks() {
@@ -17,6 +16,7 @@ function Tasks() {
   const [error, setError] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     loadTasks();
@@ -56,13 +56,12 @@ function Tasks() {
           date: form.date,
           duration: form.duration ? Number(form.duration) : undefined,
           priority: form.priority,
-          start_at: form.start_at || undefined,
-          end_at: form.end_at || undefined,
         });
       }
 
       setForm(emptyForm);
       setEditingId(null);
+      setShowForm(false);
       loadTasks();
     } catch (err) {
       setError("No se pudo guardar la tarea");
@@ -77,19 +76,20 @@ function Tasks() {
       date: task.dueDate ? task.dueDate.slice(0, 10) : "",
       duration: task.duration || "",
       priority: task.priority.toLowerCase(),
-      start_at: "",
-      end_at: "",
     });
+    setShowForm(true);
   }
 
   function handleCancelEdit() {
     setEditingId(null);
     setForm(emptyForm);
+    setShowForm(false);
   }
 
-  async function handleStatusChange(taskId, newStatus) {
+  async function toggleDone(task) {
+    const isDone = task.status.toLowerCase() === "completada";
     try {
-      await tasksService.changeStatus(taskId, newStatus);
+      await tasksService.changeStatus(task.id, isDone ? "pendiente" : "completada");
       loadTasks();
     } catch (err) {
       setError("No se pudo cambiar el estado");
@@ -105,80 +105,110 @@ function Tasks() {
     }
   }
 
-  if (loading) {
-    return <p>Cargando tareas...</p>;
-  }
+  if (loading) return <p>Cargando tareas...</p>;
 
   return (
     <div>
-      <h1>Mis tareas</h1>
+      <div className="proximos-header">
+        <span>Mis tareas</span>
+        <button className="ver-link" onClick={() => setShowForm((prev) => !prev)}>
+          {showForm ? "Cancelar" : "+ Nueva"}
+        </button>
+      </div>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p style={{ color: "#e0697e" }}>{error}</p>}
 
-      <form onSubmit={handleSubmit}>
-        <input
-          name="title"
-          placeholder="Título"
-          value={form.title}
-          onChange={handleChange}
-          required
-        />
-        <textarea
-          name="description"
-          placeholder="Descripción"
-          value={form.description}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="date"
-          type="date"
-          value={form.date}
-          onChange={handleChange}
-          required
-        />
-        {!editingId && (
-          <input
-            name="duration"
-            type="number"
-            placeholder="Duración (minutos)"
-            value={form.duration}
-            onChange={handleChange}
-          />
-        )}
-        <select name="priority" value={form.priority} onChange={handleChange}>
-          <option value="alta">Alta</option>
-          <option value="media">Media</option>
-          <option value="baja">Baja</option>
-        </select>
+      {showForm && (
+        <div className="card" style={{ marginBottom: "16px" }}>
+          <form onSubmit={handleSubmit}>
+            <div className="input-group">
+              <label>Título</label>
+              <input name="title" value={form.title} onChange={handleChange} required />
+            </div>
+            <div className="input-group">
+              <label>Descripción</label>
+              <textarea
+                className="ritmo-textarea"
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="time-row">
+              <div className="time-field">
+                <label>Fecha</label>
+                <input type="date" name="date" value={form.date} onChange={handleChange} required />
+              </div>
+              {!editingId && (
+                <div className="time-field">
+                  <label>Duración (min)</label>
+                  <input type="number" name="duration" value={form.duration} onChange={handleChange} />
+                </div>
+              )}
+            </div>
+            <div className="input-group">
+              <label>Prioridad</label>
+              <select name="priority" value={form.priority} onChange={handleChange}>
+                <option value="alta">Alta</option>
+                <option value="media">Media</option>
+                <option value="baja">Baja</option>
+              </select>
+            </div>
 
-        <button type="submit">{editingId ? "Guardar cambios" : "Crear tarea"}</button>
-        {editingId && (
-          <button type="button" onClick={handleCancelEdit}>
-            Cancelar
-          </button>
-        )}
-      </form>
+            <button type="submit" className="btn-guardar">
+              {editingId ? "Guardar cambios" : "Crear tarea"}
+            </button>
+            {editingId && (
+              <button type="button" className="btn-secondary" onClick={handleCancelEdit}>
+                Cancelar edición
+              </button>
+            )}
+          </form>
+        </div>
+      )}
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>
-            <strong>{task.title}</strong> — {task.priority} — {task.status}
+      <div className="task-list">
+        {tasks.map((task) => {
+          const isDone = task.status.toLowerCase() === "completada";
+          return (
+            <div className={`task-item ${isDone ? "done" : ""}`} key={task.id}>
+              <div className="task-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="4" width="18" height="18" rx="3" />
+                  <line x1="8" y1="10" x2="16" y2="10" />
+                  <line x1="8" y1="14" x2="13" y2="14" />
+                </svg>
+              </div>
 
-            <select
-              value={task.status.toLowerCase().replace(" ", "_")}
-              onChange={(e) => handleStatusChange(task.id, e.target.value)}
-            >
-              <option value="pendiente">Pendiente</option>
-              <option value="en_proceso">En proceso</option>
-              <option value="completada">Completada</option>
-            </select>
+              <div className="task-info">
+                <h4>{task.title}</h4>
+                <p>
+                  {task.dueDate?.slice(0, 10)} · {task.priority}
+                  {task.status.toLowerCase() === "en proceso" && " · En proceso"}
+                </p>
+              </div>
 
-            <button onClick={() => handleEdit(task)}>Editar</button>
-            <button onClick={() => handleDelete(task.id)}>Eliminar</button>
-          </li>
-        ))}
-      </ul>
+              <button
+                className={`task-check ${isDone ? "done" : ""}`}
+                onClick={() => toggleDone(task)}
+                aria-label="Marcar como completada"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </button>
+
+              <button className="tx-edit" onClick={() => handleEdit(task)} aria-label="Editar">
+                ✎
+              </button>
+              <button className="tx-delete" onClick={() => handleDelete(task.id)} aria-label="Eliminar">
+                🗑
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
