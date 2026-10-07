@@ -19,18 +19,36 @@ function Dashboard() {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let active = true;
+
     async function fetchDashboard() {
       try {
         const result = await dashboardService.getDashboard();
-        setData(result);
-      } catch (err) {
-        setError("No se pudo cargar el dashboard");
+        if (active) {
+          setData(result);
+          setError("");
+        }
+      } catch {
+        if (active) setError("No se pudo cargar el dashboard");
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
 
+    function refreshWhenVisible() {
+      if (document.visibilityState === "visible") fetchDashboard();
+    }
+
     fetchDashboard();
+
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+
+    return () => {
+      active = false;
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
   }, []);
 
   const greeting = (
@@ -63,7 +81,7 @@ function Dashboard() {
   if (loading) return <>{greeting}<p>Cargando...</p></>;
   if (error) return <>{greeting}<p>{error}</p></>;
 
-  const { percentage } = data.todayRitmo;
+  const { percentage, tasks, habits, pending } = data.todayRitmo;
   const circumference = 175.93;
   const dashOffset = circumference - (circumference * percentage) / 100;
 
@@ -130,9 +148,11 @@ function Dashboard() {
           </div>
           <div className="ritmo-info">
             <h3>
-              {data.todayRitmo.completed} de {data.todayRitmo.total} tareas completadas
+              {data.todayRitmo.completed} de {data.todayRitmo.total} actividades completadas
             </h3>
-            <p className="sub"><span>♥</span> ¡Mantén tu ritmo!</p>
+            <p className="sub">
+              <span>♥</span> Tareas {tasks.completed}/{tasks.total} · Hábitos {habits.completed}/{habits.total} · {pending} pendientes
+            </p>
           </div>
         </div>
       </div>

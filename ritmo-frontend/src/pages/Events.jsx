@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import eventsService from "../services/events.service";
 import MobileItemDetails from "../components/MobileItemDetails";
+import DateCalendar from "../components/DateCalendar";
+import TimePicker from "../components/TimePicker";
 import "../styles/eventos.css";
 
 const emptyForm = {
@@ -41,6 +43,7 @@ function Events() {
   function handleChange(event) {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setError("");
   }
 
   function openCreateForm() {
@@ -51,6 +54,16 @@ function Events() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (!form.event_date) {
+      setError("Selecciona una fecha para el evento");
+      return;
+    }
+
+    if (!form.event_time) {
+      setError("Selecciona una hora para el evento");
+      return;
+    }
 
     const payload = {
       title: form.title,
@@ -69,6 +82,7 @@ function Events() {
       }
 
       setForm(emptyForm);
+      setError("");
       setEditingId(null);
       setShowForm(false);
       loadEvents();
@@ -155,6 +169,7 @@ function Events() {
                 ✕
               </button>
             </div>
+            {error && <p className="modal-form-error" role="alert">{error}</p>}
             <form onSubmit={handleSubmit}>
             <div className="input-group">
               <label>Título</label>
@@ -164,15 +179,21 @@ function Events() {
               <label>Descripción (opcional)</label>
               <textarea className="ritmo-textarea" name="description" value={form.description} onChange={handleChange} />
             </div>
+            <DateCalendar
+              name="event_date"
+              value={form.event_date}
+              onChange={handleChange}
+              label="Fecha"
+              required
+            />
             <div className="time-row">
-              <div className="time-field">
-                <label>Fecha</label>
-                <input type="date" name="event_date" value={form.event_date} onChange={handleChange} required />
-              </div>
-              <div className="time-field">
-                <label>Hora</label>
-                <input type="time" name="event_time" value={form.event_time} onChange={handleChange} required />
-              </div>
+              <TimePicker
+                name="event_time"
+                value={form.event_time}
+                onChange={handleChange}
+                label="Hora"
+                required
+              />
             </div>
             <div className="time-row">
               <div className="time-field">

@@ -75,10 +75,10 @@ async function findAllByUser(userId) {
 	return mapTasksFromDatabase(rows);
 }
 
-async function findTodayStatsByUser(userId) {
+async function findTodayStatsByUser(userId, today) {
 	const [rows] = await pool.query(
-		"SELECT COUNT(*) AS total, COALESCE(SUM(LOWER(status) = 'completada'), 0) AS completed FROM tasks WHERE user_id = ? AND due_date = CURDATE() AND deleted_at IS NULL",
-		[userId],
+		"SELECT COUNT(*) AS total, COALESCE(SUM(LOWER(TRIM(status)) = 'completada'), 0) AS completed FROM tasks WHERE user_id = ? AND due_date >= ? AND due_date < DATE_ADD(?, INTERVAL 1 DAY) AND deleted_at IS NULL",
+		[userId, today, today],
 	);
 
 	return {
@@ -87,10 +87,10 @@ async function findTodayStatsByUser(userId) {
 	};
 }
 
-async function findUpcomingByUser(userId) {
+async function findUpcomingByUser(userId, today) {
 	const [rows] = await pool.query(
-		"SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE user_id = ? AND due_date >= CURDATE() AND LOWER(status) != 'completada' AND deleted_at IS NULL ORDER BY due_date ASC",
-		[userId],
+		"SELECT id, user_id AS userId, title, description, due_date AS dueDate, duration, start_at AS startAt, end_at AS endAt, priority, status, creation_date AS creationDate FROM tasks WHERE user_id = ? AND due_date >= ? AND LOWER(TRIM(status)) != 'completada' AND deleted_at IS NULL ORDER BY due_date ASC",
+		[userId, today],
 	);
 
 	return mapTasksFromDatabase(rows);

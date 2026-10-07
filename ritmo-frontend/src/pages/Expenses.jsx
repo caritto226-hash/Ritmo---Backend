@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import expensesService from "../services/expenses.service";
 import MobileItemDetails from "../components/MobileItemDetails";
+import DateCalendar from "../components/DateCalendar";
 import "../styles/finanzas.css";
 
 const emptyForm = { concept: "", category: "", amount: "", expense_date: "", notes: "" };
@@ -284,6 +285,7 @@ function Expenses() {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {error && <p className="modal-form-error" role="alert">{error}</p>}
           <div className="field-group">
             <label>Concepto</label>
             <input name="concept" value={form.concept} onChange={handleChange} required />
@@ -296,7 +298,7 @@ function Expenses() {
             <label>Valor (COP)</label>
             <input
               type="text"
-              inputMode="numeric"
+              inputMode="text"
               name="amount"
               value={form.amount}
               onChange={handleAmountChange}
@@ -318,10 +320,14 @@ function Expenses() {
             />
             <span className="field-hint">COP sin decimales. Positivo para ingresos; negativo para gastos.</span>
           </div>
-          <div className="field-group">
-            <label>Fecha</label>
-            <input type="date" name="expense_date" value={form.expense_date} onChange={handleChange} />
-          </div>
+          <DateCalendar
+            key={`${modalOpen}-${form.expense_date || "empty"}`}
+            name="expense_date"
+            value={form.expense_date}
+            onChange={handleChange}
+            label="Fecha"
+            onClear={() => handleChange({ target: { name: "expense_date", value: "" } })}
+          />
           <div className="field-group">
             <label>Notas</label>
             <textarea name="notes" value={form.notes} onChange={handleChange} />

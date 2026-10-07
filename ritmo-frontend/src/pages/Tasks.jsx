@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import tasksService from "../services/tasks.service";
 import MobileItemDetails from "../components/MobileItemDetails";
+import DateCalendar from "../components/DateCalendar";
 import "../styles/tareas.css";
 
 const emptyForm = {
@@ -38,6 +39,7 @@ function Tasks() {
   function handleChange(event) {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+    setError("");
   }
 
   function openCreateForm() {
@@ -48,6 +50,11 @@ function Tasks() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (!form.date) {
+      setError("Selecciona una fecha para la tarea");
+      return;
+    }
 
     try {
       if (editingId) {
@@ -68,6 +75,7 @@ function Tasks() {
       }
 
       setForm(emptyForm);
+      setError("");
       setEditingId(null);
       setShowForm(false);
       loadTasks();
@@ -161,6 +169,7 @@ function Tasks() {
               <label>Título</label>
               <input name="title" value={form.title} onChange={handleChange} required />
             </div>
+            {error && <p className="modal-form-error" role="alert">{error}</p>}
             <div className="input-group">
               <label>Descripción</label>
               <textarea
@@ -171,18 +180,21 @@ function Tasks() {
                 required
               />
             </div>
-            <div className="time-row">
-              <div className="time-field">
-                <label>Fecha</label>
-                <input type="date" name="date" value={form.date} onChange={handleChange} required />
-              </div>
-              {!editingId && (
+            <DateCalendar
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+              label="Fecha"
+              required
+            />
+            {!editingId && (
+              <div className="time-row">
                 <div className="time-field">
                   <label>Duración (min)</label>
                   <input type="number" name="duration" value={form.duration} onChange={handleChange} />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
             <div className="input-group">
               <label>Prioridad</label>
               <select name="priority" value={form.priority} onChange={handleChange}>

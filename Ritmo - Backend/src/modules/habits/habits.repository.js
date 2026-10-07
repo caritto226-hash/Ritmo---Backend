@@ -33,11 +33,23 @@ async function findAllByUser(userId) {
 
 async function findPendingTodayByUser(userId) {
 	const [rows] = await pool.query(
-		"SELECT id, user_id AS userId, name, frequency, goal, status, creation_date AS creationDate FROM habits WHERE user_id = ? AND status = 'pendiente' AND deleted_at IS NULL ORDER BY creation_date ASC",
+		"SELECT id, user_id AS userId, name, frequency, goal, status, creation_date AS creationDate FROM habits WHERE user_id = ? AND LOWER(TRIM(status)) = 'pendiente' AND deleted_at IS NULL ORDER BY creation_date ASC",
 		[userId],
 	);
 
 	return rows;
+}
+
+async function findTodayStatsByUser(userId) {
+	const [rows] = await pool.query(
+		"SELECT COUNT(*) AS total, COALESCE(SUM(LOWER(TRIM(status)) = 'completado'), 0) AS completed FROM habits WHERE user_id = ? AND deleted_at IS NULL",
+		[userId],
+	);
+
+	return {
+		completed: Number(rows[0].completed),
+		total: Number(rows[0].total),
+	};
 }
 
 async function findByIdAndUser(habitId, userId) {
@@ -97,6 +109,7 @@ module.exports = {
 	create,
 	findAllByUser,
 	findPendingTodayByUser,
+	findTodayStatsByUser,
 	findByIdAndUser,
 	update,
 	updateStatus,

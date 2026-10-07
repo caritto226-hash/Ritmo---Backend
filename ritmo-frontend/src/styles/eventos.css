@@ -13,9 +13,10 @@
   align-items: center;
   gap: 14px;
   background: var(--surface-primary);
-  border-radius: var(--radius, 20px);
-  padding: 14px 16px;
-  box-shadow: 0 2px 16px rgba(0,0,0,.05);
+  border: var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: var(--card-padding);
+  box-shadow: var(--shadow-card);
 }
 
 .event-date-badge {
@@ -30,13 +31,13 @@
   flex-shrink: 0;
 }
 .event-date-badge .day {
-  font-size: 16px;
+  font-size: var(--type-label);
   font-weight: 800;
   color: var(--accent-solid);
   line-height: 1;
 }
 .event-date-badge .month {
-  font-size: 10px;
+  font-size: var(--type-caption);
   font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -44,12 +45,12 @@
 
 .event-info { flex: 1; }
 .event-info h4 {
-  font-size: 14px;
+  font-size: var(--type-title);
   font-weight: 700;
   color: var(--text-primary);
 }
 .event-info p {
-  font-size: 12px;
+  font-size: var(--type-supporting);
   color: var(--text-secondary);
   margin-top: 2px;
 }
@@ -63,6 +64,10 @@
 .event-empty {
   text-align: center;
   color: var(--text-secondary);
-  font-size: 13px;
+  font-size: var(--type-supporting);
   padding: 24px 12px;
+}
+
+@media (max-width: 600px) {
+  .event-info h4 { font-size: var(--type-body); }
 }

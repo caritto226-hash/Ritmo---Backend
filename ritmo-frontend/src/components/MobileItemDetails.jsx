@@ -43,9 +43,9 @@ function ActionButton({ type, label, onClick }) {
         gap: "2px",
         px: "3px",
         py: "5px",
-        borderRadius: "var(--radius-sm)",
+        borderRadius: "var(--radius-control)",
         color: type === "delete" ? "#e0697e" : "var(--text-muted)",
-        fontSize: 10,
+        fontSize: "var(--type-caption)",
         fontWeight: 600,
         lineHeight: 1.2,
         textTransform: "none",
@@ -72,10 +72,12 @@ function MobileItemDetails({ item, title, details, onClose, onDuplicate, onEdit,
             maxWidth: 520,
             maxHeight: "min(78dvh, 640px)",
             mx: "auto",
-            borderRadius: "24px 24px 0 0",
+            border: "1px solid var(--surface-border)",
+            borderBottom: 0,
+            borderRadius: "var(--radius-card) var(--radius-card) 0 0",
             bgcolor: "var(--surface-primary)",
             color: "var(--text-primary)",
-            boxShadow: "0 -12px 40px rgba(23, 28, 45, .2)",
+            boxShadow: "0 -4px 16px rgb(29 43 68 / 6%)",
             overflow: "hidden",
           },
         },
@@ -102,17 +104,17 @@ function MobileItemDetails({ item, title, details, onClose, onDuplicate, onEdit,
           />
           <Typography
             component="h2"
-            sx={{ color: "var(--text-primary)", fontSize: 16, fontWeight: 700, mb: 1.5 }}
+            sx={{ color: "var(--text-primary)", fontSize: "var(--type-title)", fontWeight: 700, mb: 1.5 }}
           >
             {title}
           </Typography>
           <Stack spacing={1.25}>
             {details.filter((detail) => detail.value !== "" && detail.value != null).map((detail) => (
               <Box key={detail.label}>
-                <Typography sx={{ color: "var(--text-secondary)", fontSize: 11, fontWeight: 600 }}>
+                <Typography sx={{ color: "var(--text-secondary)", fontSize: "var(--type-caption)", fontWeight: 600 }}>
                   {detail.label}
                 </Typography>
-                <Typography sx={{ color: "var(--text-primary)", fontSize: 14, overflowWrap: "anywhere" }}>
+                <Typography sx={{ color: "var(--text-primary)", fontSize: "var(--type-body)", overflowWrap: "anywhere" }}>
                   {detail.value}
                 </Typography>
               </Box>
@@ -127,9 +129,15 @@ function MobileItemDetails({ item, title, details, onClose, onDuplicate, onEdit,
           sx={{
             flex: "0 0 auto",
             justifyContent: "space-between",
+            mx: 1.5,
+            mt: 1,
+            mb: "max(12px, env(safe-area-inset-bottom, 12px))",
             px: 0.5,
-            pt: 0.5,
-            pb: "max(12px, env(safe-area-inset-bottom, 0px))",
+            py: 0.5,
+            border: "1px solid var(--surface-border)",
+            borderRadius: "999px",
+            bgcolor: "var(--surface-primary)",
+            boxShadow: "var(--shadow-raised)",
           }}
         >
           <ActionButton type="duplicate" label="Duplicar" onClick={onDuplicate} />

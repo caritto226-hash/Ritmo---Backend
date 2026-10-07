@@ -5,17 +5,20 @@ const expensesRepository = require('../expenses/expenses.repository');
 
 async function getDashboard(userId) {
 	validateUserId(userId);
+	const today = getDateInTimeZone(new Date(), 'America/Bogota');
 
-	const [todayStats, upcomingTasks, pendingHabits, upcomingEvents, recentExpenses] = await Promise.all([
-		tasksRepository.findTodayStatsByUser(userId),
-		tasksRepository.findUpcomingByUser(userId),
+	const [todayTaskStats, todayHabitStats, upcomingTasks, pendingHabits, upcomingEvents, recentExpenses] = await Promise.all([
+		tasksRepository.findTodayStatsByUser(userId, today),
+		habitsRepository.findTodayStatsByUser(userId),
+		tasksRepository.findUpcomingByUser(userId, today),
 		habitsRepository.findPendingTodayByUser(userId),
 		eventsRepository.findUpcomingByUser(userId),
 		expensesRepository.findRecentByUser(userId),
 	]);
 
-	const completed = Number(todayStats.completed);
-	const total = Number(todayStats.total);
+	const completed = Number(todayTaskStats.completed) + Number(todayHabitStats.completed);
+	const total = Number(todayTaskStats.total) + Number(todayHabitStats.total);
+	const pending = total - completed;
 	const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
 
 	const datedItems = [
@@ -45,10 +48,31 @@ async function getDashboard(userId) {
 		todayRitmo: {
 			completed,
 			total,
+			pending,
 			percentage,
+			tasks: {
+				completed: Number(todayTaskStats.completed),
+				total: Number(todayTaskStats.total),
+			},
+			habits: {
+				completed: Number(todayHabitStats.completed),
+				total: Number(todayHabitStats.total),
+			},
 		},
 		upcoming: [...habits, ...datedItems],
 	};
+}
+
+function getDateInTimeZone(date, timeZone) {
+	const parts = new Intl.DateTimeFormat('en-CA', {
+		timeZone,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+	}).formatToParts(date);
+	const dateParts = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+
+	return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
 }
 
 function validateUserId(userId) {
@@ -61,4 +85,5 @@ function validateUserId(userId) {
 
 module.exports = {
 	getDashboard,
+	getDateInTimeZone,
 };

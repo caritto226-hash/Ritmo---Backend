@@ -55,6 +55,36 @@
   /* Geometría */
   --radius: 20px;
   --radius-sm: 12px;
+  --radius-card: 16px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
+
+  /* Espaciado */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --screen-gutter: 16px;
+  --card-padding: 16px;
+
+  /* Superficies y movimiento */
+  --border-subtle: 1px solid rgb(29 43 68 / 8%);
+  --shadow-card: 0 1px 3px rgb(29 43 68 / 6%);
+  --shadow-raised: 0 4px 16px rgb(29 43 68 / 6%);
+  --motion-fast: 150ms ease;
+
+  /* Escala tipográfica responsiva: móvil primero */
+  --type-display: 32px;
+  --type-headline: 24px;
+  --type-title: 18px;
+  --type-body: 15px;
+  --type-input: 16px;
+  --type-supporting: 14px;
+  --type-label: 13px;
+  --type-caption: 12px;
+  --type-metric: 24px;
 
   /* Alias retro-compatibles (usados por módulos heredados) */
   --navy: var(--text-primary);
@@ -88,6 +118,20 @@
   --app-bg-gradient: linear-gradient(160deg, #1a1a2e 0%, #16213e 72%, #0f3460 100%);
 }
 
+@media (min-width: 768px) {
+  :root {
+    --screen-gutter: 24px;
+    --card-padding: 24px;
+    --type-display: 40px;
+    --type-headline: 30px;
+    --type-title: 20px;
+    --type-body: 16px;
+    --type-supporting: 15px;
+    --type-label: 14px;
+    --type-metric: 28px;
+  }
+}
+
 
 
 /* ── BODY  ── */
@@ -116,7 +160,8 @@ body:has(.main-container) {
 .card, .ritmo-card, .motiv-card, .header-btn, .notif-btn,
 .input-wrapper input, input, .item-icon, .qa-btn,
 .bottom-nav, .side-menu, .calendar-cell, .tx-item, .summary-card {
-  transition: background .3s, color .3s, border-color .3s, box-shadow .3s;
+  transition: background var(--motion-fast), color var(--motion-fast),
+    border-color var(--motion-fast), box-shadow var(--motion-fast);
 }
 
 [data-theme="dark"] .card,
@@ -126,7 +171,7 @@ body:has(.main-container) {
   backdrop-filter: var(--surface-blur);
   -webkit-backdrop-filter: var(--surface-blur);
   border: 1px solid var(--surface-border);
-  box-shadow: 0 8px 30px rgba(0,0,0,.35);
+  box-shadow: 0 4px 16px rgba(0,0,0,.16);
 }
 
 [data-theme="dark"] .header-btn,

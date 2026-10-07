@@ -4,9 +4,10 @@
 
 .calendar-panel {
   background: var(--surface-primary);
-  border-radius: var(--radius,20px);
-  padding: 16px;
-  box-shadow: 0 2px 16px rgba(0,0,0,.06);
+  border: var(--border-subtle);
+  border-radius: var(--radius-card);
+  padding: var(--card-padding);
+  box-shadow: var(--shadow-card);
 }
 .calendar-panel .calendar-cell {
   aspect-ratio: 1;

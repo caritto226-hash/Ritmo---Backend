@@ -276,7 +276,14 @@ Resumen agregado del usuario autenticado.
 ```json
 {
   "data": {
-    "todayRitmo": { "completed": 3, "total": 5, "percentage": 60 },
+    "todayRitmo": {
+      "completed": 3,
+      "total": 5,
+      "pending": 2,
+      "percentage": 60,
+      "tasks": { "completed": 2, "total": 3 },
+      "habits": { "completed": 1, "total": 2 }
+    },
     "upcoming": [
       { "type": "habit", "id": 1, "name": "Leer", "status": "pendiente" },
       { "type": "task", "id": 8, "title": "Informe", "date": "2026-09-30T05:00:00.000Z" },
@@ -286,6 +293,7 @@ Resumen agregado del usuario autenticado.
   }
 }
 ```
+`todayRitmo` suma las tareas con fecha de hoy en `America/Bogota` y los hábitos activos; `completed` y `pending` indican su distribución por estado. `tasks` y `habits` exponen el desglose incluido en esos totales.
 
 ---
 
