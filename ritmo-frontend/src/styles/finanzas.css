@@ -7,11 +7,26 @@
   padding: 20px; box-shadow: 0 2px 16px rgba(0,0,0,.06);
   text-align: center;
 }
+.finance-heading { margin-bottom: 18px; }
+.finance-heading h1 {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+.finance-heading p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.4;
+  margin-top: 4px;
+}
 .summary-card .balance-label { font-size: 13px; font-weight: 700; color: var(--text-secondary); }
-.summary-card .balance-amount { font-size: 30px; font-weight: 800; color: var(--text-primary); margin: 4px 0 14px; }
+.summary-card .balance-amount { font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 4px 0 14px; }
+.summary-card .balance-amount.balance-positive { color: var(--text-primary); }
+.summary-card .balance-amount.balance-negative { color: #e0697e; }
 .summary-row { display: flex; justify-content: space-around; gap: 10px; }
 .summary-pill {
-  flex: 1; padding: 12px; border-radius: 14px; background: var(--surface-secondary);
+  flex: 1; padding: 12px; border-radius: 14px; background: var(--surface-tercy);
   display: flex; flex-direction: column; align-items: center; gap: 2px;
 }
 .summary-pill .lbl { font-size: 11px; color: var(--text-secondary); font-weight: 700; }
@@ -38,6 +53,12 @@
 .tx-amount.neg { color: #e0697e; }
 .tx-amount.pos { color: #4caf83; }
 
+@media (max-width: 600px) {
+  .summary-card { padding: 20px 16px; }
+  .summary-row { gap: 12px; }
+  .summary-pill { padding: 12px 8px; }
+}
+
 
 
 
@@ -54,8 +75,9 @@
 .tx-empty {
   text-align: center;
   color: var(--text-secondary);
-  font-size: 13px;
-  padding: 24px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 28px 18px;
 }
 
 /* --- Acciones editar/eliminar dentro de cada tx-item --- */
@@ -75,7 +97,7 @@
 .tx-edit, .tx-delete {
   width: 30px; height: 30px;
   border: none; border-radius: 10px;
-  background: var(--surface-secondary);
+  background: var(--surface-quaternary);
   color: var(--text-secondary);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
@@ -86,69 +108,13 @@
 
 .icon-ingreso { color: #4caf83; }
 
-/* --- Overlay y Modal --- */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.45);
-  opacity: 0; pointer-events: none;
-  transition: opacity .2s ease;
-  z-index: 40;
-}
-.modal-overlay.open { opacity: 1; pointer-events: auto; }
-
-.modal {
-  position: fixed;
-  left: 50%; bottom: 0;
-  transform: translate(-50%, 100%);
-  width: 100%; max-width: 420px;
-  background: var(--surface-primary);
-  border-radius: 24px 24px 0 0;
-  padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
-  box-shadow: 0 -8px 30px rgba(0,0,0,.18);
-  transition: transform .25s ease, opacity .2s ease, visibility 0s linear .2s;
-  z-index: 41;
-  max-height: 88vh;
-  overflow-y: auto;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-.modal.open {
-  transform: translate(-50%, 0);
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transition: transform .25s ease, opacity .2s ease, visibility 0s linear 0s;
-}
-
-@media (min-width: 480px) {
-  .modal {
-    left: 50%; top: 50%; bottom: auto;
-    transform: translate(-50%, calc(-50% + 12px));
-    border-radius: 24px;
-  }
-  .modal.open { transform: translate(-50%, -50%); }
-}
-
-.modal-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
-}
-.modal-header h3 { font-size: 17px; font-weight: 800; color: var(--text-primary); }
-.modal-close {
-  width: 32px; height: 32px; border: none; border-radius: 10px;
-  background: var(--surface-secondary); color: var(--text-secondary);
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
-}
-.modal-close svg { width: 16px; height: 16px; }
-
 .field-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
 .field-group label { font-size: 12px; font-weight: 700; color: var(--text-secondary); }
 .field-group input,
 .field-group select,
 .field-group textarea {
   border: 1.5px solid var(--surface-secondary);
-  background: var(--surface-secondary);
+  background: var(--surface-tercy);
   border-radius: 12px;
   padding: 10px 12px;
   font-size: 14px;
@@ -168,14 +134,4 @@
   font-size: 11px; color: #e0697e; min-height: 14px;
 }
 
-.btn-guardar {
-  width: 100%;
-  padding: 13px;
-  border: none; border-radius: 14px;
-  background: var(--accent-solid);
-  color: #fff;
-  font-size: 14px; font-weight: 800;
-  cursor: pointer;
-  margin-top: 4px;
-}
 .btn-guardar:active { transform: scale(.98); }

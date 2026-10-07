@@ -31,13 +31,13 @@ function validateCreateExpense(req, res, next) {
 		return next(error);
 	}
 
-	if (amount === undefined || amount === null || typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
-		const error = new Error('El monto es obligatorio y debe ser un número positivo');
+	if (amount === undefined || amount === null || typeof amount !== 'number' || !Number.isFinite(amount) || amount === 0) {
+		const error = new Error('El monto es obligatorio y debe ser diferente de cero');
 		error.statusCode = 400;
 		return next(error);
 	}
 
-	if (!Number.isInteger((amount * 100)) || amount <= 0) {
+	if (!hasAtMostTwoDecimals(amount)) {
 		const error = new Error('El monto debe tener máximo dos decimales');
 		error.statusCode = 400;
 		return next(error);
@@ -101,13 +101,13 @@ function validateUpdateExpense(req, res, next) {
 	}
 
 	if (amount !== undefined) {
-		if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
-			const error = new Error('El monto debe ser un número positivo');
+		if (typeof amount !== 'number' || !Number.isFinite(amount) || amount === 0) {
+			const error = new Error('El monto debe ser diferente de cero');
 			error.statusCode = 400;
 			return next(error);
 		}
 
-		if (!Number.isInteger(amount * 100)) {
+		if (!hasAtMostTwoDecimals(amount)) {
 			const error = new Error('El monto debe tener máximo dos decimales');
 			error.statusCode = 400;
 			return next(error);
@@ -144,6 +144,11 @@ function validateUpdateExpense(req, res, next) {
 
 	req.body = updateData;
 	return next();
+}
+
+function hasAtMostTwoDecimals(amount) {
+	const cents = amount * 100;
+	return Math.abs(cents - Math.round(cents)) <= Number.EPSILON * Math.max(1, Math.abs(cents)) * 4;
 }
 
 function isValidDateOnly(value) {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import eventsService from "../services/events.service";
+import MobileItemDetails from "../components/MobileItemDetails";
 import "../styles/eventos.css";
 
 const emptyForm = {
@@ -20,6 +21,7 @@ function Events() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
     loadEvents();
@@ -39,6 +41,12 @@ function Events() {
   function handleChange(event) {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function openCreateForm() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setShowForm(true);
   }
 
   async function handleSubmit(event) {
@@ -97,6 +105,30 @@ function Events() {
     }
   }
 
+  async function handleDuplicate(item) {
+    try {
+      await eventsService.create({
+        title: `${item.title.slice(0, 142)} (copia)`,
+        description: item.description || null,
+        event_date: item.eventDate ? item.eventDate.slice(0, 10) : "",
+        event_time: item.eventTime,
+        duration: Number(item.duration),
+        location: item.location || null,
+      });
+      setSelectedEvent(null);
+      await loadEvents();
+    } catch {
+      setError("No se pudo duplicar el evento");
+    }
+  }
+
+  async function handleDeleteSelectedEvent() {
+    if (!selectedEvent) return;
+    const id = selectedEvent.id;
+    setSelectedEvent(null);
+    await handleDelete(id);
+  }
+
   function dateParts(isoDate) {
     if (!isoDate) return { day: "--", month: "" };
     const date = new Date(isoDate);
@@ -109,16 +141,21 @@ function Events() {
     <div>
       <div className="proximos-header">
         <span>Mis eventos</span>
-        <button className="ver-link" onClick={() => setShowForm((prev) => !prev)}>
-          {showForm ? "Cancelar" : "+ Nuevo"}
-        </button>
       </div>
 
       {error && <p style={{ color: "#e0697e" }}>{error}</p>}
 
       {showForm && (
-        <div className="card" style={{ marginBottom: "16px" }}>
-          <form onSubmit={handleSubmit}>
+        <>
+          <div className="modal-overlay open" onClick={handleCancelEdit} />
+          <div className="modal open" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{editingId ? "Editar evento" : "Nuevo evento"}</h3>
+              <button type="button" className="modal-close" onClick={handleCancelEdit} aria-label="Cerrar formulario">
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSubmit}>
             <div className="input-group">
               <label>Título</label>
               <input name="title" value={form.title} onChange={handleChange} required />
@@ -156,12 +193,17 @@ function Events() {
                 Cancelar edición
               </button>
             )}
-          </form>
-        </div>
+            </form>
+          </div>
+        </>
       )}
 
       <div className="event-list">
-        {events.length === 0 && <p className="event-empty">Aún no tienes eventos programados</p>}
+        {events.length === 0 && (
+          <p className="event-empty">
+            Aún no tienes eventos. Registra el primero con el botón +.
+          </p>
+        )}
 
         {events.map((item) => {
           const { day, month } = dateParts(item.eventDate);
@@ -180,10 +222,55 @@ function Events() {
 
               <button className="tx-edit" onClick={() => handleEdit(item)}>✎</button>
               <button className="tx-delete" onClick={() => handleDelete(item.id)}>🗑</button>
+              <button
+                type="button"
+                className="mobile-row-open"
+                onClick={() => setSelectedEvent(item)}
+                aria-label={`Ver opciones de ${item.title}`}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
             </div>
           );
         })}
       </div>
+
+      <MobileItemDetails
+        item={selectedEvent}
+        title={selectedEvent?.title || ""}
+        details={selectedEvent ? [
+          { label: "Descripción", value: selectedEvent.description },
+          { label: "Fecha", value: selectedEvent.eventDate?.slice(0, 10) },
+          { label: "Hora", value: selectedEvent.eventTime },
+          { label: "Duración", value: `${selectedEvent.duration} min` },
+          { label: "Ubicación", value: selectedEvent.location },
+        ] : []}
+        onClose={() => setSelectedEvent(null)}
+        onDuplicate={() => handleDuplicate(selectedEvent)}
+        onEdit={() => {
+          const item = selectedEvent;
+          setSelectedEvent(null);
+          if (item) handleEdit(item);
+        }}
+        onDelete={handleDeleteSelectedEvent}
+      />
+
+      {!showForm && (
+        <button
+          type="button"
+          className="fab"
+          onClick={openCreateForm}
+          aria-label="Agregar evento"
+          title="Agregar evento"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

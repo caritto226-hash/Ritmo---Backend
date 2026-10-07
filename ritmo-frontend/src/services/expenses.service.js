@@ -5,6 +5,11 @@ async function getAll() {
   return response.data.data;
 }
 
+async function getMonthlySummary() {
+  const response = await api.get("/expenses/summary");
+  return response.data.data;
+}
+
 async function create(expenseData) {
   const response = await api.post("/expenses", expenseData);
   return response.data.data;
@@ -20,4 +25,4 @@ async function remove(id) {
   return response.data;
 }
 
-export default { getAll, create, update, remove };
+export default { getAll, getMonthlySummary, create, update, remove };

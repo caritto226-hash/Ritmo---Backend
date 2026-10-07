@@ -35,6 +35,22 @@ async function getExpenses(userId) {
 	return expensesRepository.findAllByUser(userId);
 }
 
+async function getMonthlySummary(userId) {
+	if (!Number.isInteger(userId) || userId <= 0) {
+		const error = new Error('El usuario autenticado no es válido');
+		error.statusCode = 401;
+		throw error;
+	}
+
+	const summary = await expensesRepository.getMonthlySummaryByUser(userId);
+
+	return {
+		income: Number(summary.income),
+		expenses: Number(summary.expenses),
+		balance: Number(summary.balance),
+	};
+}
+
 async function getExpenseById(expenseId, userId) {
 	if (!Number.isInteger(expenseId) || expenseId <= 0 || !Number.isInteger(userId) || userId <= 0) {
 		const error = new Error('Los identificadores de gasto y usuario no son válidos');
@@ -77,6 +93,7 @@ async function deleteExpense(expenseId, userId) {
 module.exports = {
 	createExpense,
 	getExpenses,
+	getMonthlySummary,
 	getExpenseById,
 	updateExpense,
 	deleteExpense,

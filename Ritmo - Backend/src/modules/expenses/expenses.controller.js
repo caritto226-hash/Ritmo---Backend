@@ -20,6 +20,16 @@ async function getExpenses(req, res, next) {
 	}
 }
 
+async function getMonthlySummary(req, res, next) {
+	try {
+		const summary = await expensesService.getMonthlySummary(req.user.id);
+
+		return res.status(200).json({ data: summary });
+	} catch (error) {
+		return next(error);
+	}
+}
+
 async function getExpenseById(req, res, next) {
 	try {
 		const expenseId = Number(req.params.id);
@@ -56,6 +66,7 @@ async function deleteExpense(req, res, next) {
 module.exports = {
 	createExpense,
 	getExpenses,
+	getMonthlySummary,
 	getExpenseById,
 	updateExpense,
 	deleteExpense,

@@ -32,6 +32,23 @@ async function findAllByUser(userId) {
 	return rows;
 }
 
+async function getMonthlySummaryByUser(userId) {
+	const [rows] = await pool.query(
+		`SELECT
+			COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END), 0) AS income,
+			COALESCE(SUM(CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END), 0) AS expenses,
+			COALESCE(SUM(amount), 0) AS balance
+		FROM expenses
+		WHERE user_id = ?
+			AND deleted_at IS NULL
+			AND expense_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
+			AND expense_date < DATE_ADD(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH)`,
+		[userId],
+	);
+
+	return rows[0];
+}
+
 async function findRecentByUser(userId) {
 	const [rows] = await pool.query(
 		"SELECT id, user_id AS userId, concept, category, amount, expense_date AS expenseDate, notes, created_at AS createdAt FROM expenses WHERE user_id = ? AND expense_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01') AND expense_date < DATE_ADD(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH) AND deleted_at IS NULL ORDER BY expense_date ASC, created_at ASC",
@@ -92,6 +109,7 @@ async function softDelete(expenseId, userId) {
 module.exports = {
 	create,
 	findAllByUser,
+	getMonthlySummaryByUser,
 	findRecentByUser,
 	findByIdAndUser,
 	update,

@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
     if (token) {
       // Por ahora solo confirmamos que existe un token.
       // Más adelante podemos decodificarlo para leer el rol.
-      setUser({ token });
+      setUser({ token, correo: "" });
     }
 
     setLoading(false);
@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
     const data = await authService.login(correo, contraseña);
 
     localStorage.setItem("ritmoToken", data.token);
-    setUser({ token: data.token });
+    setUser({ token: data.token, correo });
 
     return data;
   }

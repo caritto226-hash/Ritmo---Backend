@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import dashboardService from "../services/dashboard.service";
 import "../styles/dashboard.css";
 
+function formatCurrency(value) {
+  const amount = Number(value);
+  const formatted = Math.abs(amount).toLocaleString("es-CO", {
+    minimumFractionDigits: Number.isInteger(Math.abs(amount)) ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+  return `${amount < 0 ? "-$" : "$"}${formatted}`;
+}
+
 function Dashboard() {
+  const { theme, toggleTheme } = useOutletContext();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -23,16 +33,43 @@ function Dashboard() {
     fetchDashboard();
   }, []);
 
-  if (loading) return <p>Cargando...</p>;
-  if (error) return <p>{error}</p>;
+  const greeting = (
+    <div className="greeting dashboard-greeting">
+      <div>
+        <h1>Hola ✨</h1>
+        <p>¿Cómo va tu ritmo hoy?</p>
+      </div>
+      <button
+        type="button"
+        className="theme-toggle"
+        onClick={toggleTheme}
+        aria-label={theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"}
+        title={theme === "dark" ? "Activar modo claro" : "Activar modo oscuro"}
+      >
+        {theme === "dark" ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z" />
+          </svg>
+        )}
+      </button>
+    </div>
+  );
+
+  if (loading) return <>{greeting}<p>Cargando...</p></>;
+  if (error) return <>{greeting}<p>{error}</p></>;
 
   const { percentage } = data.todayRitmo;
   const circumference = 175.93;
   const dashOffset = circumference - (circumference * percentage) / 100;
 
-  function iconColorFor(type) {
-    if (type === "habit") return "purple";
-    if (type === "expense") return "green";
+  function iconColorFor(item) {
+    if (item.type === "habit") return "purple";
+    if (item.type === "expense") return Number(item.amount) < 0 ? "orange" : "green";
     return "orange";
   }
 
@@ -70,10 +107,7 @@ function Dashboard() {
         </defs>
       </svg>
 
-      <div className="greeting">
-        <h1>Hola ✨</h1>
-        <p>¿Cómo va tu ritmo hoy?</p>
-      </div>
+      {greeting}
 
       <div className="card">
         <div className="ritmo-card-header">
@@ -108,40 +142,27 @@ function Dashboard() {
         <div className="quick-actions">
           <Link to="/tasks" className="qa-item">
             <div className="qa-btn qa-tarea">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="16" />
-                <line x1="8" y1="12" x2="16" y2="12" />
-              </svg>
+              <img src="/tarea.png" alt="" />
             </div>
             <span className="qa-label">Tarea</span>
           </Link>
           <Link to="/habits" className="qa-item">
             <div className="qa-btn qa-habito">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+              <img src="/habito.png" alt="" />
             </div>
             <span className="qa-label">Hábito</span>
           </Link>
           <Link to="/expenses" className="qa-item">
             <div className="qa-btn qa-gasto">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-              </svg>
+              <img src="/finanzas.png" alt="" />
             </div>
-            <span className="qa-label">Gasto</span>
+            <span className="qa-label">Finanzas</span>
           </Link>
           <Link to="/events" className="qa-item">
             <div className="qa-btn qa-evento">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="3" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
+              <img src="/calendario.png" alt="" />
             </div>
-            <span className="qa-label">Evento</span>
+            <span className="qa-label">Calendario</span>
           </Link>
         </div>
       </div>
@@ -153,8 +174,8 @@ function Dashboard() {
         <div className="timeline">
           {data.upcoming.map((item) => (
             <div className="item" key={`${item.type}-${item.id}`}>
-              <span className={`item-dot ${iconColorFor(item.type)}`}></span>
-              <div className={`item-icon ${iconColorFor(item.type)}`}>
+              <span className={`item-dot ${iconColorFor(item)}`}></span>
+              <div className={`item-icon ${iconColorFor(item)}`}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   {iconFor(item.type)}
                 </svg>
@@ -163,7 +184,8 @@ function Dashboard() {
                 <h4>{item.title || item.name || item.concept}</h4>
                 <p>
                   {item.date && new Date(item.date).toLocaleDateString("es-CO")}
-                  {item.amount && ` · $${item.amount}`}
+                  {item.amount !== undefined && item.amount !== null &&
+                    ` · ${Number(item.amount) > 0 ? "+" : ""}${formatCurrency(item.amount)}`}
                 </p>
               </div>
             </div>

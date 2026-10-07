@@ -68,8 +68,64 @@
   width: 100%; padding: 16px; border: none; border-radius: 16px;
   background: var(--accent-gradient); color: #fff;
   font-size: 1rem; font-weight: 800; cursor: pointer;
-  box-shadow: 0 8px 20px rgba(135,90,182,.35);
+  box-shadow: 0 8px 20px rgb(29 35 56 / 34%);
 }
+
+/* ── FORMULARIOS MODALES ── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  z-index: 40;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.modal {
+  position: fixed;
+  left: 50%; bottom: 0;
+  transform: translate(-50%, 100%);
+  width: 100%; max-width: 420px;
+  background: var(--surface-primary);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 -8px 30px rgba(0,0,0,.18);
+  transition: transform .25s ease, opacity .2s ease, visibility 0s linear .2s;
+  z-index: 41;
+  max-height: 88vh;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.modal.open {
+  transform: translate(-50%, 0);
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: transform .25s ease, opacity .2s ease, visibility 0s linear 0s;
+}
+
+@media (min-width: 480px) {
+  .modal {
+    left: 50%; top: 50%; bottom: auto;
+    transform: translate(-50%, calc(-50% + 12px));
+    border-radius: 24px;
+  }
+  .modal.open { transform: translate(-50%, -50%); }
+}
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.modal-header h3 { font-size: 17px; font-weight: 800; color: var(--text-primary); }
+.modal-close {
+  width: 32px; height: 32px; border: none; border-radius: 10px;
+  background: var(--surface-secondary); color: var(--text-secondary);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.modal-close svg { width: 16px; height: 16px; }
 
 /* ── ICONOS ── */
 .icon {
@@ -152,167 +208,169 @@ input[aria-invalid="true"] {
     align-items: center;
 }
 
-/* ── QUICK ACTIONS ──
-   Compartido por dashboard.html, finanzas.html y nueva-tarea.html
-   (categorías). Por eso vive aquí y no en dashboard.css. ── */
+/* ── ACCIONES RÁPIDAS ── */
 .quick-actions {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-/*.qa-btn {
-  border-radius: var(--radius-sm);
-  padding: 14px 8px;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  cursor: pointer; border: none; font-family: inherit;
-  font-size: 12px; font-weight: 700; color: var(--navy);
-  transition: transform .15s, box-shadow .15s;
-  width: 76px; height: 76px;
-}*/
-.qa-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
-.qa-btn:active { transform: scale(.97); }
-.qa-btn svg { width: 22px; height: 22px; }
-/*.qa-tarea  { background: var(--orange-light); }
-.qa-habito { background: var(--purple-light); }
-.qa-gasto  { background: var(--green-light); }
-.qa-evento { background: var(--blue-light); }
-.qa-tarea  svg { color: var(--orange); }
-.qa-habito svg { color: var(--purple); }
-.qa-gasto  svg { color: var(--green); }
-.qa-evento svg { color: var(--blue); }*/
-
-
-/* Contenedor de la fila de acciones */
-.quick-actions {
-  display: flex;
-  justify-content: space-around; /* Distribuye los elementos uniformemente */
-  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(4px, 2.5vw, 12px);
 }
 
-/* El enlace completo que alinea todo verticalmente */
 .qa-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px; /* Espacio entre el botón y el texto de abajo */
+  gap: 6px;
   cursor: pointer;
+  min-width: 0;
+  text-decoration: none;
 }
 
-/* El botón físico (solo el círculo del icono) */
 .qa-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;  /* Ajusta el tamaño a tu gusto */
-  height: 50px;
-  border-radius: 50%; /* Botón completamente redondo */
-  background-color: #f0f0f0; /* Cambia por tus colores */
+  width: min(100%, 76px);
+  aspect-ratio: 1;
+  border-radius: 18px;
   transition: transform 0.2s ease;
 }
 
-.qa-btn svg {
-  width: 24px;
-  height: 24px;
+.qa-btn img {
+  width: 50%;
+  height: 50%;
+  object-fit: contain;
 }
 
-/* Efecto Hover para el botón */
-.qa-item:hover .qa-btn {
-  transform: scale(1.05);
+.qa-item:hover .qa-btn { transform: translateY(-2px); }
+.qa-item:active .qa-btn { transform: scale(.97); }
+.qa-item:focus-visible {
+  outline: 2px solid var(--accent-solid);
+  outline-offset: 4px;
+  border-radius: 12px;
 }
 
-/* Estilo de la etiqueta de texto */
 .qa-label {
-  font-size: 14px;
-  color: #333;
+  max-width: 100%;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
 }
 
-
-/* Tarjetas de iconos con explicación de efecto transparente se bloqueo con comentario el css anterior que aplicaba colores a cada categoría */
-.qa-tarea {
-  /* 1. Fondo blanco semitransparente */
-  background: rgba(255, 255, 255, 0.4); 
-
-  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
+.qa-tarea, .qa-habito, .qa-gasto, .qa-evento {
+  background: rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
-
-  /* 3. Borde sutil para simular el relieve del vidrio */
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.6);
-
-  /* 4. Sombra suave para dar profundidad tridimensional */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-
-  /* Estilos estructurales adicionales */
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 350px;
-  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+  box-shadow: 0 6px 20px rgba(31, 38, 135, 0.08);
+  color: #1a1a1a;
 }
 
-.qa-habito {
-  /* 1. Fondo blanco semitransparente */
-  background: rgba(255, 255, 255, 0.4); 
-
-  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
-
-  /* 3. Borde sutil para simular el relieve del vidrio */
-  border: 1px solid rgba(255, 255, 255, 0.6);
-
-  /* 4. Sombra suave para dar profundidad tridimensional */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-
-  /* Estilos estructurales adicionales */
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 350px;
-  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+@media (max-width: 360px) {
+  .qa-btn { border-radius: 15px; }
+  .qa-label { font-size: 11px; }
 }
 
-.qa-gasto {
-  /* 1. Fondo blanco semitransparente */
-  background: rgba(255, 255, 255, 0.4); 
-
-  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
-
-  /* 3. Borde sutil para simular el relieve del vidrio */
-  border: 1px solid rgba(255, 255, 255, 0.6);
-
-  /* 4. Sombra suave para dar profundidad tridimensional */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-
-  /* Estilos estructurales adicionales */
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 350px;
-  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+/* ── ELEMENTOS COMPARTIDOS ── */
+.card {
+  min-width: 0;
 }
 
-.qa-evento {
-  /* 1. Fondo blanco semitransparente */
-  background: rgba(255, 255, 255, 0.4); 
-
-  /* 2. El efecto de desenfoque en el fondo (La magia del cristal) */
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); /* Soporte para Safari */
-
-  /* 3. Borde sutil para simular el relieve del vidrio */
-  border: 1px solid rgba(255, 255, 255, 0.6);
-
-  /* 4. Sombra suave para dar profundidad tridimensional */
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-
-  /* Estilos estructurales adicionales */
-  border-radius: 16px;
-  padding: 24px;
-  max-width: 350px;
-  color: #1a1a1a; /* Texto oscuro para asegurar legibilidad */
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
 }
 
+@media (max-width: 600px) {
+  .card {
+    padding: 16px;
+    border-radius: 18px;
+  }
 
+  .btn-primary,
+  .btn-secondary,
+  .btn-guardar {
+    min-height: 48px;
+    font-size: 15px;
+  }
+
+  .task-item, .tx-item, .event-item {
+    gap: 10px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .task-info, .tx-info, .event-info, .item-info {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .tx-info { flex-basis: 0; }
+
+  .tx-amount {
+    white-space: nowrap;
+    font-size: 13px;
+  }
+
+  .tx-list .tx-item {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) 40px;
+    grid-template-areas:
+      "icon info arrow"
+      "icon amount arrow";
+    column-gap: 10px;
+    row-gap: 3px;
+  }
+
+  .tx-list .tx-item > .tx-icon { grid-area: icon; }
+  .tx-list .tx-item > .tx-info { grid-area: info; }
+  .tx-list .tx-item > .tx-amount {
+    grid-area: amount;
+    justify-self: start;
+  }
+  .tx-list .tx-item > .mobile-row-open { grid-area: arrow; }
+
+  .tx-actions { margin-left: 0; }
+
+  .task-item > .tx-edit,
+  .task-item > .tx-delete,
+  .tx-item .tx-actions,
+  .event-item > .tx-edit,
+  .event-item > .tx-delete {
+    display: none;
+  }
+
+  .tx-edit, .tx-delete {
+    width: 36px;
+    height: 36px;
+  }
+
+  .time-row { gap: 8px; }
+  .time-field { min-width: 0; }
+
+  .field-group input,
+  .field-group select,
+  .field-group textarea,
+  .input-group input,
+  .input-group select,
+  .input-group textarea,
+  .time-field input,
+  .time-field select,
+  .ritmo-textarea {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
 .icon-ar {
   width: 34px; 
   height: 34px; 
@@ -361,7 +419,7 @@ input[aria-invalid="true"] {
 .task-icon {
   width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  background: var(--surface-secondary);
+  background: var(--surface-quaternary);
 }
 .task-icon svg { width: 20px; height: 20px; color: var(--accent-solid); }
 .task-info { flex: 1; }
@@ -378,6 +436,30 @@ input[aria-invalid="true"] {
 .task-check svg { width: 14px; height: 14px; }
 .task-check.done { background: var(--accent-gradient); border-color: transparent; color: #fff; }
 .task-item.done .task-info h4 { text-decoration: line-through; color: var(--text-secondary); }
+
+.mobile-row-open {
+  display: none;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.mobile-row-open svg { width: 21px; height: 21px; }
+.mobile-row-open:focus-visible {
+  outline: 2px solid var(--accent-solid);
+  outline-offset: 1px;
+  border-radius: 50%;
+}
+
+@media (max-width: 600px) {
+  .mobile-row-open { display: flex; }
+}
 
 /* ── CALENDARIO (compartido) ── */
 .calendar-grid {
@@ -424,7 +506,7 @@ input[aria-invalid="true"] {
 }
 
 .ritmo-textarea {
-  width: 100%; min-height: 80px; padding: 12px;
+  width: 100%; min-height: 60px; padding: 12px;
   border: 1px solid var(--surface-border); border-radius: 12px;
   background: var(--surface-primary); color: var(--text-primary);
   font-family: inherit; font-size: 14px; resize: vertical;
@@ -432,7 +514,7 @@ input[aria-invalid="true"] {
 
 .time-row { display: flex; gap: 12px; }
 .time-field { flex: 1; }
-.time-field label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; display: block; font-weight: 600; }
+.time-field label { font-size: 12px; color: var(--azul-oscuro); margin-bottom: 6px; display: block; font-weight: 600; }
 .time-field select {
   width: 100%; padding: 10px; border-radius: 12px;
   border: 1px solid var(--surface-border); background: var(--surface-primary);

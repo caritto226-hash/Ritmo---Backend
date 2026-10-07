@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import habitsService from "../services/habits.service";
+import MobileItemDetails from "../components/MobileItemDetails";
 import "../styles/tareas.css";
 
 const emptyForm = { name: "", frequency: "", goal: "" };
@@ -11,6 +12,7 @@ function Habits() {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [selectedHabit, setSelectedHabit] = useState(null);
 
   useEffect(() => {
     loadHabits();
@@ -21,7 +23,16 @@ function Habits() {
       const data = await habitsService.getAll();
       setHabits(data);
     } catch (err) {
-      setError("No se pudieron cargar los hábitos");
+      if (err.response?.status === 401) {
+        setError("Tu sesión expiró o no es válida. Cierra sesión e inicia sesión de nuevo.");
+      } else if (!err.response) {
+        setError("No se pudo conectar con el servidor. Comprueba que el backend esté activo.");
+      } else {
+        setError(
+          err.response.data?.message ||
+            `No se pudieron cargar los hábitos (HTTP ${err.response.status})`,
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -30,6 +41,12 @@ function Habits() {
   function handleChange(event) {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  }
+
+  function openCreateForm() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setShowForm(true);
   }
 
   async function handleSubmit(event) {
@@ -88,22 +105,48 @@ function Habits() {
     }
   }
 
+  async function handleDuplicate(habit) {
+    try {
+      await habitsService.create({
+        name: `${habit.name.slice(0, 142)} (copia)`,
+        frequency: habit.frequency,
+        goal: habit.goal ?? null,
+      });
+      setSelectedHabit(null);
+      await loadHabits();
+    } catch {
+      setError("No se pudo duplicar el hábito");
+    }
+  }
+
+  async function handleDeleteSelectedHabit() {
+    if (!selectedHabit) return;
+    const id = selectedHabit.id;
+    setSelectedHabit(null);
+    await handleDelete(id);
+  }
+
   if (loading) return <p>Cargando hábitos...</p>;
 
   return (
     <div>
       <div className="proximos-header">
         <span>Mis hábitos</span>
-        <button className="ver-link" onClick={() => setShowForm((prev) => !prev)}>
-          {showForm ? "Cancelar" : "+ Nuevo"}
-        </button>
       </div>
 
       {error && <p style={{ color: "#e0697e" }}>{error}</p>}
 
       {showForm && (
-        <div className="card" style={{ marginBottom: "16px" }}>
-          <form onSubmit={handleSubmit}>
+        <>
+          <div className="modal-overlay open" onClick={handleCancelEdit} />
+          <div className="modal open" onClick={(event) => event.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{editingId ? "Editar hábito" : "Nuevo hábito"}</h3>
+              <button type="button" className="modal-close" onClick={handleCancelEdit} aria-label="Cerrar formulario">
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleSubmit}>
             <div className="input-group">
               <label>Nombre del hábito</label>
               <input name="name" value={form.name} onChange={handleChange} required />
@@ -125,11 +168,17 @@ function Habits() {
                 Cancelar edición
               </button>
             )}
-          </form>
-        </div>
+            </form>
+          </div>
+        </>
       )}
 
       <div className="task-list">
+        {habits.length === 0 && (
+          <p className="task-empty">
+            Aún no tienes hábitos. Registra el primero con el botón +.
+          </p>
+        )}
         {habits.map((habit) => {
           const isDone = habit.status === "completado";
           return (
@@ -157,10 +206,53 @@ function Habits() {
 
               <button className="tx-edit" onClick={() => handleEdit(habit)} aria-label="Editar">✎</button>
               <button className="tx-delete" onClick={() => handleDelete(habit.id)} aria-label="Eliminar">🗑</button>
+              <button
+                type="button"
+                className="mobile-row-open"
+                onClick={() => setSelectedHabit(habit)}
+                aria-label={`Ver opciones de ${habit.name}`}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </button>
             </div>
           );
         })}
       </div>
+
+      <MobileItemDetails
+        item={selectedHabit}
+        title={selectedHabit?.name || ""}
+        details={selectedHabit ? [
+          { label: "Frecuencia", value: selectedHabit.frequency },
+          { label: "Meta", value: selectedHabit.goal },
+          { label: "Estado", value: selectedHabit.status },
+        ] : []}
+        onClose={() => setSelectedHabit(null)}
+        onDuplicate={() => handleDuplicate(selectedHabit)}
+        onEdit={() => {
+          const habit = selectedHabit;
+          setSelectedHabit(null);
+          if (habit) handleEdit(habit);
+        }}
+        onDelete={handleDeleteSelectedHabit}
+      />
+
+      {!showForm && (
+        <button
+          type="button"
+          className="fab"
+          onClick={openCreateForm}
+          aria-label="Agregar hábito"
+          title="Agregar hábito"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19" />
+            <line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
