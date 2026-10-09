@@ -53,10 +53,24 @@ async function deleteEvent(req, res, next) {
 	}
 }
 
+async function changeStatus(req, res, next) {
+	try {
+		const event = await eventsService.changeStatus(
+			Number(req.params.id),
+			req.user.id,
+			req.body.status,
+		);
+		return res.status(200).json({ data: event });
+	} catch (error) {
+		return next(error);
+	}
+}
+
 module.exports = {
 	create,
 	getEvents,
 	getEventById,
 	update,
 	deleteEvent,
+	changeStatus,
 };

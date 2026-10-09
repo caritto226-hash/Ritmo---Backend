@@ -6,6 +6,8 @@ function validateCreateEvent(req, res, next) {
 		location,
 		event_time: eventTime,
 		duration,
+		categoryId,
+		recurrenceFrequency,
 	} = req.body || {};
 
 	if (typeof title !== 'string' || title.trim() === '') {
@@ -35,6 +37,12 @@ function validateCreateEvent(req, res, next) {
 	if (location !== undefined && location !== null && typeof location !== 'string') {
 		return next(createError('La ubicación debe ser un texto'));
 	}
+	if (categoryId !== undefined && categoryId !== null && !isValidId(categoryId)) {
+		return next(createError('categoryId debe ser un entero positivo'));
+	}
+	if (recurrenceFrequency !== undefined && recurrenceFrequency !== null && !isValidRecurrenceFrequency(recurrenceFrequency)) {
+		return next(createError('La frecuencia debe ser daily, weekly, monthly o yearly'));
+	}
 
 	req.body = {
 		title: title.trim(),
@@ -43,6 +51,8 @@ function validateCreateEvent(req, res, next) {
 		event_time: eventTime.trim(),
 		duration,
 		...(location !== undefined && location !== null ? { location } : { location: null }),
+		categoryId: categoryId ?? null,
+		recurrenceFrequency: recurrenceFrequency ?? null,
 	};
 
 	return next();
@@ -100,8 +110,21 @@ function validateUpdateEvent(req, res, next) {
 		if (data.location !== null && typeof data.location !== 'string') {
 			return next(createError('La ubicación debe ser un texto'));
 		}
-
 		updateData.location = data.location;
+	}
+
+	if (Object.prototype.hasOwnProperty.call(data, 'categoryId')) {
+		if (data.categoryId !== null && !isValidId(data.categoryId)) {
+			return next(createError('categoryId debe ser un entero positivo'));
+		}
+		updateData.categoryId = data.categoryId;
+	}
+
+	if (Object.prototype.hasOwnProperty.call(data, 'recurrenceFrequency')) {
+		if (data.recurrenceFrequency !== null && !isValidRecurrenceFrequency(data.recurrenceFrequency)) {
+			return next(createError('La frecuencia debe ser daily, weekly, monthly o yearly'));
+		}
+		updateData.recurrenceFrequency = data.recurrenceFrequency;
 	}
 
 	if (Object.keys(updateData).length === 0) {
@@ -110,6 +133,22 @@ function validateUpdateEvent(req, res, next) {
 
 	req.body = updateData;
 	return next();
+}
+
+function validateEventStatus(req, res, next) {
+	const { status } = req.body || {};
+	if (status !== 'realizado') {
+		return next(createError('El estado debe ser realizado'));
+	}
+	return next();
+}
+
+function isValidId(value) {
+	return Number.isInteger(value) && value > 0;
+}
+
+function isValidRecurrenceFrequency(value) {
+	return ['daily', 'weekly', 'monthly', 'yearly'].includes(value);
 }
 
 function isValidDateOnly(value) {
@@ -142,4 +181,5 @@ function createError(message) {
 module.exports = {
 	validateCreateEvent,
 	validateUpdateEvent,
+	validateEventStatus,
 };

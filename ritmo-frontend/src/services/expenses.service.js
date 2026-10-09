@@ -1,7 +1,9 @@
 import api from "./api";
 
-async function getAll() {
-  const response = await api.get("/expenses");
+async function getAll(categoryId) {
+  const response = await api.get("/expenses", {
+    params: categoryId ? { categoryId } : undefined,
+  });
   return response.data.data;
 }
 
@@ -25,4 +27,38 @@ async function remove(id) {
   return response.data;
 }
 
-export default { getAll, getMonthlySummary, create, update, remove };
+async function getRecurrenceReminders() {
+  const response = await api.get("/expenses/recurrences/reminders");
+  return response.data.data;
+}
+
+async function createRecurrence(recurrenceData) {
+  const response = await api.post("/expenses/recurrences", recurrenceData);
+  return response.data.data;
+}
+
+async function confirmRecurrenceOccurrence(occurrenceId, paidDate) {
+  const response = await api.patch(`/expenses/recurrences/occurrences/${occurrenceId}/confirm`, {
+    paidDate,
+  });
+  return response.data.data;
+}
+
+async function cancelRecurrence(recurrenceId, scope) {
+  const response = await api.delete(`/expenses/recurrences/${recurrenceId}`, {
+    params: { scope },
+  });
+  return response.data.data;
+}
+
+export default {
+  getAll,
+  getMonthlySummary,
+  create,
+  update,
+  remove,
+  getRecurrenceReminders,
+  createRecurrence,
+  confirmRecurrenceOccurrence,
+  cancelRecurrence,
+};

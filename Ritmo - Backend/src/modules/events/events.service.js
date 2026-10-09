@@ -1,4 +1,5 @@
 const eventsRepository = require('./events.repository');
+const categoriesRepository = require('../categories/categories.repository');
 
 async function createEvent(userId, eventData) {
 	validateUserId(userId);
@@ -10,6 +11,8 @@ async function createEvent(userId, eventData) {
 		location,
 		event_time: eventTime,
 		duration,
+		categoryId,
+		recurrenceFrequency,
 	} = eventData || {};
 
 	validateTitle(title, true);
@@ -18,6 +21,12 @@ async function createEvent(userId, eventData) {
 	validateDuration(duration, true);
 	validateOptionalText(description, 'La descripción');
 	validateOptionalText(location, 'La ubicación');
+	if (categoryId !== undefined && categoryId !== null) {
+		await validateEventCategory(categoryId, userId, Boolean(recurrenceFrequency));
+	}
+	if (recurrenceFrequency && (categoryId === undefined || categoryId === null)) {
+		throw badRequestError('Selecciona una categoría habilitada para recurrencias');
+	}
 
 	return eventsRepository.create({
 		userId,
@@ -28,6 +37,8 @@ async function createEvent(userId, eventData) {
 		status: 'programado',
 		eventTime: eventTime.trim(),
 		duration,
+		categoryId: categoryId ?? null,
+		recurrenceFrequency: recurrenceFrequency ?? null,
 	});
 }
 
@@ -51,6 +62,7 @@ async function getEventById(eventId, userId) {
 
 async function updateEvent(eventId, userId, eventData) {
 	validateIds(eventId, userId);
+	const currentEvent = await getEventById(eventId, userId);
 
 	const data = eventData || {};
 	const fields = {};
@@ -84,12 +96,30 @@ async function updateEvent(eventId, userId, eventData) {
 		validateDuration(data.duration, false);
 		fields.duration = data.duration;
 	}
-
-	const affectedRows = await eventsRepository.update(eventId, userId, fields);
-
-	if (affectedRows === 0) {
-		throw notFoundError();
+	if (Object.prototype.hasOwnProperty.call(data, 'categoryId')) {
+		const nextFrequency = Object.prototype.hasOwnProperty.call(data, 'recurrenceFrequency')
+			? data.recurrenceFrequency
+			: currentEvent.recurrenceFrequency;
+		if (data.categoryId !== currentEvent.categoryId && data.categoryId !== null) {
+			await validateEventCategory(data.categoryId, userId, Boolean(nextFrequency));
+		}
+		fields.categoryId = data.categoryId;
 	}
+	if (Object.prototype.hasOwnProperty.call(data, 'recurrenceFrequency')) {
+		if (data.recurrenceFrequency) {
+			const categoryId = data.categoryId ?? currentEvent.categoryId;
+			if (data.recurrenceFrequency !== currentEvent.recurrenceFrequency
+				|| categoryId !== currentEvent.categoryId) {
+				await validateEventCategory(categoryId, userId, true);
+			}
+			const recurrenceStartDate = data.event_date ?? String(currentEvent.eventDate).slice(0, 10);
+			fields.recurrenceAnchorDay = Number(recurrenceStartDate.slice(8, 10));
+			fields.recurrenceAnchorMonth = Number(recurrenceStartDate.slice(5, 7));
+		}
+		fields.recurrenceFrequency = data.recurrenceFrequency;
+	}
+
+	await eventsRepository.update(eventId, userId, fields);
 
 	return getEventById(eventId, userId);
 }
@@ -101,6 +131,30 @@ async function deleteEvent(eventId, userId) {
 
 	if (affectedRows === 0) {
 		throw notFoundError();
+	}
+}
+
+async function changeStatus(eventId, userId, status) {
+	validateIds(eventId, userId);
+	if (status !== 'realizado') {
+		throw badRequestError('El estado del evento no es válido');
+	}
+	await eventsRepository.updateStatus(eventId, userId, status);
+	return getEventById(eventId, userId);
+}
+
+async function validateEventCategory(categoryId, userId, requireRecurrence = false) {
+	if (!Number.isInteger(categoryId) || categoryId <= 0) {
+		throw badRequestError('Selecciona una categoría válida');
+	}
+	const category = await categoriesRepository.findByIdAndUser(categoryId, userId);
+	if (!category || category.module !== 'events') {
+		const error = new Error('Categoría de evento no encontrada');
+		error.statusCode = 404;
+		throw error;
+	}
+	if (requireRecurrence && !category.isRecurring) {
+		throw badRequestError('La categoría seleccionada no permite recurrencias');
 	}
 }
 
@@ -202,4 +256,5 @@ module.exports = {
 	getEventById,
 	updateEvent,
 	deleteEvent,
+	changeStatus,
 };

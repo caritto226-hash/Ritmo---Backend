@@ -1,7 +1,7 @@
 function validateCreateExpense(req, res, next) {
 	const {
 		concept,
-		category,
+		categoryId,
 		amount,
 		expense_date: expenseDate,
 		notes,
@@ -19,14 +19,8 @@ function validateCreateExpense(req, res, next) {
 		return next(error);
 	}
 
-	if (typeof category !== 'string' || category.trim() === '') {
-		const error = new Error('La categoría es obligatoria');
-		error.statusCode = 400;
-		return next(error);
-	}
-
-	if (category.trim().length > 45) {
-		const error = new Error('La categoría no puede superar los 45 caracteres');
+	if (!isValidCategoryId(categoryId)) {
+		const error = new Error('categoryId es obligatorio y debe ser un entero positivo');
 		error.statusCode = 400;
 		return next(error);
 	}
@@ -56,7 +50,7 @@ function validateCreateExpense(req, res, next) {
 	}
 
 	req.body.concept = concept.trim();
-	req.body.category = category.trim();
+	req.body.categoryId = categoryId;
 	req.body.amount = Number(amount);
 	req.body.expense_date = expenseDate === undefined || expenseDate === null ? new Date().toISOString().slice(0, 10) : expenseDate.trim();
 	req.body.notes = notes === undefined || notes === null ? null : notes.trim();
@@ -65,7 +59,7 @@ function validateCreateExpense(req, res, next) {
 }
 
 function validateUpdateExpense(req, res, next) {
-	const { concept, category, amount, expense_date: expenseDate, notes } = req.body || {};
+	const { concept, categoryId, amount, expense_date: expenseDate, notes } = req.body || {};
 	const updateData = {};
 
 	if (concept !== undefined) {
@@ -84,20 +78,14 @@ function validateUpdateExpense(req, res, next) {
 		updateData.concept = concept.trim();
 	}
 
-	if (category !== undefined) {
-		if (typeof category !== 'string' || category.trim() === '') {
-			const error = new Error('La categoría debe ser un texto no vacío');
+	if (categoryId !== undefined) {
+		if (!isValidCategoryId(categoryId)) {
+			const error = new Error('categoryId debe ser un entero positivo');
 			error.statusCode = 400;
 			return next(error);
 		}
 
-		if (category.trim().length > 45) {
-			const error = new Error('La categoría no puede superar los 45 caracteres');
-			error.statusCode = 400;
-			return next(error);
-		}
-
-		updateData.category = category.trim();
+		updateData.categoryId = categoryId;
 	}
 
 	if (amount !== undefined) {
@@ -146,6 +134,26 @@ function validateUpdateExpense(req, res, next) {
 	return next();
 }
 
+function validateExpenseCategoryFilter(req, res, next) {
+	const { categoryId } = req.query;
+
+	if (categoryId !== undefined && !isValidCategoryIdQuery(categoryId)) {
+		const error = new Error('categoryId debe ser un entero positivo');
+		error.statusCode = 400;
+		return next(error);
+	}
+
+	return next();
+}
+
+function isValidCategoryId(value) {
+	return Number.isInteger(value) && value > 0;
+}
+
+function isValidCategoryIdQuery(value) {
+	return typeof value === 'string' && /^\d+$/.test(value) && Number.isSafeInteger(Number(value)) && Number(value) > 0;
+}
+
 function hasAtMostTwoDecimals(amount) {
 	const cents = amount * 100;
 	return Math.abs(cents - Math.round(cents)) <= Number.EPSILON * Math.max(1, Math.abs(cents)) * 4;
@@ -165,4 +173,5 @@ function isValidDateOnly(value) {
 module.exports = {
 	validateCreateExpense,
 	validateUpdateExpense,
+	validateExpenseCategoryFilter,
 };

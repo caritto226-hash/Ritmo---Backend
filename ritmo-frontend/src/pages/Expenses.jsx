@@ -1,11 +1,33 @@
 import { useState, useEffect } from "react";
 import expensesService from "../services/expenses.service";
+import categoriesService from "../services/categories.service";
+import CategoryIconBadge from "../components/CategoryIconBadge";
+import CategorySelect from "../components/CategorySelect";
+import CategoryManager from "../components/CategoryManager";
+import FinanceRecurrenceReminders from "../components/FinanceRecurrenceReminders";
 import MobileItemDetails from "../components/MobileItemDetails";
 import DateCalendar from "../components/DateCalendar";
 import "../styles/finanzas.css";
 
-const emptyForm = { concept: "", category: "", amount: "", expense_date: "", notes: "" };
+const emptyForm = { concept: "", categoryId: "", amount: "", expense_date: "", notes: "" };
 const emptySummary = { income: 0, expenses: 0, balance: 0 };
+const recurrenceFrequencies = [
+  ["daily", "Diaria"],
+  ["weekly", "Semanal"],
+  ["monthly", "Mensual"],
+  ["yearly", "Anual"],
+];
+
+function getTodayDate() {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Bogota",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const dateParts = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
+}
 
 function parseCopAmount(value) {
   const text = String(value).trim();
@@ -36,32 +58,53 @@ function formatCurrency(value) {
 
 function Expenses() {
   const [expenses, setExpenses] = useState([]);
+  const [recurrenceReminders, setRecurrenceReminders] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [summary, setSummary] = useState(emptySummary);
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
+  const [editingExpenseCategory, setEditingExpenseCategory] = useState(null);
   const [amountTouched, setAmountTouched] = useState(false);
   const [originalEditingAmount, setOriginalEditingAmount] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [categoryManagerOpen, setCategoryManagerOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [recurrenceEnabled, setRecurrenceEnabled] = useState(false);
+  const [recurrenceFrequency, setRecurrenceFrequency] = useState("monthly");
 
   useEffect(() => {
-    loadExpenses();
+    loadPage();
   }, []);
 
-  async function loadExpenses() {
+  async function loadPage(filter = categoryFilter) {
     try {
-      const [data, monthlySummary] = await Promise.all([
-        expensesService.getAll(),
+      const [data, monthlySummary, availableCategories, reminders] = await Promise.all([
+        expensesService.getAll(filter || undefined),
         expensesService.getMonthlySummary(),
+        categoriesService.getAll(),
+        expensesService.getRecurrenceReminders(),
       ]);
       setExpenses(data);
+      setRecurrenceReminders(reminders);
       setSummary(monthlySummary);
+      setCategories(availableCategories);
     } catch (err) {
-      setError("No se pudieron cargar las finanzas");
+      setError(err.response?.data?.message || "No se pudieron cargar las finanzas");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadExpenses(filter = categoryFilter) {
+    try {
+      setExpenses(await expensesService.getAll(filter || undefined));
+      setError("");
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudieron filtrar los movimientos");
     }
   }
 
@@ -69,11 +112,20 @@ function Expenses() {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
     setError("");
+    setSuccess("");
   }
 
   function openCreateModal() {
     setEditingId(null);
-    setForm(emptyForm);
+    setEditingExpenseCategory(null);
+    setError("");
+    setSuccess("");
+    setRecurrenceEnabled(false);
+    setRecurrenceFrequency("monthly");
+    setForm({
+      ...emptyForm,
+      categoryId: categories[0] ? String(categories[0].id) : "",
+    });
     setAmountTouched(false);
     setOriginalEditingAmount(null);
     setModalOpen(true);
@@ -81,9 +133,13 @@ function Expenses() {
 
   function openEditModal(item) {
     setEditingId(item.id);
+    setEditingExpenseCategory(item.category);
+    setError("");
+    setSuccess("");
+    setRecurrenceEnabled(false);
     setForm({
       concept: item.concept,
-      category: item.category,
+      categoryId: String(item.categoryId),
       amount: formatCopInput(item.amount),
       expense_date: item.expenseDate ? item.expenseDate.slice(0, 10) : "",
       notes: item.notes || "",
@@ -103,10 +159,16 @@ function Expenses() {
     }));
     setAmountTouched(true);
     setError("");
+    setSuccess("");
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    if (!form.categoryId) {
+      setError("Selecciona una categoría para el movimiento.");
+      return;
+    }
 
     const amount = editingId && !amountTouched
       ? originalEditingAmount
@@ -118,14 +180,25 @@ function Expenses() {
 
     const payload = {
       concept: form.concept,
-      category: form.category,
+      categoryId: Number(form.categoryId),
       amount,
       expense_date: form.expense_date || undefined,
       notes: form.notes || null,
     };
 
     try {
-      if (editingId) {
+      if (recurrenceEnabled && !editingId) {
+        const startDate = form.expense_date || getTodayDate();
+        await expensesService.createRecurrence({
+          concept: form.concept,
+          categoryId: Number(form.categoryId),
+          amount,
+          frequency: recurrenceFrequency,
+          startDate,
+          notes: form.notes || null,
+        });
+        setSuccess("Recordatorio recurrente creado. El movimiento se registrará cuando confirmes el pago o ingreso.");
+      } else if (editingId) {
         await expensesService.update(editingId, payload);
       } else {
         await expensesService.create(payload);
@@ -133,18 +206,45 @@ function Expenses() {
 
       setModalOpen(false);
       setError("");
-      await loadExpenses();
+      await loadPage();
     } catch (err) {
-      setError("No se pudo guardar el movimiento");
+      setError(err.response?.data?.message || "No se pudo guardar el movimiento");
+    }
+  }
+
+  async function confirmRecurrenceReminder(reminder, paidDate) {
+    try {
+      await expensesService.confirmRecurrenceOccurrence(reminder.occurrenceId, paidDate);
+      setSuccess(`${Number(reminder.amount) > 0 ? "Ingreso recibido" : "Pago realizado"} y agregado a movimientos.`);
+      await loadPage();
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo confirmar el recordatorio");
+    }
+  }
+
+  async function cancelRecurrenceReminder(reminder, scope) {
+    const confirmationMessage = scope === "future"
+      ? `¿Detener las próximas fechas de "${reminder.concept}"? Los movimientos históricos y los recordatorios vencidos se conservarán.`
+      : `¿Eliminar todos los recordatorios de "${reminder.concept}"? Los movimientos históricos ya registrados se conservarán.`;
+    if (!window.confirm(confirmationMessage)) return;
+
+    try {
+      await expensesService.cancelRecurrence(reminder.recurrenceId, scope);
+      setSuccess(scope === "future"
+        ? "Se detuvieron las próximas fechas. Los recordatorios vencidos siguen disponibles."
+        : "Se eliminó la recurrencia y se conservaron los movimientos históricos.");
+      await loadPage();
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo eliminar la recurrencia");
     }
   }
 
   async function handleDelete(id) {
     try {
       await expensesService.remove(id);
-      loadExpenses();
+      await loadPage();
     } catch (err) {
-      setError("No se pudo eliminar el movimiento");
+      setError(err.response?.data?.message || "No se pudo eliminar el movimiento");
     }
   }
 
@@ -152,13 +252,13 @@ function Expenses() {
     try {
       await expensesService.create({
         concept: `${expense.concept.slice(0, 92)} (copia)`,
-        category: expense.category,
+        categoryId: expense.categoryId,
         amount: Number(expense.amount),
         expense_date: expense.expenseDate ? expense.expenseDate.slice(0, 10) : undefined,
         notes: expense.notes || null,
       });
       setSelectedExpense(null);
-      await loadExpenses();
+      await loadPage();
     } catch {
       setError("No se pudo duplicar el movimiento");
     }
@@ -169,6 +269,10 @@ function Expenses() {
     const id = selectedExpense.id;
     setSelectedExpense(null);
     await handleDelete(id);
+  }
+
+  function openCategoryManager() {
+    setCategoryManagerOpen(true);
   }
 
   if (loading) return <p>Cargando finanzas...</p>;
@@ -197,11 +301,35 @@ function Expenses() {
         </div>
       </div>
 
-      <div className="proximos-header" style={{ marginTop: "16px" }}>
-        <span>Movimientos</span>
+      <div className="finance-list-tools">
+        <label className="finance-category-filter">
+          <span>Filtrar por categoría</span>
+          <CategorySelect
+            categories={categories}
+            value={categoryFilter}
+            onChange={(value) => {
+              setCategoryFilter(value);
+              loadExpenses(value);
+            }}
+            includeAllLabel="Todas las categorías"
+            className="category-filter-select"
+            onCreateCategory={openCategoryManager}
+          />
+        </label>
       </div>
 
       {error && <p style={{ color: "#e0697e" }}>{error}</p>}
+      {success && <p className="finance-success" role="status">{success}</p>}
+
+      <FinanceRecurrenceReminders
+        reminders={recurrenceReminders}
+        onConfirm={confirmRecurrenceReminder}
+        onCancel={cancelRecurrenceReminder}
+      />
+
+      <div className="proximos-header finance-movements-header" style={{ marginTop: "16px" }}>
+        <span>Movimientos</span>
+      </div>
 
       <div className="tx-list">
         {expenses.length === 0 && (
@@ -212,14 +340,18 @@ function Expenses() {
 
         {expenses.map((item) => (
           <div className="tx-item" key={item.id}>
-            <div className="tx-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="9" />
-              </svg>
-            </div>
+            <CategoryIconBadge
+              category={item.category}
+              size={22}
+              className="tx-icon"
+            />
             <div className="tx-info">
               <h4>{item.concept}</h4>
-              <p>{item.category} · {item.expenseDate?.slice(0, 10)} · {Number(item.amount) > 0 ? "Ingreso" : "Gasto"}</p>
+              <p>
+                {item.category?.name} · {item.expenseDate?.slice(0, 10)}
+                {item.scheduledDate ? ` · Programado: ${item.scheduledDate.slice(0, 10)}` : ""}
+                {" · "}{Number(item.amount) > 0 ? "Ingreso" : "Gasto"}
+              </p>
             </div>
             <span className={`tx-amount ${Number(item.amount) < 0 ? "neg" : "pos"}`}>
               {Number(item.amount) > 0 ? "+" : ""}{formatCurrency(item.amount)}
@@ -246,10 +378,11 @@ function Expenses() {
         item={selectedExpense}
         title={selectedExpense?.concept || ""}
         details={selectedExpense ? [
-          { label: "Categoría", value: selectedExpense.category },
+          { label: "Categoría", value: selectedExpense.category?.name },
           { label: "Tipo", value: Number(selectedExpense.amount) > 0 ? "Ingreso" : "Gasto" },
           { label: "Valor", value: `${Number(selectedExpense.amount) > 0 ? "+" : ""}${formatCurrency(selectedExpense.amount)}` },
           { label: "Fecha", value: selectedExpense.expenseDate?.slice(0, 10) },
+          ...(selectedExpense.scheduledDate ? [{ label: "Fecha programada", value: selectedExpense.scheduledDate.slice(0, 10) }] : []),
           { label: "Notas", value: selectedExpense.notes },
         ] : []}
         onClose={() => setSelectedExpense(null)}
@@ -262,7 +395,7 @@ function Expenses() {
         onDelete={handleDeleteSelectedExpense}
       />
 
-      {!modalOpen && (
+      {!modalOpen && !categoryManagerOpen && (
         <button
           type="button"
           className="fab"
@@ -277,7 +410,10 @@ function Expenses() {
         </button>
       )}
 
-      <div className={`modal-overlay ${modalOpen ? "open" : ""}`} onClick={() => setModalOpen(false)} />
+      <div
+        className={`modal-overlay ${modalOpen ? "open" : ""}`}
+        onClick={() => setModalOpen(false)}
+      />
       <div className={`modal ${modalOpen ? "open" : ""}`}>
         <div className="modal-header">
           <h3>{editingId ? "Editar movimiento" : "Nuevo movimiento"}</h3>
@@ -292,7 +428,19 @@ function Expenses() {
           </div>
           <div className="field-group">
             <label>Categoría</label>
-            <input name="category" value={form.category} onChange={handleChange} required />
+            <CategorySelect
+              categories={categories}
+              value={form.categoryId}
+              onChange={(categoryId) => {
+                const selectedCategory = categories.find((category) => String(category.id) === categoryId);
+                setForm((previous) => ({ ...previous, categoryId }));
+                if (!selectedCategory?.isRecurring) {
+                  setRecurrenceEnabled(false);
+                }
+              }}
+              inactiveCategory={editingExpenseCategory}
+              onCreateCategory={openCategoryManager}
+            />
           </div>
           <div className="field-group">
             <label>Valor (COP)</label>
@@ -328,6 +476,41 @@ function Expenses() {
             label="Fecha"
             onClear={() => handleChange({ target: { name: "expense_date", value: "" } })}
           />
+          {!editingId && categories.find((category) => String(category.id) === form.categoryId)?.isRecurring && (
+            <div className="recurrence-form-section">
+              <label className="recurrence-enable-option">
+                <input
+                  type="checkbox"
+                  checked={recurrenceEnabled}
+                  onChange={(event) => {
+                    const enabled = event.target.checked;
+                    setRecurrenceEnabled(enabled);
+                    if (enabled && !form.expense_date) {
+                      setForm((previous) => ({ ...previous, expense_date: getTodayDate() }));
+                    }
+                  }}
+                />
+                <span>Programar como pago o ingreso fijo</span>
+              </label>
+              {recurrenceEnabled && (
+                <div className="field-group recurrence-frequency-field">
+                  <label htmlFor="expense-recurrence-frequency">Frecuencia del recordatorio</label>
+                  <select
+                    id="expense-recurrence-frequency"
+                    value={recurrenceFrequency}
+                    onChange={(event) => setRecurrenceFrequency(event.target.value)}
+                  >
+                    {recurrenceFrequencies.map(([frequency, label]) => (
+                      <option value={frequency} key={frequency}>{label}</option>
+                    ))}
+                  </select>
+                  <span className="field-hint">
+                    La primera fecha será la fecha indicada arriba. El movimiento se crea solo al confirmarlo.
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
           <div className="field-group">
             <label>Notas</label>
             <textarea name="notes" value={form.notes} onChange={handleChange} />
@@ -338,6 +521,22 @@ function Expenses() {
           </button>
         </form>
       </div>
+
+      {categoryManagerOpen && (
+        <CategoryManager
+          module="finance"
+          categories={categories}
+          onClose={() => setCategoryManagerOpen(false)}
+          onChanged={async () => {
+            if (categoryFilter) {
+              setCategoryFilter("");
+              await loadPage("");
+            } else {
+              await loadPage();
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

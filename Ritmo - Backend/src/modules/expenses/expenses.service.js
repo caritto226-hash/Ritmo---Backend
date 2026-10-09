@@ -1,4 +1,5 @@
 const expensesRepository = require('./expenses.repository');
+const categoriesRepository = require('../categories/categories.repository');
 
 async function createExpense(userId, expenseData) {
 	if (!Number.isInteger(userId) || userId <= 0) {
@@ -9,30 +10,36 @@ async function createExpense(userId, expenseData) {
 
 	const {
 		concept,
-		category,
+		categoryId,
 		amount,
 		expense_date: expenseDate,
 		notes,
 	} = expenseData;
 
+	await validateFinanceCategory(categoryId, userId);
+
 	return expensesRepository.create({
 		userId,
 		concept,
-		category,
+		categoryId,
 		amount,
 		expenseDate: expenseDate || new Date().toISOString().slice(0, 10),
 		notes: notes ?? null,
 	});
 }
 
-async function getExpenses(userId) {
+async function getExpenses(userId, categoryId) {
 	if (!Number.isInteger(userId) || userId <= 0) {
 		const error = new Error('El usuario autenticado no es válido');
 		error.statusCode = 401;
 		throw error;
 	}
 
-	return expensesRepository.findAllByUser(userId);
+	if (categoryId !== undefined && (!Number.isInteger(categoryId) || categoryId <= 0)) {
+		throw badRequestError('El identificador de categoría no es válido');
+	}
+
+	return expensesRepository.findAllByUser(userId, categoryId);
 }
 
 async function getMonthlySummary(userId) {
@@ -70,10 +77,14 @@ async function getExpenseById(expenseId, userId) {
 }
 
 async function updateExpense(expenseId, userId, data) {
-	await getExpenseById(expenseId, userId);
+	const currentExpense = await getExpenseById(expenseId, userId);
+	if (Object.prototype.hasOwnProperty.call(data, 'categoryId')
+		&& data.categoryId !== currentExpense.categoryId) {
+		await validateFinanceCategory(data.categoryId, userId);
+	}
 
 	const dataFiltrada = {};
-	const allowedFields = ['concept', 'category', 'amount', 'expense_date', 'notes'];
+	const allowedFields = ['concept', 'categoryId', 'amount', 'expense_date', 'notes'];
 
 	for (const field of allowedFields) {
 		if (Object.prototype.hasOwnProperty.call(data, field)) {
@@ -88,6 +99,25 @@ async function deleteExpense(expenseId, userId) {
 	await getExpenseById(expenseId, userId);
 
 	await expensesRepository.softDelete(expenseId, userId);
+}
+
+async function validateFinanceCategory(categoryId, userId) {
+	if (!Number.isInteger(categoryId) || categoryId <= 0) {
+		throw badRequestError('El identificador de categoría no es válido');
+	}
+
+	const category = await categoriesRepository.findByIdAndUser(categoryId, userId);
+	if (!category || category.module !== 'finance') {
+		const error = new Error('Categoría financiera no encontrada');
+		error.statusCode = 404;
+		throw error;
+	}
+}
+
+function badRequestError(message) {
+	const error = new Error(message);
+	error.statusCode = 400;
+	return error;
 }
 
 module.exports = {

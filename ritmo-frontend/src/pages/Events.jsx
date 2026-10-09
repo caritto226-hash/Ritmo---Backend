@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import eventsService from "../services/events.service";
+import categoriesService from "../services/categories.service";
 import MobileItemDetails from "../components/MobileItemDetails";
 import DateCalendar from "../components/DateCalendar";
 import TimePicker from "../components/TimePicker";
+import CategorySelect from "../components/CategorySelect";
+import CategoryManager from "../components/CategoryManager";
+import CategoryIconBadge from "../components/CategoryIconBadge";
 import "../styles/eventos.css";
 
 const emptyForm = {
@@ -12,18 +16,28 @@ const emptyForm = {
   event_time: "",
   duration: "",
   location: "",
+  categoryId: "",
+  recurrenceFrequency: "",
 };
+const recurrenceFrequencies = [
+  ["daily", "Diaria"],
+  ["weekly", "Semanal"],
+  ["monthly", "Mensual"],
+  ["yearly", "Anual"],
+];
 
 const monthNames = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
 
 function Events() {
   const [events, setEvents] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
 
   useEffect(() => {
     loadEvents();
@@ -31,10 +45,14 @@ function Events() {
 
   async function loadEvents() {
     try {
-      const data = await eventsService.getAll();
+      const [data, availableCategories] = await Promise.all([
+        eventsService.getAll(),
+        categoriesService.getAll("events"),
+      ]);
       setEvents(data);
+      setCategories(availableCategories);
     } catch (err) {
-      setError("No se pudieron cargar los eventos");
+      setError(err.response?.data?.message || "No se pudieron cargar los eventos");
     } finally {
       setLoading(false);
     }
@@ -48,7 +66,7 @@ function Events() {
 
   function openCreateForm() {
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({ ...emptyForm, categoryId: categories[0] ? String(categories[0].id) : "" });
     setShowForm(true);
   }
 
@@ -72,6 +90,8 @@ function Events() {
       event_time: form.event_time,
       duration: Number(form.duration),
       location: form.location || null,
+      categoryId: form.categoryId ? Number(form.categoryId) : null,
+      recurrenceFrequency: form.recurrenceFrequency || null,
     };
 
     try {
@@ -87,7 +107,7 @@ function Events() {
       setShowForm(false);
       loadEvents();
     } catch (err) {
-      setError("No se pudo guardar el evento");
+      setError(err.response?.data?.message || "No se pudo guardar el evento");
     }
   }
 
@@ -100,6 +120,8 @@ function Events() {
       event_time: item.eventTime || "",
       duration: item.duration || "",
       location: item.location || "",
+      categoryId: item.categoryId ? String(item.categoryId) : "",
+      recurrenceFrequency: item.recurrenceFrequency || "",
     });
     setShowForm(true);
   }
@@ -115,7 +137,16 @@ function Events() {
       await eventsService.remove(id);
       loadEvents();
     } catch (err) {
-      setError("No se pudo eliminar el evento");
+      setError(err.response?.data?.message || "No se pudo eliminar el evento");
+    }
+  }
+
+  async function markEventDone(item) {
+    try {
+      await eventsService.changeStatus(item.id, "realizado");
+      await loadEvents();
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo marcar el evento como realizado");
     }
   }
 
@@ -128,11 +159,12 @@ function Events() {
         event_time: item.eventTime,
         duration: Number(item.duration),
         location: item.location || null,
+        categoryId: item.categoryId ?? null,
       });
       setSelectedEvent(null);
       await loadEvents();
-    } catch {
-      setError("No se pudo duplicar el evento");
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo duplicar el evento");
     }
   }
 
@@ -152,6 +184,7 @@ function Events() {
   if (loading) return <p>Cargando eventos...</p>;
 
   return (
+    <>
     <div>
       <div className="proximos-header">
         <span>Mis eventos</span>
@@ -175,6 +208,39 @@ function Events() {
               <label>Título</label>
               <input name="title" value={form.title} onChange={handleChange} required />
             </div>
+            <div className="input-group">
+              <label>Categoría</label>
+              <CategorySelect
+                categories={categories}
+                value={form.categoryId}
+                inactiveCategory={editingId ? events.find((event) => event.id === editingId)?.category : null}
+                onChange={(categoryId) => setForm((previous) => ({
+                  ...previous,
+                  categoryId,
+                  recurrenceFrequency: categories.find((category) => String(category.id) === categoryId)?.isRecurring
+                    ? previous.recurrenceFrequency
+                    : "",
+                }))}
+                onCreateCategory={() => setShowCategoryManager(true)}
+              />
+            </div>
+            {(categories.find((category) => String(category.id) === form.categoryId)?.isRecurring
+              || Boolean(form.recurrenceFrequency)) && (
+              <div className="input-group">
+                <label htmlFor="event-recurrence-frequency">Repetir evento</label>
+                <select
+                  id="event-recurrence-frequency"
+                  name="recurrenceFrequency"
+                  value={form.recurrenceFrequency}
+                  onChange={handleChange}
+                >
+                  <option value="">No repetir</option>
+                  {recurrenceFrequencies.map(([value, label]) => (
+                    <option value={value} key={value}>{label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <div className="input-group">
               <label>Descripción (opcional)</label>
               <textarea className="ritmo-textarea" name="description" value={form.description} onChange={handleChange} />
@@ -236,8 +302,15 @@ function Events() {
               </div>
 
               <div className="event-info">
-                <h4>{item.title}</h4>
+                <h4>
+                  <CategoryIconBadge category={item.category} size={18} />
+                  {item.title}
+                </h4>
                 <p>{item.eventTime} · {item.duration} min</p>
+                {item.category?.name && <p>{item.category.name}</p>}
+                {item.status === "realizado"
+                  ? <p>Realizado</p>
+                  : <button type="button" className="btn-secondary" onClick={() => markEventDone(item)}>Realizado</button>}
                 {item.location && <p className="event-location">📍 {item.location}</p>}
               </div>
 
@@ -267,6 +340,9 @@ function Events() {
           { label: "Hora", value: selectedEvent.eventTime },
           { label: "Duración", value: `${selectedEvent.duration} min` },
           { label: "Ubicación", value: selectedEvent.location },
+          { label: "Categoría", value: selectedEvent.category?.name || "Sin categoría" },
+          { label: "Estado", value: selectedEvent.status },
+          { label: "Recurrencia", value: selectedEvent.recurrenceFrequency || "No recurrente" },
         ] : []}
         onClose={() => setSelectedEvent(null)}
         onDuplicate={() => handleDuplicate(selectedEvent)}
@@ -293,6 +369,19 @@ function Events() {
         </button>
       )}
     </div>
+
+    {showCategoryManager && (
+      <CategoryManager
+        module="events"
+        categories={categories}
+        onClose={() => setShowCategoryManager(false)}
+        onChanged={async () => {
+          setCategories(await categoriesService.getAll("events"));
+          await loadEvents();
+        }}
+      />
+    )}
+    </>
   );
 }
 

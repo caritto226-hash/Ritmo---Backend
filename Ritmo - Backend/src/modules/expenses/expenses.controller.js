@@ -12,7 +12,10 @@ async function createExpense(req, res, next) {
 
 async function getExpenses(req, res, next) {
 	try {
-		const expenses = await expensesService.getExpenses(req.user.id);
+		const categoryId = req.query.categoryId === undefined
+			? undefined
+			: Number(req.query.categoryId);
+		const expenses = await expensesService.getExpenses(req.user.id, categoryId);
 
 		return res.status(200).json({ data: expenses });
 	} catch (error) {

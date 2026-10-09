@@ -143,6 +143,13 @@
     object-fit: contain; 
 }
 
+.category-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 /* ── INPUTS Y FORMULARIOS ── */
 .input-group {
     text-align: left;
@@ -451,11 +458,12 @@ button, a, input, select, textarea {
   box-shadow: var(--shadow-card);
 }
 .task-icon {
-  width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: 50px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: var(--surface-quaternary);
 }
 .task-icon svg { width: 20px; height: 20px; color: var(--accent-solid); }
+.task-icon.category-colored-icon svg { color: inherit; }
 .task-info { flex: 1; }
 .task-info h4 { font-size: var(--type-title); font-weight: 700; color: var(--text-primary); }
 .task-info p { font-size: var(--type-supporting);color: var(--text-secondary); margin-top: 2px; }

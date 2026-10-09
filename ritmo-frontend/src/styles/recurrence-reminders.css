@@ -1,0 +1,218 @@
+.finance-reminders {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.finance-reminders-header h2 {
+  color: var(--text-primary);
+  font-size: var(--type-title);
+  font-weight: 800;
+}
+
+.finance-reminders-header p {
+  margin-top: 3px;
+  color: var(--text-secondary);
+  font-size: var(--type-supporting);
+}
+
+.finance-reminder-list {
+  display: grid;
+  gap: 10px;
+}
+
+.finance-reminder {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  background: var(--surface-primary);
+  box-shadow: var(--shadow-card);
+}
+
+.finance-reminder.overdue {
+  border-color: color-mix(in srgb, #d83d4d 40%, var(--surface-border));
+  background: color-mix(in srgb, #d83d4d 5%, var(--surface-primary));
+}
+
+.finance-reminder-icon {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.finance-reminder-copy {
+  min-width: 0;
+}
+
+.finance-reminder-title-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.finance-reminder-title-row h3 {
+  overflow: hidden;
+  color: var(--text-primary);
+  font-size: var(--type-supporting);
+  font-weight: 700;
+  text-overflow: ellipsis;
+}
+
+.finance-reminder-urgent-dot {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  border-radius: 50%;
+  background: #d83d4d;
+  box-shadow: 0 0 0 3px rgb(216 61 77 / 13%);
+}
+
+.finance-reminder-copy p {
+  margin-top: 3px;
+  color: var(--text-secondary);
+  font-size: var(--type-caption);
+  line-height: 1.4;
+}
+
+.finance-reminder-copy > strong {
+  display: block;
+  margin-top: 5px;
+  font-size: var(--type-supporting);
+}
+
+.finance-reminder-copy > strong.income { color: #25875e; }
+.finance-reminder-copy > strong.expense { color: #d45a6c; }
+
+.finance-reminder-actions {
+  display: flex;
+  max-width: 270px;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.finance-reminder-date {
+  display: grid;
+  gap: 3px;
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.finance-reminder-date input {
+  width: 132px;
+  min-height: 36px;
+  padding: 5px 7px;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-control);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--type-caption);
+}
+
+.finance-reminder-confirm,
+.finance-reminder-cancel-actions button {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  font-size: var(--type-caption);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.finance-reminder-confirm {
+  background: var(--accent-gradient);
+  color: #fff;
+}
+
+.finance-reminder-cancel-actions {
+  display: flex;
+  flex-basis: 100%;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.finance-reminder-cancel-actions button {
+  min-height: 30px;
+  padding: 5px 8px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface-primary);
+  color: var(--text-secondary);
+}
+
+.finance-reminders-compact {
+  margin: 0;
+}
+
+.finance-reminder.compact {
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px;
+  box-shadow: none;
+}
+
+.finance-reminder.compact .finance-reminder-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.finance-reminder.compact .finance-reminder-date {
+  display: none;
+}
+
+.finance-reminder.compact .finance-reminder-actions {
+  max-width: none;
+}
+
+.finance-reminder.compact .finance-reminder-confirm {
+  min-height: 32px;
+  padding: 5px 9px;
+}
+
+@media (max-width: 600px) {
+  .finance-reminder {
+    grid-template-columns: 36px minmax(0, 1fr);
+    gap: 8px 10px;
+  }
+
+  .finance-reminder-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .finance-reminder-actions {
+    grid-column: 1 / -1;
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  .finance-reminder-date {
+    flex: 1;
+  }
+
+  .finance-reminder-date input {
+    width: 100%;
+  }
+
+  .finance-reminder-cancel-actions {
+    justify-content: flex-start;
+  }
+
+  .finance-reminder.compact {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+  }
+
+  .finance-reminder.compact .finance-reminder-actions {
+    grid-column: auto;
+  }
+}

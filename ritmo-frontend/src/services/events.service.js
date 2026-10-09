@@ -20,4 +20,9 @@ async function remove(id) {
   return response.data;
 }
 
-export default { getAll, create, update, remove };
+async function changeStatus(id, status) {
+  const response = await api.patch(`/events/${id}/status`, { status });
+  return response.data.data;
+}
+
+export default { getAll, create, update, remove, changeStatus };

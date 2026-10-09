@@ -2,6 +2,7 @@ const express = require('express');
 const {
 	validateCreateEvent,
 	validateUpdateEvent,
+	validateEventStatus,
 } = require('./events.validator');
 const eventsController = require('./events.controller');
 const { verifyToken } = require('../../middlewares/auth.middleware');
@@ -12,6 +13,7 @@ router.post('/', verifyToken, validateCreateEvent, eventsController.create);
 router.get('/', verifyToken, eventsController.getEvents);
 router.get('/:id', verifyToken, eventsController.getEventById);
 router.put('/:id', verifyToken, validateUpdateEvent, eventsController.update);
+router.patch('/:id/status', verifyToken, validateEventStatus, eventsController.changeStatus);
 router.delete('/:id', verifyToken, eventsController.deleteEvent);
 
 module.exports = router;

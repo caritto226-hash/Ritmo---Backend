@@ -1,17 +1,23 @@
 import { useState, useEffect } from "react";
 import habitsService from "../services/habits.service";
+import categoriesService from "../services/categories.service";
 import MobileItemDetails from "../components/MobileItemDetails";
+import CategoryIconBadge from "../components/CategoryIconBadge";
+import CategorySelect from "../components/CategorySelect";
+import CategoryManager from "../components/CategoryManager";
 import "../styles/tareas.css";
 
-const emptyForm = { name: "", frequency: "", goal: "" };
+const emptyForm = { name: "", frequency: "", goal: "", categoryId: "", reminderTime: "" };
 
 function Habits() {
   const [habits, setHabits] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [selectedHabit, setSelectedHabit] = useState(null);
 
   useEffect(() => {
@@ -20,8 +26,12 @@ function Habits() {
 
   async function loadHabits() {
     try {
-      const data = await habitsService.getAll();
+      const [data, availableCategories] = await Promise.all([
+        habitsService.getAll(),
+        categoriesService.getAll("habits"),
+      ]);
       setHabits(data);
+      setCategories(availableCategories);
     } catch (err) {
       if (err.response?.status === 401) {
         setError("Tu sesión expiró o no es válida. Cierra sesión e inicia sesión de nuevo.");
@@ -45,7 +55,10 @@ function Habits() {
 
   function openCreateForm() {
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      categoryId: categories[0] ? String(categories[0].id) : "",
+    });
     setShowForm(true);
   }
 
@@ -56,6 +69,8 @@ function Habits() {
       name: form.name,
       frequency: form.frequency,
       goal: form.goal ? Number(form.goal) : null,
+      categoryId: form.categoryId ? Number(form.categoryId) : null,
+      reminderTime: form.reminderTime || null,
     };
 
     try {
@@ -70,13 +85,19 @@ function Habits() {
       setShowForm(false);
       loadHabits();
     } catch (err) {
-      setError("No se pudo guardar el hábito");
+      setError(err.response?.data?.message || "No se pudo guardar el hábito");
     }
   }
 
   function handleEdit(habit) {
     setEditingId(habit.id);
-    setForm({ name: habit.name, frequency: habit.frequency, goal: habit.goal || "" });
+    setForm({
+      name: habit.name,
+      frequency: habit.frequency,
+      goal: habit.goal || "",
+      categoryId: habit.categoryId ? String(habit.categoryId) : "",
+      reminderTime: habit.reminderTime ? habit.reminderTime.slice(0, 5) : "",
+    });
     setShowForm(true);
   }
 
@@ -92,7 +113,7 @@ function Habits() {
       await habitsService.changeStatus(habit.id, isDone ? "pendiente" : "completado");
       loadHabits();
     } catch (err) {
-      setError("No se pudo cambiar el estado");
+      setError(err.response?.data?.message || "No se pudo cambiar el estado");
     }
   }
 
@@ -101,7 +122,7 @@ function Habits() {
       await habitsService.remove(id);
       loadHabits();
     } catch (err) {
-      setError("No se pudo eliminar el hábito");
+      setError(err.response?.data?.message || "No se pudo eliminar el hábito");
     }
   }
 
@@ -111,11 +132,12 @@ function Habits() {
         name: `${habit.name.slice(0, 142)} (copia)`,
         frequency: habit.frequency,
         goal: habit.goal ?? null,
+        categoryId: habit.categoryId ?? null,
       });
       setSelectedHabit(null);
       await loadHabits();
-    } catch {
-      setError("No se pudo duplicar el hábito");
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo duplicar el hábito");
     }
   }
 
@@ -124,6 +146,12 @@ function Habits() {
     const id = selectedHabit.id;
     setSelectedHabit(null);
     await handleDelete(id);
+  }
+
+  async function reloadCategories() {
+    const data = await categoriesService.getAll("habits");
+    setCategories(data);
+    await loadHabits();
   }
 
   if (loading) return <p>Cargando hábitos...</p>;
@@ -156,6 +184,35 @@ function Habits() {
               <input name="frequency" value={form.frequency} onChange={handleChange} required />
             </div>
             <div className="input-group">
+              <label>Categoría</label>
+              <CategorySelect
+                categories={categories}
+                value={form.categoryId}
+                inactiveCategory={editingId ? habits.find((habit) => habit.id === editingId)?.category : null}
+                onChange={(categoryId) => setForm((previous) => ({
+                  ...previous,
+                  categoryId,
+                  reminderTime: categories.find((category) => String(category.id) === categoryId)?.isRecurring
+                    ? previous.reminderTime
+                    : "",
+                }))}
+                onCreateCategory={() => setShowCategoryManager(true)}
+              />
+            </div>
+            {(categories.find((category) => String(category.id) === form.categoryId)?.isRecurring
+              || Boolean(form.reminderTime)) && (
+              <div className="input-group">
+                <label htmlFor="habit-reminder-time">Recordatorio adicional (opcional)</label>
+                <input
+                  id="habit-reminder-time"
+                  type="time"
+                  name="reminderTime"
+                  value={form.reminderTime}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+            <div className="input-group">
               <label>Meta (opcional)</label>
               <input type="number" name="goal" value={form.goal} onChange={handleChange} />
             </div>
@@ -183,15 +240,21 @@ function Habits() {
           const isDone = habit.status === "completado";
           return (
             <div className={`task-item ${isDone ? "done" : ""}`} key={habit.id}>
-              <div className="task-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
+              <CategoryIconBadge
+                category={habit.category}
+                fallbackIcon="heart-pulse"
+                size={21}
+                className="task-icon category-colored-icon"
+              />
 
               <div className="task-info">
                 <h4>{habit.name}</h4>
-                <p>{habit.frequency}{habit.goal && ` · meta: ${habit.goal}`}</p>
+                <p>
+                  {habit.frequency}{habit.goal && ` · meta: ${habit.goal}`}
+                  {habit.reminderTime && ` · recordatorio ${habit.reminderTime.slice(0, 5)}`}
+                  {habit.category?.name && ` · ${habit.category.name}`}
+                </p>
+                {habit.category?.description && <p>{habit.category.description}</p>}
               </div>
 
               <button
@@ -227,7 +290,10 @@ function Habits() {
         details={selectedHabit ? [
           { label: "Frecuencia", value: selectedHabit.frequency },
           { label: "Meta", value: selectedHabit.goal },
+          { label: "Recordatorio adicional", value: selectedHabit.reminderTime?.slice(0, 5) || "Sin configurar" },
           { label: "Estado", value: selectedHabit.status },
+          { label: "Categoría", value: selectedHabit.category?.name || "Sin categoría" },
+          { label: "Propósito", value: selectedHabit.category?.description || "" },
         ] : []}
         onClose={() => setSelectedHabit(null)}
         onDuplicate={() => handleDuplicate(selectedHabit)}
@@ -252,6 +318,15 @@ function Habits() {
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
+      )}
+
+      {showCategoryManager && (
+        <CategoryManager
+          module="habits"
+          categories={categories}
+          onClose={() => setShowCategoryManager(false)}
+          onChanged={reloadCategories}
+        />
       )}
     </div>
   );

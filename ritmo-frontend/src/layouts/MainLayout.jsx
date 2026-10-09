@@ -1,6 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
+import dashboardWidgets from "../constants/dashboardWidgets";
+
+const defaultWidgetVisibility = Object.fromEntries(
+  dashboardWidgets.map(({ id }) => [id, true]),
+);
 
 function MainLayout() {
   const { user, logout } = useContext(AuthContext);
@@ -10,9 +15,13 @@ function MainLayout() {
   );
   const [menuOpen, setMenuOpen] = useState(false);
   const [desktopMenuCollapsed, setDesktopMenuCollapsed] = useState(false);
+  const [dashboardSettingsOpen, setDashboardSettingsOpen] = useState(false);
+  const [dashboardWidgetVisibility, setDashboardWidgetVisibility] = useState(defaultWidgetVisibility);
+  const [settingsError, setSettingsError] = useState("");
   const [theme, setTheme] = useState(
     () => (localStorage.getItem("ritmo-theme") === "dark" ? "dark" : "light"),
   );
+  const widgetVisibilityKey = `ritmo-dashboard-widget-visibility-${user?.correo?.trim().toLowerCase() || "default"}`;
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -28,15 +37,38 @@ function MainLayout() {
   }, []);
 
   useEffect(() => {
+    try {
+      const savedVisibility = localStorage.getItem(widgetVisibilityKey);
+      const parsedVisibility = savedVisibility ? JSON.parse(savedVisibility) : {};
+      setDashboardWidgetVisibility({
+        ...defaultWidgetVisibility,
+        ...Object.fromEntries(
+          Object.keys(defaultWidgetVisibility)
+            .filter((widgetId) => typeof parsedVisibility[widgetId] === "boolean")
+            .map((widgetId) => [widgetId, parsedVisibility[widgetId]]),
+        ),
+      });
+      setSettingsError("");
+    } catch {
+      setDashboardWidgetVisibility(defaultWidgetVisibility);
+      setSettingsError("No se pudieron cargar los ajustes guardados de los widgets.");
+    }
+  }, [widgetVisibilityKey]);
+
+  useEffect(() => {
     function closeOnEscape(event) {
       if (event.key !== "Escape") return;
+      if (dashboardSettingsOpen) {
+        setDashboardSettingsOpen(false);
+        return;
+      }
       if (isDesktop) setDesktopMenuCollapsed(true);
       else setMenuOpen(false);
     }
 
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [isDesktop]);
+  }, [dashboardSettingsOpen, isDesktop]);
 
   useEffect(() => {
     setMenuOpen(false);
@@ -44,6 +76,17 @@ function MainLayout() {
 
   function toggleTheme() {
     setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
+  }
+
+  function updateWidgetVisibility(widgetId, isVisible) {
+    const nextVisibility = { ...dashboardWidgetVisibility, [widgetId]: isVisible };
+    setDashboardWidgetVisibility(nextVisibility);
+    try {
+      localStorage.setItem(widgetVisibilityKey, JSON.stringify(nextVisibility));
+      setSettingsError("");
+    } catch {
+      setSettingsError("No se pudieron guardar los ajustes de los widgets.");
+    }
   }
 
   function isActive(path) {
@@ -181,6 +224,22 @@ function MainLayout() {
           <button
             type="button"
             className="side-menu-link"
+            aria-haspopup="dialog"
+            aria-expanded={dashboardSettingsOpen}
+            onClick={() => {
+              setDashboardSettingsOpen(true);
+              setMenuOpen(false);
+            }}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 2.94-.08-.02a1.7 1.7 0 0 0-1.82.5l-.06.06h-3.4l-.03-.08a1.7 1.7 0 0 0-1.42-1.13l-.08-.01-1.7-2.94.06-.06A1.7 1.7 0 0 0 9.9 14.3l-.02-.08v-3.4l.08-.03a1.7 1.7 0 0 0 1.13-1.42l.01-.08 2.94-1.7.06.06a1.7 1.7 0 0 0 1.88.34l.06-.03 2.94 1.7-.02.08a1.7 1.7 0 0 0 .5 1.82l.06.06v3.4l-.08.03A1.7 1.7 0 0 0 19.4 15Z" />
+            </svg>
+            Ajustes
+          </button>
+          <button
+            type="button"
+            className="side-menu-link"
             onClick={() => {
               setMenuOpen(false);
               logout();
@@ -196,8 +255,56 @@ function MainLayout() {
         </div>
       </aside>
 
+      {dashboardSettingsOpen && (
+        <div
+          className="dashboard-settings-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setDashboardSettingsOpen(false);
+          }}
+        >
+          <section
+            className="dashboard-settings-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="dashboard-settings-title"
+          >
+            <header className="dashboard-settings-header">
+              <div>
+                <h2 id="dashboard-settings-title">Ajustes del dashboard</h2>
+                <p>Elige qué widgets quieres ver en Inicio.</p>
+              </div>
+              <button
+                type="button"
+                className="dashboard-settings-close"
+                aria-label="Cerrar ajustes"
+                onClick={() => setDashboardSettingsOpen(false)}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="m18 6-12 12M6 6l12 12" />
+                </svg>
+              </button>
+            </header>
+            {settingsError && <p className="dashboard-settings-error" role="alert">{settingsError}</p>}
+            <div className="dashboard-settings-list">
+              {dashboardWidgets.map(({ id, label }) => (
+                <label className="dashboard-settings-option" key={id}>
+                  <span>{label}</span>
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    checked={dashboardWidgetVisibility[id] !== false}
+                    onChange={(event) => updateWidgetVisibility(id, event.target.checked)}
+                    aria-label={`Mostrar ${label}`}
+                  />
+                </label>
+              ))}
+            </div>
+          </section>
+        </div>
+      )}
+
       <div className="scroll-area">
-        <Outlet context={{ theme, toggleTheme }} />
+        <Outlet context={{ theme, toggleTheme, widgetVisibility: dashboardWidgetVisibility }} />
       </div>
 
       <nav className="bottom-nav">

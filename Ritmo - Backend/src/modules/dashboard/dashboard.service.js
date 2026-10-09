@@ -2,16 +2,18 @@ const tasksRepository = require('../tasks/tasks.repository');
 const habitsRepository = require('../habits/habits.repository');
 const eventsRepository = require('../events/events.repository');
 const expensesRepository = require('../expenses/expenses.repository');
+const usersRepository = require('../users/users.repository');
 
 async function getDashboard(userId) {
 	validateUserId(userId);
 	const today = getDateInTimeZone(new Date(), 'America/Bogota');
 
-	const [todayTaskStats, todayHabitStats, upcomingTasks, pendingHabits, upcomingEvents, recentExpenses] = await Promise.all([
+	const [user, todayTaskStats, todayHabitStats, upcomingTasks, pendingHabits, upcomingEvents, recentExpenses] = await Promise.all([
+		usersRepository.findById(userId),
 		tasksRepository.findTodayStatsByUser(userId, today),
-		habitsRepository.findTodayStatsByUser(userId),
+		habitsRepository.findTodayStatsByUser(userId, today),
 		tasksRepository.findUpcomingByUser(userId, today),
-		habitsRepository.findPendingTodayByUser(userId),
+		habitsRepository.findPendingTodayByUser(userId, today),
 		eventsRepository.findUpcomingByUser(userId),
 		expensesRepository.findRecentByUser(userId),
 	]);
@@ -45,6 +47,10 @@ async function getDashboard(userId) {
 	}));
 
 	return {
+		user: {
+			id: userId,
+			name: user?.name || '',
+		},
 		todayRitmo: {
 			completed,
 			total,

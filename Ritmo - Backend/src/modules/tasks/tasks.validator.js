@@ -7,6 +7,8 @@ function validateCreateTask(req, res, next) {
 		date,
 		duration,
 		priority,
+		categoryId,
+		recurrenceFrequency,
 		start_at: startAt,
 		end_at: endAt,
 	} = req.body || {};
@@ -66,6 +68,18 @@ function validateCreateTask(req, res, next) {
 		return next(error);
 	}
 
+	if (categoryId !== undefined && categoryId !== null && !isValidCategoryId(categoryId)) {
+		const error = new Error('categoryId debe ser un entero positivo');
+		error.statusCode = 400;
+		return next(error);
+	}
+	if (recurrenceFrequency !== undefined && recurrenceFrequency !== null
+		&& !isValidRecurrenceFrequency(recurrenceFrequency)) {
+		const error = new Error('La frecuencia debe ser daily, weekly, monthly o yearly');
+		error.statusCode = 400;
+		return next(error);
+	}
+
 	req.body.title = title.trim();
 	req.body.description = description.trim();
 	req.body.date = date.trim();
@@ -73,12 +87,16 @@ function validateCreateTask(req, res, next) {
 	req.body.priority = normalizedPriority || 'media';
 	req.body.start_at = startAt === undefined || startAt === null ? null : startAt;
 	req.body.end_at = endAt === undefined || endAt === null ? null : endAt;
+	req.body.categoryId = categoryId ?? null;
+	req.body.recurrenceFrequency = recurrenceFrequency ?? null;
 
 	return next();
 }
 
 function validateUpdateTask(req, res, next) {
-	const { title, description, due_date: dueDate, priority } = req.body || {};
+	const {
+		title, description, due_date: dueDate, priority, categoryId, recurrenceFrequency,
+	} = req.body || {};
 	const updateData = {};
 
 	if (title !== undefined) {
@@ -130,6 +148,24 @@ function validateUpdateTask(req, res, next) {
 		updateData.priority = normalizedPriority;
 	}
 
+	if (categoryId !== undefined) {
+		if (categoryId !== null && !isValidCategoryId(categoryId)) {
+			const error = new Error('categoryId debe ser un entero positivo');
+			error.statusCode = 400;
+			return next(error);
+		}
+		if (recurrenceFrequency !== undefined) {
+			if (recurrenceFrequency !== null && !isValidRecurrenceFrequency(recurrenceFrequency)) {
+				const error = new Error('La frecuencia debe ser daily, weekly, monthly o yearly');
+				error.statusCode = 400;
+				return next(error);
+			}
+			updateData.recurrenceFrequency = recurrenceFrequency;
+		}
+
+		updateData.categoryId = categoryId;
+	}
+
 	if (Object.keys(updateData).length === 0) {
 		const error = new Error('Debe proporcionar al menos un campo válido para actualizar');
 		error.statusCode = 400;
@@ -175,6 +211,14 @@ function isValidDateTime(value) {
 
 	const date = new Date(`${value}Z`);
 	return !Number.isNaN(date.getTime());
+}
+
+function isValidCategoryId(value) {
+	return Number.isInteger(value) && value > 0;
+}
+
+function isValidRecurrenceFrequency(value) {
+	return ['daily', 'weekly', 'monthly', 'yearly'].includes(value);
 }
 
 module.exports = {

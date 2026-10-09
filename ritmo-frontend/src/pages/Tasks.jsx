@@ -1,24 +1,38 @@
 import { useState, useEffect } from "react";
 import tasksService from "../services/tasks.service";
+import categoriesService from "../services/categories.service";
 import MobileItemDetails from "../components/MobileItemDetails";
 import DateCalendar from "../components/DateCalendar";
+import CategoryIconBadge from "../components/CategoryIconBadge";
+import CategorySelect from "../components/CategorySelect";
+import CategoryManager from "../components/CategoryManager";
 import "../styles/tareas.css";
 
 const emptyForm = {
   title: "",
   description: "",
+  categoryId: "",
   date: "",
   duration: "",
   priority: "media",
+  recurrenceFrequency: "",
 };
+const recurrenceFrequencies = [
+  ["daily", "Diaria"],
+  ["weekly", "Semanal"],
+  ["monthly", "Mensual"],
+  ["yearly", "Anual"],
+];
 
 function Tasks() {
   const [tasks, setTasks] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
@@ -27,10 +41,14 @@ function Tasks() {
 
   async function loadTasks() {
     try {
-      const data = await tasksService.getAll();
+      const [data, availableCategories] = await Promise.all([
+        tasksService.getAll(),
+        categoriesService.getAll("tasks"),
+      ]);
       setTasks(data);
+      setCategories(availableCategories);
     } catch (err) {
-      setError("No se pudieron cargar las tareas");
+      setError(err.response?.data?.message || "No se pudieron cargar las tareas");
     } finally {
       setLoading(false);
     }
@@ -44,7 +62,10 @@ function Tasks() {
 
   function openCreateForm() {
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      categoryId: categories[0] ? String(categories[0].id) : "",
+    });
     setShowForm(true);
   }
 
@@ -63,6 +84,8 @@ function Tasks() {
           description: form.description,
           due_date: form.date,
           priority: form.priority,
+          categoryId: form.categoryId ? Number(form.categoryId) : null,
+          recurrenceFrequency: form.recurrenceFrequency || null,
         });
       } else {
         await tasksService.create({
@@ -71,6 +94,8 @@ function Tasks() {
           date: form.date,
           duration: form.duration ? Number(form.duration) : undefined,
           priority: form.priority,
+          categoryId: form.categoryId ? Number(form.categoryId) : null,
+          recurrenceFrequency: form.recurrenceFrequency || null,
         });
       }
 
@@ -80,7 +105,7 @@ function Tasks() {
       setShowForm(false);
       loadTasks();
     } catch (err) {
-      setError("No se pudo guardar la tarea");
+      setError(err.response?.data?.message || "No se pudo guardar la tarea");
     }
   }
 
@@ -91,7 +116,9 @@ function Tasks() {
       description: task.description || "",
       date: task.dueDate ? task.dueDate.slice(0, 10) : "",
       duration: task.duration || "",
+      categoryId: task.categoryId ? String(task.categoryId) : "",
       priority: task.priority.toLowerCase(),
+      recurrenceFrequency: task.recurrenceFrequency || "",
     });
     setShowForm(true);
   }
@@ -108,7 +135,7 @@ function Tasks() {
       await tasksService.changeStatus(task.id, isDone ? "pendiente" : "completada");
       loadTasks();
     } catch (err) {
-      setError("No se pudo cambiar el estado");
+      setError(err.response?.data?.message || "No se pudo cambiar el estado");
     }
   }
 
@@ -117,7 +144,7 @@ function Tasks() {
       await tasksService.remove(taskId);
       loadTasks();
     } catch (err) {
-      setError("No se pudo eliminar la tarea");
+      setError(err.response?.data?.message || "No se pudo eliminar la tarea");
     }
   }
 
@@ -129,11 +156,12 @@ function Tasks() {
         date: task.dueDate ? task.dueDate.slice(0, 10) : "",
         duration: task.duration ? Number(task.duration) : undefined,
         priority: task.priority.toLowerCase(),
+        categoryId: task.categoryId ?? null,
       });
       setSelectedTask(null);
       await loadTasks();
-    } catch {
-      setError("No se pudo duplicar la tarea");
+    } catch (err) {
+      setError(err.response?.data?.message || "No se pudo duplicar la tarea");
     }
   }
 
@@ -142,6 +170,12 @@ function Tasks() {
     const id = selectedTask.id;
     setSelectedTask(null);
     await handleDelete(id);
+  }
+
+  async function reloadCategories() {
+    const data = await categoriesService.getAll("tasks");
+    setCategories(data);
+    await loadTasks();
   }
 
   if (loading) return <p>Cargando tareas...</p>;
@@ -180,6 +214,39 @@ function Tasks() {
                 required
               />
             </div>
+            <div className="input-group">
+              <label>Categoría</label>
+              <CategorySelect
+                categories={categories}
+                value={form.categoryId}
+                inactiveCategory={editingId ? tasks.find((task) => task.id === editingId)?.category : null}
+                onChange={(categoryId) => setForm((previous) => ({
+                  ...previous,
+                  categoryId,
+                  recurrenceFrequency: categories.find((category) => String(category.id) === categoryId)?.isRecurring
+                    ? previous.recurrenceFrequency
+                    : "",
+                }))}
+                onCreateCategory={() => setShowCategoryManager(true)}
+              />
+            </div>
+            {(categories.find((category) => String(category.id) === form.categoryId)?.isRecurring
+              || Boolean(form.recurrenceFrequency)) && (
+              <div className="input-group">
+                <label htmlFor="task-recurrence-frequency">Repetir tarea</label>
+                <select
+                  id="task-recurrence-frequency"
+                  name="recurrenceFrequency"
+                  value={form.recurrenceFrequency}
+                  onChange={handleChange}
+                >
+                  <option value="">No repetir</option>
+                  {recurrenceFrequencies.map(([value, label]) => (
+                    <option value={value} key={value}>{label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
             <DateCalendar
               name="date"
               value={form.date}
@@ -227,20 +294,21 @@ function Tasks() {
           const isDone = task.status.toLowerCase() === "completada";
           return (
             <div className={`task-item ${isDone ? "done" : ""}`} key={task.id}>
-              <div className="task-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="3" y="4" width="18" height="18" rx="3" />
-                  <line x1="8" y1="10" x2="16" y2="10" />
-                  <line x1="8" y1="14" x2="13" y2="14" />
-                </svg>
-              </div>
+              <CategoryIconBadge
+                category={task.category}
+                fallbackIcon="list-checks"
+                size={21}
+                className="task-icon category-colored-icon"
+              />
 
               <div className="task-info">
                 <h4>{task.title}</h4>
                 <p>
                   {task.dueDate?.slice(0, 10)} · {task.priority}
                   {task.status.toLowerCase() === "en proceso" && " · En proceso"}
+                  {task.category?.name && ` · ${task.category.name}`}
                 </p>
+                {task.category?.description && <p>{task.category.description}</p>}
               </div>
 
               <button
@@ -283,6 +351,8 @@ function Tasks() {
           { label: "Prioridad", value: selectedTask.priority },
           { label: "Estado", value: selectedTask.status },
           { label: "Duración", value: selectedTask.duration ? `${selectedTask.duration} min` : "" },
+          { label: "Categoría", value: selectedTask.category?.name || "Sin categoría" },
+          { label: "Propósito", value: selectedTask.category?.description || "" },
         ] : []}
         onClose={() => setSelectedTask(null)}
         onDuplicate={() => handleDuplicate(selectedTask)}
@@ -307,6 +377,15 @@ function Tasks() {
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
+      )}
+
+      {showCategoryManager && (
+        <CategoryManager
+          module="tasks"
+          categories={categories}
+          onClose={() => setShowCategoryManager(false)}
+          onChanged={reloadCategories}
+        />
       )}
     </div>
   );

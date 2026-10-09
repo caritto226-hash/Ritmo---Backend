@@ -1,7 +1,7 @@
 const allowedStatuses = new Set(['pendiente', 'completado']);
 
 function validateCreateHabit(req, res, next) {
-	const { name, frequency, goal } = req.body || {};
+	const { name, frequency, goal, categoryId, reminderTime } = req.body || {};
 
 	if (!isValidName(name)) {
 		return next(createError('El nombre es obligatorio y no puede superar los 100 caracteres'));
@@ -15,15 +15,24 @@ function validateCreateHabit(req, res, next) {
 		return next(createError('La meta debe ser un entero positivo'));
 	}
 
+	if (categoryId !== undefined && categoryId !== null && !isValidCategoryId(categoryId)) {
+		return next(createError('categoryId debe ser un entero positivo'));
+	}
+	if (reminderTime !== undefined && reminderTime !== null && !isValidTime(reminderTime)) {
+		return next(createError('La hora del recordatorio debe tener formato HH:mm'));
+	}
+
 	req.body.name = name.trim();
 	req.body.frequency = frequency.trim();
 	req.body.goal = goal === undefined || goal === null ? null : goal;
+	req.body.categoryId = categoryId ?? null;
+	req.body.reminderTime = reminderTime ?? null;
 
 	return next();
 }
 
 function validateUpdateHabit(req, res, next) {
-	const { name, frequency, goal } = req.body || {};
+	const { name, frequency, goal, categoryId, reminderTime } = req.body || {};
 	const updateData = {};
 
 	if (name !== undefined) {
@@ -48,6 +57,20 @@ function validateUpdateHabit(req, res, next) {
 		}
 
 		updateData.goal = goal;
+	}
+
+	if (categoryId !== undefined) {
+		if (categoryId !== null && !isValidCategoryId(categoryId)) {
+			return next(createError('categoryId debe ser un entero positivo'));
+		}
+		if (reminderTime !== undefined) {
+			if (reminderTime !== null && !isValidTime(reminderTime)) {
+				return next(createError('La hora del recordatorio debe tener formato HH:mm'));
+			}
+			updateData.reminderTime = reminderTime;
+		}
+
+		updateData.categoryId = categoryId;
 	}
 
 	if (Object.keys(updateData).length === 0) {
@@ -78,6 +101,14 @@ function isValidText(value) {
 
 function isValidGoal(value) {
 	return Number.isInteger(value) && value > 0;
+}
+
+function isValidCategoryId(value) {
+	return Number.isInteger(value) && value > 0;
+}
+
+function isValidTime(value) {
+	return typeof value === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
 }
 
 function createError(message) {
