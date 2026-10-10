@@ -115,13 +115,13 @@ function validateUpdateExpense(req, res, next) {
 	}
 
 	if (notes !== undefined) {
-		if (typeof notes !== 'string') {
+		if (notes !== null && typeof notes !== 'string') {
 			const error = new Error('Las notas deben ser un texto');
 			error.statusCode = 400;
 			return next(error);
 		}
 
-		updateData.notes = notes.trim();
+		updateData.notes = notes === null ? null : notes.trim();
 	}
 
 	if (Object.keys(updateData).length === 0) {

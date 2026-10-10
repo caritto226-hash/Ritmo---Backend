@@ -107,7 +107,7 @@ async function findByIdAndUser(categoryId, userId) {
 
 async function findByNormalizedName(userId, module, normalizedName, excludedCategoryId = null) {
 	const [rows] = await pool.query(
-		`SELECT id FROM categories
+		`SELECT id, is_active AS isActive FROM categories
 		WHERE user_id = ? AND module = ? AND normalized_name = ?
 			AND (? IS NULL OR id != ?)
 		LIMIT 1`,
@@ -162,6 +162,18 @@ async function deactivate(categoryId, userId) {
 	return result.affectedRows;
 }
 
+async function reactivate(categoryId, userId, fields) {
+	await pool.query(
+		`UPDATE categories
+		SET name = ?, description = ?, icon = ?, color = ?, is_recurring = ?,
+			is_active = 1, deleted_at = NULL
+		WHERE id = ? AND user_id = ? AND is_active = 0`,
+		[fields.name, fields.description, fields.icon, fields.color, fields.isRecurring ? 1 : 0, categoryId, userId],
+	);
+
+	return findByIdAndUser(categoryId, userId);
+}
+
 async function ensureDefaultCategories(userId, module) {
 	const [rows] = await pool.query(
 		`SELECT COUNT(*) AS defaultCount
@@ -211,4 +223,5 @@ module.exports = {
 	findByNormalizedName,
 	update,
 	deactivate,
+	reactivate,
 };

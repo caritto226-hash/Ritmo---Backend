@@ -58,7 +58,7 @@ async function create(expenseData) {
 
 	const [result] = await pool.query(
 		'INSERT INTO expenses (user_id, category_id, concept, amount, expense_date, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())',
-		[userId, categoryId, concept, amount, expenseDate, notes],
+		[userId, categoryId, concept, amount, expenseDate, notes ?? ''],
 	);
 
 	return findByIdAndUser(result.insertId, userId);
@@ -135,7 +135,7 @@ async function update(expenseId, userId, fields) {
 
 		if (column) {
 			assignments.push(`${column} = ?`);
-			values.push(value);
+			values.push(field === 'notes' ? value ?? '' : value);
 		}
 	}
 

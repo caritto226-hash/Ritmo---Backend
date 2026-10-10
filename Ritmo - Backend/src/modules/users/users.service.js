@@ -1,8 +1,17 @@
 const bcrypt = require('bcrypt');
 const usersRepository = require('./users.repository');
 
+const ROL_USUARIO = 1;
+const ROL_SOPORTE = 2;
+
 async function create(userData) {
 	const { nombre: name, correo: email, password, idRol: roleId } = userData;
+
+	if (roleId !== ROL_USUARIO) {
+		const error = new Error('El registro público solo permite el rol de usuario (idRol 1)');
+		error.statusCode = 403;
+		throw error;
+	}
 
 	const existingUser = await usersRepository.findByEmail(email);
 
@@ -49,7 +58,7 @@ async function getById(id) {
 	return user;
 }
 
-async function update(id, data) {
+async function update(id, data, requester) {
 	const existingUser = await usersRepository.findById(id);
 	if (!existingUser) {
 		const error = new Error('Usuario no encontrado');
@@ -58,6 +67,12 @@ async function update(id, data) {
 	}
 
 	const { nombre: name, correo: email, idRol: roleId } = data;
+
+	if (requester.idRol !== ROL_SOPORTE && roleId !== existingUser.roleId) {
+		const error = new Error('No tienes permiso para cambiar el rol');
+		error.statusCode = 403;
+		throw error;
+	}
 
 	const emailInUse = await usersRepository.findByEmailExcludingId(email, id);
 	if (emailInUse) {

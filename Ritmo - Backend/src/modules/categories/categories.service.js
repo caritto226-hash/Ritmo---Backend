@@ -16,8 +16,24 @@ async function createCategory(userId, categoryData) {
 	const name = normalizeDisplayName(categoryData.name);
 	const normalizedName = normalizeCategoryName(name);
 
-	if (await categoriesRepository.findByNormalizedName(userId, categoryData.module, normalizedName)) {
+	const existingCategory = await categoriesRepository.findByNormalizedName(
+		userId,
+		categoryData.module,
+		normalizedName,
+	);
+
+	if (existingCategory && existingCategory.isActive) {
 		throw conflictError();
+	}
+
+	if (existingCategory) {
+		return categoriesRepository.reactivate(existingCategory.id, userId, {
+			name,
+			description: categoryData.description,
+			icon: categoryData.icon,
+			color: categoryData.color,
+			isRecurring: categoryData.isRecurring,
+		});
 	}
 
 	try {

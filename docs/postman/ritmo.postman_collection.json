@@ -1,0 +1,381 @@
+{
+  "info": {
+    "name": "Ritmo API",
+    "description": "Pruebas funcionales de la API de Ritmo. Ejecutar en orden con el Collection Runner y el backend corriendo en {{baseUrl}}. Cada ejecución registra un usuario nuevo, por lo que la colección se puede repetir sin conflictos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{token}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "correo", "value": "" },
+    { "key": "token", "value": "" },
+    { "key": "taskId", "value": "" },
+    { "key": "finCatId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Usuarios y autenticación",
+      "item": [
+        {
+          "name": "Registrar usuario",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('correo', `usuario${Date.now()}@ritmo.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Devuelve el usuario sin contraseña', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('id');",
+                  "  pm.expect(body.email).to.eql(pm.collectionVariables.get('correo'));",
+                  "  pm.expect(body).to.not.have.property('password_hash');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Demo\",\n  \"correo\": \"{{correo}}\",\n  \"password\": \"123456\",\n  \"idRol\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Registrar correo duplicado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje de correo registrado', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('El correo ya está registrado');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Demo\",\n  \"correo\": \"{{correo}}\",\n  \"password\": \"123456\",\n  \"idRol\": 1\n}"
+            },
+            "url": "{{baseUrl}}/api/users"
+          }
+        },
+        {
+          "name": "Iniciar sesión",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Devuelve y guarda el token', () => {",
+                  "  const token = pm.response.json().token;",
+                  "  pm.expect(token).to.be.a('string');",
+                  "  pm.collectionVariables.set('token', token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{correo}}\",\n  \"contraseña\": \"123456\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Tareas",
+      "item": [
+        {
+          "name": "Crear tarea",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('Guarda el id de la tarea', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.status).to.eql('pendiente');",
+                  "  pm.collectionVariables.set('taskId', body.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Preparar presentación\",\n  \"description\": \"Revisar diapositivas\",\n  \"date\": \"2026-10-15\",\n  \"priority\": \"alta\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tasks"
+          }
+        },
+        {
+          "name": "Listar tareas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('La lista incluye la tarea creada', () => {",
+                  "  const tasks = pm.response.json().data;",
+                  "  pm.expect(tasks).to.be.an('array');",
+                  "  const ids = tasks.map((task) => task.id);",
+                  "  pm.expect(ids).to.include(Number(pm.collectionVariables.get('taskId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/tasks"
+          }
+        },
+        {
+          "name": "Actualizar tarea",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Aplica los cambios', () => {",
+                  "  const task = pm.response.json().data;",
+                  "  pm.expect(task.title).to.eql('Preparar presentación final');",
+                  "  pm.expect(task.priority).to.eql('media');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Preparar presentación final\",\n  \"due_date\": \"2026-10-16\",\n  \"priority\": \"media\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tasks/{{taskId}}"
+          }
+        },
+        {
+          "name": "Crear tarea sin título (validación)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje de validación', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('El título es obligatorio');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"\",\n  \"description\": \"Sin título\",\n  \"date\": \"2026-10-15\"\n}"
+            },
+            "url": "{{baseUrl}}/api/tasks"
+          }
+        },
+        {
+          "name": "Eliminar tarea (borrado lógico)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Confirma la eliminación', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Tarea eliminada correctamente');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/tasks/{{taskId}}"
+          }
+        },
+        {
+          "name": "Consultar tarea eliminada",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 Not Found', () => pm.response.to.have.status(404));",
+                  "pm.test('La API ya no devuelve la tarea eliminada', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Tarea no encontrada');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/tasks/{{taskId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Finanzas",
+      "item": [
+        {
+          "name": "Registrar gasto con categoría",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Consulta las categorías de finanzas (se crean las predeterminadas la primera vez)",
+                  "pm.sendRequest({",
+                  "  url: pm.collectionVariables.get('baseUrl') + '/api/categories?module=finance',",
+                  "  method: 'GET',",
+                  "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('token') }",
+                  "}, (error, response) => {",
+                  "  if (error) { console.log(error); return; }",
+                  "  const categories = response.json().data || [];",
+                  "  const category = categories.find((item) => item.name === 'Gastos variables') || categories[0];",
+                  "  if (category) pm.collectionVariables.set('finCatId', category.id);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "pm.test('El movimiento queda asociado a la categoría', () => {",
+                  "  const expense = pm.response.json();",
+                  "  pm.expect(expense.categoryId).to.eql(Number(pm.collectionVariables.get('finCatId')));",
+                  "  pm.expect(expense.category.module).to.eql('finance');",
+                  "  pm.expect(Number(expense.amount)).to.be.below(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Supermercado\",\n  \"categoryId\": {{finCatId}},\n  \"amount\": -150000,\n  \"expense_date\": \"2026-10-09\",\n  \"notes\": \"Compra semanal\"\n}"
+            },
+            "url": "{{baseUrl}}/api/expenses"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Seguridad",
+      "item": [
+        {
+          "name": "Consultar tareas sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "pm.test('Mensaje de token requerido', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Token de autenticación requerido');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/tasks"
+          }
+        },
+        {
+          "name": "Listar usuarios con rol usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 403 Forbidden', () => pm.response.to.have.status(403));",
+                  "pm.test('Mensaje de acceso prohibido', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Acceso prohibido');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/users"
+          }
+        }
+      ]
+    }
+  ]
+}
