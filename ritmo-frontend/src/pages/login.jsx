@@ -26,10 +26,18 @@ function Login() {
       await login(correo, contraseña);
       navigate("/dashboard");
     } catch (err) {
-      // 429 = demasiados intentos; el resto de errores se muestra con un mensaje genérico.
-      setError(err.response?.status === 429
-        ? err.response.data.message
-        : "Correo o contraseña incorrectos");
+      const status = err.response?.status;
+
+      if (status === 401) {
+        setError("Correo o contraseña incorrectos");
+      } else if ((status === 400 || status === 429) && err.response.data?.message) {
+        // 400 = validación (por ejemplo, formato de correo); 429 = demasiados intentos.
+        setError(err.response.data.message);
+      } else if (!err.response) {
+        setError("No se pudo conectar con el servidor. Intenta de nuevo en unos minutos.");
+      } else {
+        setError("No se pudo iniciar sesión. Intenta de nuevo.");
+      }
     } finally {
       setLoading(false);
     }

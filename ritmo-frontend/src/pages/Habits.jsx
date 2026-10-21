@@ -66,7 +66,8 @@ function Habits() {
     const payload = {
       name: form.name,
       frequency: form.frequency,
-      goal: form.goal ? Number(form.goal) : null,
+      // Solo un campo vacío significa "sin meta"; cualquier valor escrito se envía tal cual.
+      goal: form.goal === "" ? null : Number(form.goal),
       categoryId: form.categoryId ? Number(form.categoryId) : null,
       reminderTime: form.reminderTime || null,
     };
@@ -92,7 +93,7 @@ function Habits() {
     setForm({
       name: habit.name,
       frequency: habit.frequency,
-      goal: habit.goal || "",
+      goal: habit.goal ?? "",
       categoryId: habit.categoryId ? String(habit.categoryId) : "",
       reminderTime: habit.reminderTime ? habit.reminderTime.slice(0, 5) : "",
     });
@@ -133,6 +134,11 @@ function Habits() {
         frequency: habit.frequency,
         goal: habit.goal ?? null,
         categoryId: habit.categoryId ?? null,
+        // Se copia el recordatorio solo si la categoría todavía lo permite; si no, la copia fallaría.
+        reminderTime: habit.reminderTime
+          && categories.find((category) => category.id === habit.categoryId)?.isRecurring
+          ? habit.reminderTime.slice(0, 5)
+          : null,
       });
       setSelectedHabit(null);
       await loadHabits();
@@ -214,7 +220,7 @@ function Habits() {
             )}
             <div className="input-group">
               <label>Meta (opcional)</label>
-              <input type="number" name="goal" value={form.goal} onChange={handleChange} />
+              <input type="number" name="goal" value={form.goal} onChange={handleChange} min="1" step="1" />
             </div>
 
             <button type="submit" className="btn-guardar">
