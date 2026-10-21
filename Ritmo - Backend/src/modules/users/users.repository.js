@@ -50,7 +50,7 @@ async function findById(id) {
 
 async function findByEmailWithPassword(email) {
 	const [rows] = await pool.query(
-		'SELECT id, name, email, password_hash, role_id FROM users WHERE email = ? AND deleted_at IS NULL LIMIT 1',
+		'SELECT id, name, email, password_hash, role_id FROM users WHERE email = ? AND status = 1 AND deleted_at IS NULL LIMIT 1',
 		[email],
 	);
 
@@ -58,8 +58,9 @@ async function findByEmailWithPassword(email) {
 }
 
 async function findByEmailExcludingId(email, id) {
+	// Incluye cuentas eliminadas porque el índice UNIQUE de email también las cubre.
 	const [rows] = await pool.query(
-		'SELECT id FROM users WHERE email = ? AND id != ? AND deleted_at IS NULL',
+		'SELECT id FROM users WHERE email = ? AND id != ?',
 		[email, id]
 	);
 	return rows[0] || null;
@@ -82,7 +83,7 @@ async function update(id, data) {
 
 async function updatePassword(userId, newPasswordHash) {
 	await pool.query(
-		'UPDATE users SET password_hash = ? WHERE id = ?',
+		'UPDATE users SET password_hash = ?, password_changed_at = NOW() WHERE id = ?',
 		[newPasswordHash, userId]
 	);
 }
@@ -110,8 +111,26 @@ async function findActiveByEmail(email) {
 	return rows[0] || null;
 }
 
+async function findActiveSessionById(id) {
+	const [rows] = await pool.query(
+		`SELECT id, role_id AS roleId, UNIX_TIMESTAMP(password_changed_at) AS passwordChangedAt
+		FROM users WHERE id = ? AND status = 1 AND deleted_at IS NULL LIMIT 1`,
+		[id],
+	);
+
+	if (!rows[0]) {
+		return null;
+	}
+
+	return {
+		...rows[0],
+		passwordChangedAt: rows[0].passwordChangedAt === null ? null : Number(rows[0].passwordChangedAt),
+	};
+}
+
 module.exports = {
 	findByEmail,
+	findActiveSessionById,
 	findRoleById,
 	create,
 	findAll,

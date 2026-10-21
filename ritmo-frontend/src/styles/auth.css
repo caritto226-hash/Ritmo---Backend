@@ -76,6 +76,24 @@
     color: var(--gris-texto);
 }
 
+.info-banner {
+    background-color: #eef7f1;
+    border-left: 4px solid #3c9d6b;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: left;
+    margin-bottom: 20px;
+    font-size: var(--type-supporting);
+    color: var(--gris-texto);
+}
+
+.not-found-link {
+    display: block;
+    margin-top: 24px;
+    text-align: center;
+    text-decoration: none;
+}
+
 /* ── FOOTER ── */
 .footer-links {
     margin-top: 20px;

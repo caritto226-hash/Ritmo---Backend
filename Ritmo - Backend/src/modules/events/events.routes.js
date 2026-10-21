@@ -6,8 +6,11 @@ const {
 } = require('./events.validator');
 const eventsController = require('./events.controller');
 const { verifyToken } = require('../../middlewares/auth.middleware');
+const { validateIdParam } = require('../../middlewares/id-param.middleware');
 
 const router = express.Router();
+
+router.param('id', validateIdParam);
 
 router.post('/', verifyToken, validateCreateEvent, eventsController.create);
 router.get('/', verifyToken, eventsController.getEvents);

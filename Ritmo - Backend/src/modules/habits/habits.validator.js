@@ -1,4 +1,6 @@
 const allowedStatuses = new Set(['pendiente', 'completado']);
+// Coincide con habits.frequency VARCHAR(100).
+const MAX_FREQUENCY_LENGTH = 100;
 
 function validateCreateHabit(req, res, next) {
 	const { name, frequency, goal, categoryId, reminderTime } = req.body || {};
@@ -7,8 +9,8 @@ function validateCreateHabit(req, res, next) {
 		return next(createError('El nombre es obligatorio y no puede superar los 100 caracteres'));
 	}
 
-	if (!isValidText(frequency)) {
-		return next(createError('La frecuencia es obligatoria y debe ser un texto'));
+	if (!isValidFrequency(frequency)) {
+		return next(createError(`La frecuencia es obligatoria y no puede superar los ${MAX_FREQUENCY_LENGTH} caracteres`));
 	}
 
 	if (goal !== undefined && goal !== null && !isValidGoal(goal)) {
@@ -44,8 +46,8 @@ function validateUpdateHabit(req, res, next) {
 	}
 
 	if (frequency !== undefined) {
-		if (!isValidText(frequency)) {
-			return next(createError('La frecuencia debe ser un texto no vacío'));
+		if (!isValidFrequency(frequency)) {
+			return next(createError(`La frecuencia debe ser un texto no vacío de hasta ${MAX_FREQUENCY_LENGTH} caracteres`));
 		}
 
 		updateData.frequency = frequency.trim();
@@ -63,14 +65,17 @@ function validateUpdateHabit(req, res, next) {
 		if (categoryId !== null && !isValidCategoryId(categoryId)) {
 			return next(createError('categoryId debe ser un entero positivo'));
 		}
-		if (reminderTime !== undefined) {
-			if (reminderTime !== null && !isValidTime(reminderTime)) {
-				return next(createError('La hora del recordatorio debe tener formato HH:mm'));
-			}
-			updateData.reminderTime = reminderTime;
-		}
 
 		updateData.categoryId = categoryId;
+	}
+
+	// El recordatorio se valida por separado: ya no depende de que llegue categoryId.
+	if (reminderTime !== undefined) {
+		if (reminderTime !== null && !isValidTime(reminderTime)) {
+			return next(createError('La hora del recordatorio debe tener formato HH:mm'));
+		}
+
+		updateData.reminderTime = reminderTime;
 	}
 
 	if (Object.keys(updateData).length === 0) {
@@ -83,16 +88,22 @@ function validateUpdateHabit(req, res, next) {
 
 function validateHabitStatus(req, res, next) {
 	const { status } = req.body || {};
+	const normalizedStatus = typeof status === 'string' ? status.trim().toLowerCase() : '';
 
-	if (typeof status !== 'string' || !allowedStatuses.has(status)) {
+	if (!allowedStatuses.has(normalizedStatus)) {
 		return next(createError('El estado debe ser pendiente o completado'));
 	}
 
+	req.body.status = normalizedStatus;
 	return next();
 }
 
 function isValidName(value) {
 	return isValidText(value) && value.trim().length <= 100;
+}
+
+function isValidFrequency(value) {
+	return isValidText(value) && value.trim().length <= MAX_FREQUENCY_LENGTH;
 }
 
 function isValidText(value) {

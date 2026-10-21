@@ -15,7 +15,13 @@ const emptyForm = {
   date: "",
   duration: "",
   priority: "media",
+  status: "pendiente",
   recurrenceFrequency: "",
+};
+const statusLabels = {
+  pendiente: "Pendiente",
+  en_proceso: "En proceso",
+  completada: "Completada",
 };
 const recurrenceFrequencies = [
   ["daily", "Diaria"],
@@ -62,10 +68,8 @@ function Tasks() {
 
   function openCreateForm() {
     setEditingId(null);
-    setForm({
-      ...emptyForm,
-      categoryId: categories[0] ? String(categories[0].id) : "",
-    });
+    // La categoría es opcional: no se asigna ninguna sin que el usuario la elija.
+    setForm(emptyForm);
     setShowForm(true);
   }
 
@@ -79,6 +83,7 @@ function Tasks() {
 
     try {
       if (editingId) {
+        const originalTask = tasks.find((task) => task.id === editingId);
         await tasksService.update(editingId, {
           title: form.title,
           description: form.description,
@@ -87,6 +92,9 @@ function Tasks() {
           categoryId: form.categoryId ? Number(form.categoryId) : null,
           recurrenceFrequency: form.recurrenceFrequency || null,
         });
+        if (originalTask && form.status !== originalTask.status) {
+          await tasksService.changeStatus(editingId, form.status);
+        }
       } else {
         await tasksService.create({
           title: form.title,
@@ -118,6 +126,7 @@ function Tasks() {
       duration: task.duration || "",
       categoryId: task.categoryId ? String(task.categoryId) : "",
       priority: task.priority.toLowerCase(),
+      status: task.status,
       recurrenceFrequency: task.recurrenceFrequency || "",
     });
     setShowForm(true);
@@ -140,6 +149,7 @@ function Tasks() {
   }
 
   async function handleDelete(taskId) {
+    if (!window.confirm("¿Eliminar esta tarea? Esta acción no se puede deshacer.")) return;
     try {
       await tasksService.remove(taskId);
       loadTasks();
@@ -200,14 +210,16 @@ function Tasks() {
             </div>
             <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <label>Título</label>
-              <input name="title" value={form.title} onChange={handleChange} required />
+              <label htmlFor="task-title">Título</label>
+              <input id="task-title" name="title" value={form.title} onChange={handleChange} maxLength={45} required />
             </div>
             {error && <p className="modal-form-error" role="alert">{error}</p>}
             <div className="input-group">
-              <label>Descripción</label>
+              <label htmlFor="task-description">Descripción</label>
               <textarea
+                id="task-description"
                 className="ritmo-textarea"
+                maxLength={2000}
                 name="description"
                 value={form.description}
                 onChange={handleChange}
@@ -257,19 +269,29 @@ function Tasks() {
             {!editingId && (
               <div className="time-row">
                 <div className="time-field">
-                  <label>Duración (min)</label>
-                  <input type="number" name="duration" value={form.duration} onChange={handleChange} />
+                  <label htmlFor="task-duration">Duración (min)</label>
+                  <input id="task-duration" type="number" min="1" max="1440" name="duration" value={form.duration} onChange={handleChange} />
                 </div>
               </div>
             )}
             <div className="input-group">
-              <label>Prioridad</label>
-              <select name="priority" value={form.priority} onChange={handleChange}>
+              <label htmlFor="task-priority">Prioridad</label>
+              <select id="task-priority" name="priority" value={form.priority} onChange={handleChange}>
                 <option value="alta">Alta</option>
                 <option value="media">Media</option>
                 <option value="baja">Baja</option>
               </select>
             </div>
+            {editingId && (
+              <div className="input-group">
+                <label htmlFor="task-status">Estado</label>
+                <select id="task-status" name="status" value={form.status} onChange={handleChange}>
+                  {Object.entries(statusLabels).map(([value, label]) => (
+                    <option value={value} key={value}>{label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <button type="submit" className="btn-guardar">
               {editingId ? "Guardar cambios" : "Crear tarea"}
@@ -305,7 +327,7 @@ function Tasks() {
                 <h4>{task.title}</h4>
                 <p>
                   {task.dueDate?.slice(0, 10)} · {task.priority}
-                  {task.status.toLowerCase() === "en proceso" && " · En proceso"}
+                  {task.status === "en_proceso" && " · En proceso"}
                   {task.category?.name && ` · ${task.category.name}`}
                 </p>
                 {task.category?.description && <p>{task.category.description}</p>}
@@ -349,7 +371,7 @@ function Tasks() {
           { label: "Descripción", value: selectedTask.description || "Sin descripción" },
           { label: "Fecha", value: selectedTask.dueDate?.slice(0, 10) },
           { label: "Prioridad", value: selectedTask.priority },
-          { label: "Estado", value: selectedTask.status },
+          { label: "Estado", value: statusLabels[selectedTask.status] || selectedTask.status },
           { label: "Duración", value: selectedTask.duration ? `${selectedTask.duration} min` : "" },
           { label: "Categoría", value: selectedTask.category?.name || "Sin categoría" },
           { label: "Propósito", value: selectedTask.category?.description || "" },

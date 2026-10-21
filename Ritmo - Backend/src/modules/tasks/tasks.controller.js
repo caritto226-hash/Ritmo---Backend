@@ -4,7 +4,7 @@ async function create(req, res, next) {
 	try {
 		const task = await tasksService.create(req.user.id, req.body);
 
-		return res.status(201).json(task);
+		return res.status(201).json({ data: task });
 	} catch (error) {
 		return next(error);
 	}

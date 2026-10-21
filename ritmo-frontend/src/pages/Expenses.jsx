@@ -29,22 +29,27 @@ function getTodayDate() {
   return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
 }
 
+// Los montos son pesos enteros; coincide con el máximo que se permite registrar.
+const MAX_AMOUNT = 99999999;
+// Al pegar solo se aceptan cifras simples ("1500000") o con puntos de miles bien puestos ("1.500.000").
+const PASTED_AMOUNT_PATTERN = /^(\d+|\d{1,3}(\.\d{3})+)$/;
+const AMOUNT_FORMAT_ERROR = "El valor debe ser un número entero de pesos, sin comas ni decimales.";
+
+// "1.500.000" → 1500000. El signo no viene del campo: lo pone el selector Gasto / Ingreso.
 function parseCopAmount(value) {
-  const text = String(value).trim();
-  const isNegative = text.startsWith("-");
-  const digits = text.replace(/\D/g, "");
-  if (!digits) return NaN;
-  const amount = Number(digits);
-  return isNegative ? -amount : amount;
+  const digits = String(value).replace(/\D/g, "");
+  return digits ? Number(digits) : NaN;
+}
+
+// "1500000" → "1.500.000". Se agrupa a mano porque Intl en español no agrupa los números de 4 cifras.
+function formatAmountDigits(digits) {
+  return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
 function formatCopInput(value) {
   const amount = Number(value);
   if (!Number.isFinite(amount)) return "";
-  const formatted = Math.round(Math.abs(amount)).toLocaleString("es-CO", {
-    maximumFractionDigits: 0,
-  });
-  return `${amount < 0 ? "-$ " : "$ "}${formatted}`;
+  return formatAmountDigits(String(Math.round(Math.abs(amount))));
 }
 
 function formatCurrency(value) {
@@ -70,6 +75,7 @@ function Expenses() {
   const [editingExpenseCategory, setEditingExpenseCategory] = useState(null);
   const [amountTouched, setAmountTouched] = useState(false);
   const [originalEditingAmount, setOriginalEditingAmount] = useState(null);
+  const [movementType, setMovementType] = useState("expense");
   const [modalOpen, setModalOpen] = useState(false);
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState(null);
@@ -128,6 +134,7 @@ function Expenses() {
     });
     setAmountTouched(false);
     setOriginalEditingAmount(null);
+    setMovementType("expense");
     setModalOpen(true);
   }
 
@@ -146,20 +153,38 @@ function Expenses() {
     });
     setAmountTouched(false);
     setOriginalEditingAmount(Number(item.amount));
+    setMovementType(Number(item.amount) > 0 ? "income" : "expense");
     setModalOpen(true);
   }
 
   function handleAmountChange(event) {
-    const { value } = event.target;
-    const isNegative = value.startsWith("-");
-    const digits = value.replace(/\D/g, "");
-    setForm((prev) => ({
-      ...prev,
-      amount: digits ? `${isNegative ? "-" : ""}${digits}` : isNegative ? "-" : "",
-    }));
+    // Los puntos son los separadores de miles que pone el propio campo; cualquier otro carácter se rechaza.
+    if (/[^\d.]/.test(event.target.value)) {
+      setError(AMOUNT_FORMAT_ERROR);
+      return;
+    }
+    const digits = event.target.value.replace(/\D/g, "").replace(/^0+(?=\d)/, "");
+    setForm((prev) => ({ ...prev, amount: formatAmountDigits(digits) }));
     setAmountTouched(true);
     setError("");
     setSuccess("");
+  }
+
+  // Bloquea coma, punto y signos desde el teclado: sin esto, "1500,50" terminaría siendo 150050.
+  function handleAmountKeyDown(event) {
+    if ([",", ".", "-", "+", "e", "E"].includes(event.key)) {
+      event.preventDefault();
+      setError(AMOUNT_FORMAT_ERROR);
+    }
+  }
+
+  // Un texto pegado como "1.500,50" o "1500.50" se rechaza en lugar de convertirse en 150050.
+  function handleAmountPaste(event) {
+    const pasted = event.clipboardData.getData("text").trim().replace(/^\$\s*/, "");
+    if (!PASTED_AMOUNT_PATTERN.test(pasted)) {
+      event.preventDefault();
+      setError(AMOUNT_FORMAT_ERROR);
+    }
   }
 
   async function handleSubmit(event) {
@@ -170,13 +195,21 @@ function Expenses() {
       return;
     }
 
-    const amount = editingId && !amountTouched
-      ? originalEditingAmount
+    // El valor del campo siempre es positivo; el selector decide si se guarda como gasto (-) o ingreso (+).
+    const absoluteAmount = editingId && !amountTouched
+      ? Math.abs(originalEditingAmount)
       : parseCopAmount(form.amount);
-    if (!Number.isFinite(amount) || amount === 0) {
-      setError("El valor debe ser distinto de cero. Usa un valor positivo para ingresos o negativo para gastos.");
+    if (!Number.isFinite(absoluteAmount) || absoluteAmount === 0) {
+      setError("Escribe un valor mayor que cero.");
       return;
     }
+
+    if (absoluteAmount > MAX_AMOUNT) {
+      setError("El valor no puede superar $ 99.999.999.");
+      return;
+    }
+
+    const amount = movementType === "expense" ? -absoluteAmount : absoluteAmount;
 
     const payload = {
       concept: form.concept,
@@ -240,6 +273,7 @@ function Expenses() {
   }
 
   async function handleDelete(id) {
+    if (!window.confirm("¿Eliminar este movimiento? Esta acción no se puede deshacer.")) return;
     try {
       await expensesService.remove(id);
       await loadPage();
@@ -357,8 +391,8 @@ function Expenses() {
               {Number(item.amount) > 0 ? "+" : ""}{formatCurrency(item.amount)}
             </span>
             <div className="tx-actions">
-              <button className="tx-edit" onClick={() => openEditModal(item)}>✎</button>
-              <button className="tx-delete" onClick={() => handleDelete(item.id)}>🗑</button>
+              <button className="tx-edit" onClick={() => openEditModal(item)} aria-label={`Editar ${item.concept}`}>✎</button>
+              <button className="tx-delete" onClick={() => handleDelete(item.id)} aria-label={`Eliminar ${item.concept}`}>🗑</button>
             </div>
             <button
               type="button"
@@ -424,7 +458,7 @@ function Expenses() {
           {error && <p className="modal-form-error" role="alert">{error}</p>}
           <div className="field-group">
             <label>Concepto</label>
-            <input name="concept" value={form.concept} onChange={handleChange} required />
+            <input name="concept" value={form.concept} onChange={handleChange} maxLength={100} required />
           </div>
           <div className="field-group">
             <label>Categoría</label>
@@ -443,30 +477,42 @@ function Expenses() {
             />
           </div>
           <div className="field-group">
-            <label>Valor (COP)</label>
+            <span className="movement-type-label" id="movement-type-label">Tipo de movimiento</span>
+            <div className="movement-type-toggle" role="group" aria-labelledby="movement-type-label">
+              <button
+                type="button"
+                className={`movement-type-option expense ${movementType === "expense" ? "active" : ""}`}
+                aria-pressed={movementType === "expense"}
+                onClick={() => { setMovementType("expense"); setError(""); }}
+              >
+                Gasto
+              </button>
+              <button
+                type="button"
+                className={`movement-type-option income ${movementType === "income" ? "active" : ""}`}
+                aria-pressed={movementType === "income"}
+                onClick={() => { setMovementType("income"); setError(""); }}
+              >
+                Ingreso
+              </button>
+            </div>
+          </div>
+          <div className="field-group">
+            <label htmlFor="expense-amount">Valor (COP)</label>
             <input
+              id="expense-amount"
               type="text"
-              inputMode="text"
+              inputMode="numeric"
               name="amount"
               value={form.amount}
               onChange={handleAmountChange}
-              onFocus={() => {
-                if (form.amount) {
-                  const amount = parseCopAmount(form.amount);
-                  setForm((prev) => ({ ...prev, amount: Number.isFinite(amount) ? String(amount) : "" }));
-                }
-              }}
-              onBlur={() => {
-                const amount = parseCopAmount(form.amount);
-                if (Number.isFinite(amount) && amount !== 0) {
-                  setForm((prev) => ({ ...prev, amount: formatCopInput(amount) }));
-                }
-              }}
-              placeholder="$ 0"
+              onKeyDown={handleAmountKeyDown}
+              onPaste={handleAmountPaste}
+              placeholder="0"
               autoComplete="off"
               required
             />
-            <span className="field-hint">COP sin decimales. Positivo para ingresos; negativo para gastos.</span>
+            <span className="field-hint">Pesos enteros, sin decimales. Máximo 99.999.999.</span>
           </div>
           <DateCalendar
             key={`${modalOpen}-${form.expense_date || "empty"}`}
@@ -513,7 +559,7 @@ function Expenses() {
           )}
           <div className="field-group">
             <label>Notas</label>
-            <textarea name="notes" value={form.notes} onChange={handleChange} />
+            <textarea name="notes" value={form.notes} onChange={handleChange} maxLength={2000} />
           </div>
 
           <button type="submit" className="btn-guardar">

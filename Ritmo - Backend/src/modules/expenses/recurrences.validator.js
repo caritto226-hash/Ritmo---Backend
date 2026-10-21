@@ -1,4 +1,9 @@
+const { getTodayInBogota } = require('../../utils/dates');
+
 const frequencies = new Set(['daily', 'weekly', 'monthly', 'yearly']);
+// Cada repetición se guarda en expenses.amount DECIMAL(10,2).
+const MAX_ABSOLUTE_AMOUNT = 99999999.99;
+const MAX_NOTES_LENGTH = 2000;
 
 function validateCreateRecurrence(req, res, next) {
 	const {
@@ -22,14 +27,17 @@ function validateCreateRecurrence(req, res, next) {
 	if (!hasAtMostTwoDecimals(amount)) {
 		return next(badRequestError('El monto debe tener máximo dos decimales'));
 	}
+	if (Math.abs(amount) > MAX_ABSOLUTE_AMOUNT) {
+		return next(badRequestError('El monto no puede superar 99.999.999,99'));
+	}
 	if (!frequencies.has(frequency)) {
 		return next(badRequestError('La frecuencia debe ser daily, weekly, monthly o yearly'));
 	}
 	if (!isValidDateOnly(startDate)) {
 		return next(badRequestError('La fecha inicial debe tener formato YYYY-MM-DD y ser válida'));
 	}
-	if (notes !== undefined && notes !== null && typeof notes !== 'string') {
-		return next(badRequestError('Las notas deben ser un texto'));
+	if (notes !== undefined && notes !== null && (typeof notes !== 'string' || notes.length > MAX_NOTES_LENGTH)) {
+		return next(badRequestError(`Las notas deben ser un texto de hasta ${MAX_NOTES_LENGTH} caracteres`));
 	}
 
 	req.body = {
@@ -48,7 +56,7 @@ function validateConfirmOccurrence(req, res, next) {
 	if (paidDate !== undefined && !isValidDateOnly(paidDate)) {
 		return next(badRequestError('paidDate debe tener formato YYYY-MM-DD y ser válida'));
 	}
-	if (paidDate !== undefined && paidDate > todayInTimeZone()) {
+	if (paidDate !== undefined && paidDate > getTodayInBogota()) {
 		return next(badRequestError('paidDate no puede ser una fecha futura'));
 	}
 	return next();
@@ -86,17 +94,6 @@ function isValidDateOnly(value) {
 function hasAtMostTwoDecimals(amount) {
 	const cents = amount * 100;
 	return Math.abs(cents - Math.round(cents)) <= Number.EPSILON * Math.max(1, Math.abs(cents)) * 4;
-}
-
-function todayInTimeZone() {
-	const parts = new Intl.DateTimeFormat('en-CA', {
-		timeZone: 'America/Bogota',
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-	}).formatToParts(new Date());
-	const dateParts = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-	return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
 }
 
 function badRequestError(message) {

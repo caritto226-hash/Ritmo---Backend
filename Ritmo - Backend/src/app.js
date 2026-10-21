@@ -1,4 +1,6 @@
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const {
 	notFoundMiddleware,
 	errorMiddleware,
@@ -11,15 +13,21 @@ const expensesRouter = require('./modules/expenses');
 const habitsRouter = require('./modules/habits');
 const dashboardRouter = require('./modules/dashboard');
 const categoriesRouter = require('./modules/categories');
-const cors = require('cors');
 const app = express();
 
+// Orígenes permitidos separados por comas en CORS_ORIGIN; por defecto, el servidor de Vite.
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+	.split(',')
+	.map((origin) => origin.trim())
+	.filter(Boolean);
 
+app.disable('x-powered-by');
+app.use(helmet());
 app.use(express.json());
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: allowedOrigins,
   })
 );
 

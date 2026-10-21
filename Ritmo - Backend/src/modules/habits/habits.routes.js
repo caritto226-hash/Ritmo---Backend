@@ -6,8 +6,11 @@ const {
 } = require('./habits.validator');
 const habitsController = require('./habits.controller');
 const { verifyToken } = require('../../middlewares/auth.middleware');
+const { validateIdParam } = require('../../middlewares/id-param.middleware');
 
 const router = express.Router();
+
+router.param('id', validateIdParam);
 
 router.post('/', verifyToken, validateCreateHabit, habitsController.createHabit);
 router.get('/', verifyToken, habitsController.getHabits);

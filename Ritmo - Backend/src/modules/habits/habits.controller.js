@@ -4,7 +4,7 @@ async function createHabit(req, res, next) {
 	try {
 		const habit = await habitsService.createHabit(req.user.id, req.body);
 
-		return res.status(201).json(habit);
+		return res.status(201).json({ data: habit });
 	} catch (error) {
 		return next(error);
 	}

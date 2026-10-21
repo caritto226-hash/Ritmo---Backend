@@ -6,6 +6,16 @@ const monthFormatter = new Intl.DateTimeFormat("es-CO", {
   year: "numeric",
 });
 
+// Intl devuelve "octubre de 2026"; solo se pone en mayúscula la primera letra.
+function formatMonth(date) {
+  const label = monthFormatter.format(date);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+function getTodayKeyInBogota() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Bogota" }).format(new Date());
+}
+
 function toDateKey(date) {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -38,7 +48,7 @@ function DashboardCalendar({ commitmentDates, error }) {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
-  const todayKey = toDateKey(new Date());
+  const todayKey = getTodayKeyInBogota();
   const days = getCalendarDays(visibleMonth);
 
   function changeMonth(offset) {
@@ -63,7 +73,7 @@ function DashboardCalendar({ commitmentDates, error }) {
               <path d="m15 18-6-6 6-6" />
             </svg>
           </button>
-          <strong>{monthFormatter.format(visibleMonth)}</strong>
+          <strong>{formatMonth(visibleMonth)}</strong>
           <button
             type="button"
             onClick={() => changeMonth(1)}
@@ -76,7 +86,7 @@ function DashboardCalendar({ commitmentDates, error }) {
         </div>
       </header>
 
-      <div className="dashboard-calendar-grid" role="grid" aria-label={monthFormatter.format(visibleMonth)}>
+      <div className="dashboard-calendar-grid" role="grid" aria-label={formatMonth(visibleMonth)}>
         {weekdays.map((weekday, index) => (
           <span className="dashboard-calendar-weekday" role="columnheader" key={`${weekday}-${index}`}>
             {weekday}

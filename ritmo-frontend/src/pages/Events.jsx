@@ -27,6 +27,16 @@ const recurrenceFrequencies = [
 ];
 
 const monthNames = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+const statusLabels = {
+  programado: "Programado",
+  completado: "Completado",
+  cancelado: "Cancelado",
+};
+
+// La API devuelve la hora como "HH:mm:ss"; en pantalla se muestra "HH:mm".
+function formatTime(value) {
+  return value ? String(value).slice(0, 5) : "";
+}
 
 function Events() {
   const [events, setEvents] = useState([]);
@@ -66,7 +76,8 @@ function Events() {
 
   function openCreateForm() {
     setEditingId(null);
-    setForm({ ...emptyForm, categoryId: categories[0] ? String(categories[0].id) : "" });
+    // La categoría es opcional: no se asigna ninguna sin que el usuario la elija.
+    setForm(emptyForm);
     setShowForm(true);
   }
 
@@ -117,7 +128,7 @@ function Events() {
       title: item.title,
       description: item.description || "",
       event_date: item.eventDate ? item.eventDate.slice(0, 10) : "",
-      event_time: item.eventTime || "",
+      event_time: formatTime(item.eventTime),
       duration: item.duration || "",
       location: item.location || "",
       categoryId: item.categoryId ? String(item.categoryId) : "",
@@ -133,6 +144,7 @@ function Events() {
   }
 
   async function handleDelete(id) {
+    if (!window.confirm("¿Eliminar este evento? Esta acción no se puede deshacer.")) return;
     try {
       await eventsService.remove(id);
       loadEvents();
@@ -141,12 +153,12 @@ function Events() {
     }
   }
 
-  async function markEventDone(item) {
+  async function changeEventStatus(item, status) {
     try {
-      await eventsService.changeStatus(item.id, "realizado");
+      await eventsService.changeStatus(item.id, status);
       await loadEvents();
     } catch (err) {
-      setError(err.response?.data?.message || "No se pudo marcar el evento como realizado");
+      setError(err.response?.data?.message || "No se pudo cambiar el estado del evento");
     }
   }
 
@@ -175,10 +187,11 @@ function Events() {
     await handleDelete(id);
   }
 
-  function dateParts(isoDate) {
-    if (!isoDate) return { day: "--", month: "" };
-    const date = new Date(isoDate);
-    return { day: date.getUTCDate(), month: monthNames[date.getUTCMonth()] };
+  // eventDate llega como "YYYY-MM-DD HH:mm:ss": se lee del texto, sin pasar por la zona horaria del navegador.
+  function dateParts(value) {
+    const match = typeof value === "string" ? value.match(/^(\d{4})-(\d{2})-(\d{2})/) : null;
+    if (!match) return { day: "--", month: "" };
+    return { day: Number(match[3]), month: monthNames[Number(match[2]) - 1] };
   }
 
   if (loading) return <p>Cargando eventos...</p>;
@@ -205,8 +218,8 @@ function Events() {
             {error && <p className="modal-form-error" role="alert">{error}</p>}
             <form onSubmit={handleSubmit}>
             <div className="input-group">
-              <label>Título</label>
-              <input name="title" value={form.title} onChange={handleChange} required />
+              <label htmlFor="event-title">Título</label>
+              <input id="event-title" name="title" value={form.title} onChange={handleChange} maxLength={150} required />
             </div>
             <div className="input-group">
               <label>Categoría</label>
@@ -242,8 +255,8 @@ function Events() {
               </div>
             )}
             <div className="input-group">
-              <label>Descripción (opcional)</label>
-              <textarea className="ritmo-textarea" name="description" value={form.description} onChange={handleChange} />
+              <label htmlFor="event-description">Descripción (opcional)</label>
+              <textarea id="event-description" className="ritmo-textarea" name="description" value={form.description} onChange={handleChange} maxLength={2000} />
             </div>
             <DateCalendar
               name="event_date"
@@ -263,12 +276,12 @@ function Events() {
             </div>
             <div className="time-row">
               <div className="time-field">
-                <label>Duración (min)</label>
-                <input type="number" name="duration" value={form.duration} onChange={handleChange} required />
+                <label htmlFor="event-duration">Duración (min)</label>
+                <input id="event-duration" type="number" min="1" max="1440" name="duration" value={form.duration} onChange={handleChange} required />
               </div>
               <div className="time-field">
-                <label>Ubicación (opcional)</label>
-                <input name="location" value={form.location} onChange={handleChange} />
+                <label htmlFor="event-location">Ubicación (opcional)</label>
+                <input id="event-location" name="location" value={form.location} onChange={handleChange} maxLength={150} />
               </div>
             </div>
 
@@ -306,16 +319,22 @@ function Events() {
                   <CategoryIconBadge category={item.category} size={18} />
                   {item.title}
                 </h4>
-                <p>{item.eventTime} · {item.duration} min</p>
+                <p>{formatTime(item.eventTime)} · {item.duration} min</p>
                 {item.category?.name && <p>{item.category.name}</p>}
-                {item.status === "realizado"
-                  ? <p>Realizado</p>
-                  : <button type="button" className="btn-secondary" onClick={() => markEventDone(item)}>Realizado</button>}
+                <p className="event-status">Estado: {statusLabels[item.status] || item.status}</p>
+                {item.status === "programado" ? (
+                  <div className="event-status-actions">
+                    <button type="button" className="btn-secondary" onClick={() => changeEventStatus(item, "completado")}>Completar</button>
+                    <button type="button" className="btn-secondary" onClick={() => changeEventStatus(item, "cancelado")}>Cancelar evento</button>
+                  </div>
+                ) : (
+                  <button type="button" className="btn-secondary" onClick={() => changeEventStatus(item, "programado")}>Volver a programado</button>
+                )}
                 {item.location && <p className="event-location">📍 {item.location}</p>}
               </div>
 
-              <button className="tx-edit" onClick={() => handleEdit(item)}>✎</button>
-              <button className="tx-delete" onClick={() => handleDelete(item.id)}>🗑</button>
+              <button className="tx-edit" onClick={() => handleEdit(item)} aria-label={`Editar ${item.title}`}>✎</button>
+              <button className="tx-delete" onClick={() => handleDelete(item.id)} aria-label={`Eliminar ${item.title}`}>🗑</button>
               <button
                 type="button"
                 className="mobile-row-open"
@@ -337,11 +356,11 @@ function Events() {
         details={selectedEvent ? [
           { label: "Descripción", value: selectedEvent.description },
           { label: "Fecha", value: selectedEvent.eventDate?.slice(0, 10) },
-          { label: "Hora", value: selectedEvent.eventTime },
+          { label: "Hora", value: formatTime(selectedEvent.eventTime) },
           { label: "Duración", value: `${selectedEvent.duration} min` },
           { label: "Ubicación", value: selectedEvent.location },
           { label: "Categoría", value: selectedEvent.category?.name || "Sin categoría" },
-          { label: "Estado", value: selectedEvent.status },
+          { label: "Estado", value: statusLabels[selectedEvent.status] || selectedEvent.status },
           { label: "Recurrencia", value: selectedEvent.recurrenceFrequency || "No recurrente" },
         ] : []}
         onClose={() => setSelectedEvent(null)}

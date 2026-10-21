@@ -136,7 +136,7 @@ async function deleteEvent(eventId, userId) {
 
 async function changeStatus(eventId, userId, status) {
 	validateIds(eventId, userId);
-	if (status !== 'realizado') {
+	if (!['programado', 'completado', 'cancelado'].includes(status)) {
 		throw badRequestError('El estado del evento no es válido');
 	}
 	await eventsRepository.updateStatus(eventId, userId, status);

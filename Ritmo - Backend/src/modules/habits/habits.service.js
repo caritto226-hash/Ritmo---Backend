@@ -1,5 +1,6 @@
 const habitsRepository = require('./habits.repository');
 const categoriesRepository = require('../categories/categories.repository');
+const { getTodayInBogota } = require('../../utils/dates');
 
 async function createHabit(userId, habitData) {
 	validateUserId(userId);
@@ -73,6 +74,11 @@ async function updateHabit(habitId, userId, data) {
 		&& filteredData.categoryId !== habit.categoryId) {
 		await validateHabitCategory(filteredData.categoryId, userId);
 	}
+	if (filteredData.reminderTime && !(filteredData.categoryId ?? habit.categoryId)) {
+		const error = new Error('El recordatorio requiere una categoría que permita recurrencias');
+		error.statusCode = 400;
+		throw error;
+	}
 	if (filteredData.reminderTime
 		&& (filteredData.reminderTime !== String(habit.reminderTime || '').slice(0, 5)
 			|| (filteredData.categoryId !== undefined && filteredData.categoryId !== habit.categoryId))) {
@@ -125,18 +131,6 @@ function validateIds(habitId, userId) {
 		error.statusCode = 400;
 		throw error;
 	}
-}
-
-function getTodayInBogota() {
-	const parts = new Intl.DateTimeFormat('en-CA', {
-		timeZone: 'America/Bogota',
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-	}).formatToParts(new Date());
-	const dateParts = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-
-	return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
 }
 
 module.exports = {

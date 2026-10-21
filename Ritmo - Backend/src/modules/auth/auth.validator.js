@@ -1,5 +1,7 @@
 function validateLogin(req, res, next) {
-	const { correo, contraseña } = req.body || {};
+	const { correo, password } = req.body || {};
+	// Se acepta "password" igual que en el registro, además de "contraseña".
+	const contraseña = req.body && req.body['contraseña'] !== undefined ? req.body['contraseña'] : password;
 
 	if (typeof correo !== 'string' || correo.trim() === '') {
 		const error = new Error('El correo es obligatorio');
@@ -23,6 +25,7 @@ function validateLogin(req, res, next) {
 	}
 
 	req.body.correo = normalizedCorreo;
+	req.body['contraseña'] = contraseña;
 
 	return next();
 }

@@ -1,3 +1,7 @@
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 150;
+const ROL_USUARIO = 1;
+
 function validateCreateUser(req, res, next) {
 	const { nombre, correo, password, idRol } = req.body || {};
 	const passwordAlias = req.body ? req.body['contrase\u00f1a'] : undefined;
@@ -5,6 +9,12 @@ function validateCreateUser(req, res, next) {
 
 	if (typeof nombre !== 'string' || nombre.trim() === '') {
 		const error = new Error('El nombre es obligatorio');
+		error.statusCode = 400;
+		return next(error);
+	}
+
+	if (nombre.trim().length > MAX_NAME_LENGTH) {
+		const error = new Error(`El nombre no puede superar los ${MAX_NAME_LENGTH} caracteres`);
 		error.statusCode = 400;
 		return next(error);
 	}
@@ -24,6 +34,12 @@ function validateCreateUser(req, res, next) {
 		return next(error);
 	}
 
+	if (normalizedCorreo.length > MAX_EMAIL_LENGTH) {
+		const error = new Error(`El correo no puede superar los ${MAX_EMAIL_LENGTH} caracteres`);
+		error.statusCode = 400;
+		return next(error);
+	}
+
 	if (typeof userPassword !== 'string' || userPassword.length === 0) {
 		const error = new Error('La contraseña es obligatoria');
 		error.statusCode = 400;
@@ -36,13 +52,8 @@ function validateCreateUser(req, res, next) {
 		return next(error);
 	}
 
-	if (idRol === undefined || idRol === null || idRol === '') {
-		const error = new Error('El rol es obligatorio');
-		error.statusCode = 400;
-		return next(error);
-	}
-
-	const normalizedIdRol = Number(idRol);
+	// El registro público crea usuarios normales (rol 1) cuando no se envía idRol.
+	const normalizedIdRol = idRol === undefined || idRol === null || idRol === '' ? ROL_USUARIO : Number(idRol);
 
 	if (!Number.isInteger(normalizedIdRol) || normalizedIdRol <= 0) {
 		const error = new Error('El rol debe ser un entero positivo');
@@ -60,7 +71,7 @@ function validateCreateUser(req, res, next) {
 
 function validateUpdateUser(req, res, next) {
   try {
-    const { nombre, correo, idRol } = req.body;
+    const { nombre, correo, idRol } = req.body || {};
 
     if (!nombre || typeof nombre !== 'string' || nombre.trim() === '') {
       const error = new Error('El nombre es obligatorio');
@@ -68,9 +79,21 @@ function validateUpdateUser(req, res, next) {
       throw error;
     }
 
+    if (nombre.trim().length > MAX_NAME_LENGTH) {
+      const error = new Error(`El nombre no puede superar los ${MAX_NAME_LENGTH} caracteres`);
+      error.statusCode = 400;
+      throw error;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!correo || !emailRegex.test(correo)) {
+    if (typeof correo !== 'string' || !emailRegex.test(correo.trim())) {
       const error = new Error('El correo es obligatorio y debe tener formato válido');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    if (correo.trim().length > MAX_EMAIL_LENGTH) {
+      const error = new Error(`El correo no puede superar los ${MAX_EMAIL_LENGTH} caracteres`);
       error.statusCode = 400;
       throw error;
     }
@@ -95,7 +118,7 @@ function validateUpdateUser(req, res, next) {
 
 function validateStatus(req, res, next) {
   try {
-    const { status } = req.body;
+    const { status } = req.body || {};
 
     if (typeof status !== 'boolean') {
       const error = new Error('El status debe ser true o false');

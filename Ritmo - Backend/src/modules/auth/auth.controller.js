@@ -14,16 +14,11 @@ async function login(req, res, next) {
 async function forgotPassword(req, res, next) {
 	try {
 		const { correo } = req.body;
-		const token = await authService.forgotPassword(correo);
-		const response = {
+		await authService.forgotPassword(correo);
+
+		return res.status(200).json({
 			message: 'Si el correo existe, recibirás instrucciones de recuperación',
-		};
-
-		if (token) {
-			response.token = token;
-		}
-
-		return res.status(200).json(response);
+		});
 	} catch (error) {
 		return next(error);
 	}

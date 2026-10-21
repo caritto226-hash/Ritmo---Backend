@@ -63,7 +63,7 @@ async function remove(req, res, next) {
 
 		await usersService.remove(id);
 
-		return res.status(200).json({ message: 'User deleted successfully' });
+		return res.status(200).json({ message: 'Usuario eliminado correctamente' });
 	} catch (error) {
 		return next(error);
 	}

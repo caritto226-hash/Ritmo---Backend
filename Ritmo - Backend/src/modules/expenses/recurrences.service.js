@@ -1,5 +1,6 @@
 const categoriesRepository = require('../categories/categories.repository');
 const recurrencesRepository = require('./recurrences.repository');
+const { getTodayInBogota } = require('../../utils/dates');
 
 async function createRecurrence(userId, data) {
 	validateUserId(userId);
@@ -18,7 +19,7 @@ async function createRecurrence(userId, data) {
 
 async function getReminders(userId) {
 	validateUserId(userId);
-	const today = dateInTimeZone(new Date(), 'America/Bogota');
+	const today = getTodayInBogota();
 	return (await recurrencesRepository.findRemindersByUser(userId)).map((reminder) => ({
 		...reminder,
 		isOverdue: reminder.scheduledDate < today,
@@ -34,7 +35,7 @@ async function confirmOccurrence(occurrenceId, userId, paidDate) {
 	return recurrencesRepository.confirmOccurrence(
 		occurrenceId,
 		userId,
-		paidDate || dateInTimeZone(new Date(), 'America/Bogota'),
+		paidDate || getTodayInBogota(),
 	);
 }
 
@@ -50,7 +51,7 @@ async function cancelRecurrence(recurrenceId, userId, scope) {
 		recurrenceId,
 		userId,
 		scope,
-		dateInTimeZone(new Date(), 'America/Bogota'),
+		getTodayInBogota(),
 	);
 }
 
@@ -74,17 +75,6 @@ function validateUserId(userId) {
 		error.statusCode = 401;
 		throw error;
 	}
-}
-
-function dateInTimeZone(date, timeZone) {
-	const parts = new Intl.DateTimeFormat('en-CA', {
-		timeZone,
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-	}).formatToParts(date);
-	const dateParts = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-	return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
 }
 
 function badRequestError(message) {

@@ -59,7 +59,7 @@ async function findAllByUser(userId) {
 	return rows.map(mapEvent);
 }
 
-async function findUpcomingByUser(userId) {
+async function findUpcomingByUser(userId, today) {
 	const [rows] = await pool.query(
 		`SELECT event.id, event.user_id AS userId, event.category_id AS categoryId,
 			event.recurrence_frequency AS recurrenceFrequency, event.title, event.description,
@@ -70,10 +70,10 @@ async function findUpcomingByUser(userId) {
 		FROM events AS event
 		LEFT JOIN categories AS category
 			ON category.id = event.category_id AND category.user_id = event.user_id
-		WHERE event.user_id = ? AND event.event_date >= CURDATE()
-			AND event.deleted_at IS NULL
+		WHERE event.user_id = ? AND event.event_date >= ?
+			AND event.status = 'programado' AND event.deleted_at IS NULL
 		ORDER BY event.event_date ASC, event.event_time ASC`,
-		[userId],
+		[userId, today],
 	);
 
 	return rows.map(mapEvent);
@@ -166,12 +166,13 @@ async function updateStatus(eventId, userId, status) {
 			error.statusCode = 404;
 			throw error;
 		}
-		const wasCompleted = event.status === 'realizado';
+		const wasCompleted = event.status === 'completado';
 		await connection.query(
 			'UPDATE events SET status = ? WHERE id = ? AND user_id = ? AND deleted_at IS NULL',
 			[status, eventId, userId],
 		);
-		if (status === 'realizado' && !wasCompleted
+		// Solo completar genera la siguiente repetición; cancelar o volver a "programado" no.
+		if (status === 'completado' && !wasCompleted
 			&& !Boolean(event.recurrenceAdvanced) && event.recurrenceFrequency) {
 			const nextDate = getNextDate(
 				event.eventDate,

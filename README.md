@@ -28,7 +28,7 @@ Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanz
 - Crear una cuenta, iniciar sesión y recuperar la contraseña.
 - Organizar tareas con prioridad, categoría y repetición.
 - Llevar hábitos con seguimiento diario.
-- Programar eventos y marcarlos como realizados.
+- Programar eventos y marcarlos como completados o cancelados.
 - Registrar ingresos y gastos, clasificarlos por categoría, ver el resumen del mes y manejar pagos que se repiten.
 - Organizar todo con categorías predeterminadas o creadas por la propia persona.
 - Ver un dashboard con el progreso del día.
@@ -38,7 +38,7 @@ Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanz
 | Cuenta y usuarios | Registro, inicio de sesión, recuperación de contraseña y roles (usuario y soporte) | `/api/auth`, `/api/users` |
 | Tareas | Crear, consultar, actualizar, completar y eliminar tareas, con prioridad, estado, categoría y repetición | `/api/tasks` |
 | Hábitos | Crear y editar hábitos, marcar su cumplimiento por día y guardar una hora de recordatorio | `/api/habits` |
-| Eventos | Programar eventos, consultarlos, marcarlos como realizados y repetirlos | `/api/events` |
+| Eventos | Programar eventos, consultarlos, completarlos o cancelarlos y repetirlos | `/api/events` |
 | Finanzas | Registrar ingresos y gastos, clasificarlos por categoría, ver el resumen del mes y manejar pagos recurrentes | `/api/expenses` |
 | Categorías | Clasificar la información de finanzas, tareas, hábitos y eventos, con categorías predeterminadas o propias | `/api/categories` |
 | Dashboard | Ver el resumen del día: progreso de tareas y hábitos, agenda del día con filtros y recordatorios de pagos | `/api/dashboard` |
@@ -156,6 +156,8 @@ DB_NAME=ritmo_organizadorpersonal
 
 JWT_SECRET=your_jwt_secret_here
 JWT_EXPIRES_IN=1h
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:5173
 ```
 
 | Variable | Para qué sirve | ¿Obligatoria? |
@@ -279,7 +281,7 @@ POST /api/users
 }
 ```
 
-- El registro es público, pero **solo se permite `idRol: 1`**. Las cuentas de soporte se asignan directamente en la base de datos.
+- El registro es público, pero **solo se permite `idRol: 1`**; si no se envía `idRol`, se asigna 1. Las cuentas de soporte se asignan directamente en la base de datos.
 - El correo no puede estar registrado antes.
 - La contraseña debe tener mínimo 6 caracteres. Se guarda cifrada con bcrypt y nunca se devuelve.
 - La respuesta es `{ id, name, email, roleId }`.
@@ -360,7 +362,7 @@ Se crean con `POST /api/expenses/recurrences`, usando una categoría con `isRecu
 
 ### Tareas y eventos que se repiten
 
-Si la categoría tiene `isRecurring`, una tarea o un evento puede tener `recurrenceFrequency` (`daily`, `weekly`, `monthly` o `yearly`). La siguiente tarea se crea cuando la actual se marca como `completada`, y el siguiente evento cuando el actual se marca como `realizado`. Si no se completa, queda vencida; no se crean copias solas.
+Si la categoría tiene `isRecurring`, una tarea o un evento puede tener `recurrenceFrequency` (`daily`, `weekly`, `monthly` o `yearly`). La siguiente tarea se crea cuando la actual se marca como `completada`, y el siguiente evento cuando el actual se marca como `completado`. Un evento puede estar `programado`, `completado` o `cancelado`, y se puede devolver a `programado`; cancelar no genera la siguiente repetición. Si no se completa, queda vencida; no se crean copias solas.
 
 ## Pruebas con Postman
 
@@ -444,7 +446,9 @@ El mismo sistema de categorías se reutiliza en **tareas, hábitos y eventos**, 
 - Las contraseñas se guardan cifradas con bcrypt, nunca en texto plano.
 - Las consultas SQL usan parámetros (`?`), que evitan la inyección SQL.
 - Los archivos `.env` del backend y del frontend están en `.gitignore`. En GitHub solo están los `.env.example`.
-- La recuperación de contraseña (`/api/auth/forgot-password`) devuelve el token en la respuesta **solo para poder probarla en Postman**. En una versión de producción ese token debería llegar por correo.
+- La recuperación de contraseña (`/api/auth/forgot-password`) **nunca devuelve el token en la respuesta**. Mientras no haya envío de correos, con `NODE_ENV=development` el token se muestra solo en la consola del servidor para poder probar `/api/auth/reset-password`.
+- Los JWT dejan de servir (401) si el usuario se elimina, se desactiva o cambia su contraseña.
+- `/api/auth/login` admite 5 intentos fallidos cada 15 minutos por IP y correo; después responde 429.
 
 ## Estado actual
 
@@ -456,7 +460,7 @@ El mismo sistema de categorías se reutiliza en **tareas, hábitos y eventos**, 
 | ✅ | Recuperación de contraseña con token (sin envío de correo) |
 | ✅ | Tareas: CRUD, estados, prioridad, categoría y repetición |
 | ✅ | Hábitos: CRUD y seguimiento por día |
-| ✅ | Eventos: CRUD, marcar como realizado y repetición |
+| ✅ | Eventos: CRUD, completar, cancelar y repetición |
 | ✅ | Finanzas: ingresos y gastos, resumen del mes y pagos recurrentes |
 | ✅ | Categorías por módulo |
 | ✅ | Dashboard con el resumen del día |

@@ -1,3 +1,9 @@
+const { getTodayInBogota } = require('../../utils/dates');
+
+// expenses.amount es DECIMAL(10,2): el valor absoluto máximo es 99.999.999,99.
+const MAX_ABSOLUTE_AMOUNT = 99999999.99;
+const MAX_NOTES_LENGTH = 2000;
+
 function validateCreateExpense(req, res, next) {
 	const {
 		concept,
@@ -37,14 +43,20 @@ function validateCreateExpense(req, res, next) {
 		return next(error);
 	}
 
+	if (Math.abs(amount) > MAX_ABSOLUTE_AMOUNT) {
+		const error = new Error('El monto no puede superar 99.999.999,99');
+		error.statusCode = 400;
+		return next(error);
+	}
+
 	if (expenseDate !== undefined && expenseDate !== null && (!isValidDateOnly(expenseDate))) {
 		const error = new Error('La fecha del gasto debe tener formato YYYY-MM-DD');
 		error.statusCode = 400;
 		return next(error);
 	}
 
-	if (notes !== undefined && notes !== null && typeof notes !== 'string') {
-		const error = new Error('Las notas deben ser un texto');
+	if (notes !== undefined && notes !== null && (typeof notes !== 'string' || notes.length > MAX_NOTES_LENGTH)) {
+		const error = new Error(`Las notas deben ser un texto de hasta ${MAX_NOTES_LENGTH} caracteres`);
 		error.statusCode = 400;
 		return next(error);
 	}
@@ -52,7 +64,8 @@ function validateCreateExpense(req, res, next) {
 	req.body.concept = concept.trim();
 	req.body.categoryId = categoryId;
 	req.body.amount = Number(amount);
-	req.body.expense_date = expenseDate === undefined || expenseDate === null ? new Date().toISOString().slice(0, 10) : expenseDate.trim();
+	// La fecha por defecto es "hoy" en Bogotá (antes se usaba UTC y después de las 19:00 guardaba el día siguiente).
+	req.body.expense_date = expenseDate === undefined || expenseDate === null ? getTodayInBogota() : expenseDate.trim();
 	req.body.notes = notes === undefined || notes === null ? null : notes.trim();
 
 	return next();
@@ -101,6 +114,12 @@ function validateUpdateExpense(req, res, next) {
 			return next(error);
 		}
 
+		if (Math.abs(amount) > MAX_ABSOLUTE_AMOUNT) {
+			const error = new Error('El monto no puede superar 99.999.999,99');
+			error.statusCode = 400;
+			return next(error);
+		}
+
 		updateData.amount = Number(amount);
 	}
 
@@ -115,8 +134,8 @@ function validateUpdateExpense(req, res, next) {
 	}
 
 	if (notes !== undefined) {
-		if (notes !== null && typeof notes !== 'string') {
-			const error = new Error('Las notas deben ser un texto');
+		if (notes !== null && (typeof notes !== 'string' || notes.length > MAX_NOTES_LENGTH)) {
+			const error = new Error(`Las notas deben ser un texto de hasta ${MAX_NOTES_LENGTH} caracteres`);
 			error.statusCode = 400;
 			return next(error);
 		}

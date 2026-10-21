@@ -1,4 +1,7 @@
 const allowedPriorities = new Set(['alta', 'media', 'baja']);
+// Coincide con tasks.title VARCHAR(45); el mismo límite aplica al crear y al editar.
+const MAX_TITLE_LENGTH = 45;
+const MAX_DESCRIPTION_LENGTH = 2000;
 
 function validateCreateTask(req, res, next) {
 	const {
@@ -19,8 +22,8 @@ function validateCreateTask(req, res, next) {
 		return next(error);
 	}
 
-	if (title.trim().length > 45) {
-		const error = new Error('El título no puede superar los 45 caracteres');
+	if (title.trim().length > MAX_TITLE_LENGTH) {
+		const error = new Error(`El título no puede superar los ${MAX_TITLE_LENGTH} caracteres`);
 		error.statusCode = 400;
 		return next(error);
 	}
@@ -31,8 +34,8 @@ function validateCreateTask(req, res, next) {
 		return next(error);
 	}
 
-	if (description.length > 2000) {
-		const error = new Error('La descripción no puede superar los 2000 caracteres');
+	if (description.length > MAX_DESCRIPTION_LENGTH) {
+		const error = new Error(`La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres`);
 		error.statusCode = 400;
 		return next(error);
 	}
@@ -94,9 +97,13 @@ function validateCreateTask(req, res, next) {
 }
 
 function validateUpdateTask(req, res, next) {
+	const body = req.body || {};
 	const {
-		title, description, due_date: dueDate, priority, categoryId, recurrenceFrequency,
-	} = req.body || {};
+		title, description, priority, categoryId, recurrenceFrequency,
+		start_at: startAt, end_at: endAt,
+	} = body;
+	// Se acepta "date" (el nombre que usa el POST) además de "due_date".
+	const dueDate = body.due_date !== undefined ? body.due_date : body.date;
 	const updateData = {};
 
 	if (title !== undefined) {
@@ -106,8 +113,8 @@ function validateUpdateTask(req, res, next) {
 			return next(error);
 		}
 
-		if (title.trim().length > 150) {
-			const error = new Error('El título no puede superar los 150 caracteres');
+		if (title.trim().length > MAX_TITLE_LENGTH) {
+			const error = new Error(`El título no puede superar los ${MAX_TITLE_LENGTH} caracteres`);
 			error.statusCode = 400;
 			return next(error);
 		}
@@ -122,7 +129,13 @@ function validateUpdateTask(req, res, next) {
 			return next(error);
 		}
 
-		updateData.description = description;
+		if (description.length > MAX_DESCRIPTION_LENGTH) {
+			const error = new Error(`La descripción no puede superar los ${MAX_DESCRIPTION_LENGTH} caracteres`);
+			error.statusCode = 400;
+			return next(error);
+		}
+
+		updateData.description = description.trim();
 	}
 
 	if (dueDate !== undefined) {
@@ -154,16 +167,39 @@ function validateUpdateTask(req, res, next) {
 			error.statusCode = 400;
 			return next(error);
 		}
-		if (recurrenceFrequency !== undefined) {
-			if (recurrenceFrequency !== null && !isValidRecurrenceFrequency(recurrenceFrequency)) {
-				const error = new Error('La frecuencia debe ser daily, weekly, monthly o yearly');
-				error.statusCode = 400;
-				return next(error);
-			}
-			updateData.recurrenceFrequency = recurrenceFrequency;
-		}
 
 		updateData.categoryId = categoryId;
+	}
+
+	// Cada campo se valida por separado: la recurrencia ya no depende de que llegue categoryId.
+	if (recurrenceFrequency !== undefined) {
+		if (recurrenceFrequency !== null && !isValidRecurrenceFrequency(recurrenceFrequency)) {
+			const error = new Error('La frecuencia debe ser daily, weekly, monthly o yearly');
+			error.statusCode = 400;
+			return next(error);
+		}
+
+		updateData.recurrenceFrequency = recurrenceFrequency;
+	}
+
+	if (startAt !== undefined) {
+		if (startAt !== null && !isValidDateTime(startAt)) {
+			const error = new Error('La fecha de inicio debe tener una fecha y hora válidas');
+			error.statusCode = 400;
+			return next(error);
+		}
+
+		updateData.start_at = startAt;
+	}
+
+	if (endAt !== undefined) {
+		if (endAt !== null && !isValidDateTime(endAt)) {
+			const error = new Error('La fecha de finalización debe tener una fecha y hora válidas');
+			error.statusCode = 400;
+			return next(error);
+		}
+
+		updateData.end_at = endAt;
 	}
 
 	if (Object.keys(updateData).length === 0) {

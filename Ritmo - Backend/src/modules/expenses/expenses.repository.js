@@ -77,7 +77,7 @@ async function findAllByUser(userId, categoryId) {
 	return rows.map(mapExpense);
 }
 
-async function getMonthlySummaryByUser(userId) {
+async function getMonthlySummaryByUser(userId, today) {
 	const [rows] = await pool.query(
 		`SELECT
 			COALESCE(SUM(CASE WHEN amount > 0 THEN amount ELSE 0 END), 0) AS income,
@@ -86,23 +86,23 @@ async function getMonthlySummaryByUser(userId) {
 		FROM expenses
 		WHERE user_id = ?
 			AND deleted_at IS NULL
-			AND expense_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
-			AND expense_date < DATE_ADD(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH)`,
-		[userId],
+			AND expense_date >= DATE_FORMAT(?, '%Y-%m-01')
+			AND expense_date < DATE_ADD(DATE_FORMAT(?, '%Y-%m-01'), INTERVAL 1 MONTH)`,
+		[userId, today, today],
 	);
 
 	return rows[0];
 }
 
-async function findRecentByUser(userId) {
+async function findRecentByUser(userId, today) {
 	const [rows] = await pool.query(
 		`${expenseSelect}
 		WHERE expense.user_id = ?
-			AND expense.expense_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01')
-			AND expense.expense_date < DATE_ADD(DATE_FORMAT(CURDATE(), '%Y-%m-01'), INTERVAL 1 MONTH)
+			AND expense.expense_date >= DATE_FORMAT(?, '%Y-%m-01')
+			AND expense.expense_date < DATE_ADD(DATE_FORMAT(?, '%Y-%m-01'), INTERVAL 1 MONTH)
 			AND expense.deleted_at IS NULL
 		ORDER BY expense.expense_date ASC, expense.created_at ASC`,
-		[userId],
+		[userId, today, today],
 	);
 
 	return rows.map(mapExpense);

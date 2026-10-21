@@ -1,3 +1,10 @@
+// Estados según la regla de negocio; "programado" permite deshacer un cambio hecho por error.
+const allowedStatuses = new Set(['programado', 'completado', 'cancelado']);
+// Coinciden con events.title VARCHAR(150) y events.location VARCHAR(150).
+const MAX_TITLE_LENGTH = 150;
+const MAX_LOCATION_LENGTH = 150;
+const MAX_DESCRIPTION_LENGTH = 2000;
+
 function validateCreateEvent(req, res, next) {
 	const {
 		title,
@@ -14,8 +21,8 @@ function validateCreateEvent(req, res, next) {
 		return next(createError('El título es obligatorio'));
 	}
 
-	if (title.trim().length > 150) {
-		return next(createError('El título no puede superar los 150 caracteres'));
+	if (title.trim().length > MAX_TITLE_LENGTH) {
+		return next(createError(`El título no puede superar los ${MAX_TITLE_LENGTH} caracteres`));
 	}
 
 	if (typeof eventDate !== 'string' || !isValidDateOnly(eventDate)) {
@@ -30,12 +37,12 @@ function validateCreateEvent(req, res, next) {
 		return next(createError('La duración es obligatoria y debe ser un entero entre 1 y 1440 minutos'));
 	}
 
-	if (description !== undefined && description !== null && typeof description !== 'string') {
-		return next(createError('La descripción debe ser un texto'));
+	if (description !== undefined && description !== null && !isValidOptionalText(description, MAX_DESCRIPTION_LENGTH)) {
+		return next(createError(`La descripción debe ser un texto de hasta ${MAX_DESCRIPTION_LENGTH} caracteres`));
 	}
 
-	if (location !== undefined && location !== null && typeof location !== 'string') {
-		return next(createError('La ubicación debe ser un texto'));
+	if (location !== undefined && location !== null && !isValidOptionalText(location, MAX_LOCATION_LENGTH)) {
+		return next(createError(`La ubicación debe ser un texto de hasta ${MAX_LOCATION_LENGTH} caracteres`));
 	}
 	if (categoryId !== undefined && categoryId !== null && !isValidId(categoryId)) {
 		return next(createError('categoryId debe ser un entero positivo'));
@@ -67,16 +74,16 @@ function validateUpdateEvent(req, res, next) {
 			return next(createError('El título debe ser un texto no vacío'));
 		}
 
-		if (data.title.trim().length > 150) {
-			return next(createError('El título no puede superar los 150 caracteres'));
+		if (data.title.trim().length > MAX_TITLE_LENGTH) {
+			return next(createError(`El título no puede superar los ${MAX_TITLE_LENGTH} caracteres`));
 		}
 
 		updateData.title = data.title.trim();
 	}
 
 	if (Object.prototype.hasOwnProperty.call(data, 'description')) {
-		if (data.description !== null && typeof data.description !== 'string') {
-			return next(createError('La descripción debe ser un texto'));
+		if (data.description !== null && !isValidOptionalText(data.description, MAX_DESCRIPTION_LENGTH)) {
+			return next(createError(`La descripción debe ser un texto de hasta ${MAX_DESCRIPTION_LENGTH} caracteres`));
 		}
 
 		updateData.description = data.description;
@@ -107,8 +114,8 @@ function validateUpdateEvent(req, res, next) {
 	}
 
 	if (Object.prototype.hasOwnProperty.call(data, 'location')) {
-		if (data.location !== null && typeof data.location !== 'string') {
-			return next(createError('La ubicación debe ser un texto'));
+		if (data.location !== null && !isValidOptionalText(data.location, MAX_LOCATION_LENGTH)) {
+			return next(createError(`La ubicación debe ser un texto de hasta ${MAX_LOCATION_LENGTH} caracteres`));
 		}
 		updateData.location = data.location;
 	}
@@ -137,10 +144,18 @@ function validateUpdateEvent(req, res, next) {
 
 function validateEventStatus(req, res, next) {
 	const { status } = req.body || {};
-	if (status !== 'realizado') {
-		return next(createError('El estado debe ser realizado'));
+	const normalizedStatus = typeof status === 'string' ? status.trim().toLowerCase() : '';
+
+	if (!allowedStatuses.has(normalizedStatus)) {
+		return next(createError('El estado debe ser programado, completado o cancelado'));
 	}
+
+	req.body.status = normalizedStatus;
 	return next();
+}
+
+function isValidOptionalText(value, maxLength) {
+	return typeof value === 'string' && value.length <= maxLength;
 }
 
 function isValidId(value) {

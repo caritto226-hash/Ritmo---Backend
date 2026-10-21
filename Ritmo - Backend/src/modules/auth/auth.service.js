@@ -5,18 +5,14 @@ const authRepository = require('./auth.repository');
 const usersRepository = require('../users/users.repository');
 const resetTokensRepository = require('./reset-tokens.repository');
 
+// Hash de una contraseña ficticia: se compara cuando el correo no existe para que el login tarde lo mismo.
+const DUMMY_PASSWORD_HASH = bcrypt.hashSync('ritmo-contrasena-ficticia', 10);
+
 async function login(correo, contraseña) {
 	const user = await authRepository.findByEmailWithPassword(correo);
+	const passwordMatches = await bcrypt.compare(contraseña, user ? user.password_hash : DUMMY_PASSWORD_HASH);
 
-	if (!user) {
-		const error = new Error('Credenciales inválidas');
-		error.statusCode = 401;
-		throw error;
-	}
-
-	const passwordMatches = await bcrypt.compare(contraseña, user.password_hash);
-
-	if (!passwordMatches) {
+	if (!user || !passwordMatches) {
 		const error = new Error('Credenciales inválidas');
 		error.statusCode = 401;
 		throw error;
@@ -48,8 +44,11 @@ async function forgotPassword(correo) {
 
 	await resetTokensRepository.createToken(user.id, tokenHash, expiresAt);
 
-	// Solo para pruebas académicas con Postman; en producción debe enviarse por correo y nunca devolverse.
-	return token;
+	// El token nunca viaja en la respuesta HTTP. Mientras no haya envío de correos,
+	// solo se muestra en la consola del servidor en desarrollo para poder probar el flujo.
+	if (process.env.NODE_ENV === 'development') {
+		console.info(`[forgot-password] Token de recuperación para el usuario ${user.id}: ${token}`);
+	}
 }
 
 async function resetPassword(token, nuevaContrasena) {

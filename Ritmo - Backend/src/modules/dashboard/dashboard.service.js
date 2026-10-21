@@ -3,10 +3,11 @@ const habitsRepository = require('../habits/habits.repository');
 const eventsRepository = require('../events/events.repository');
 const expensesRepository = require('../expenses/expenses.repository');
 const usersRepository = require('../users/users.repository');
+const { getTodayInBogota } = require('../../utils/dates');
 
 async function getDashboard(userId) {
 	validateUserId(userId);
-	const today = getDateInTimeZone(new Date(), 'America/Bogota');
+	const today = getTodayInBogota();
 
 	const [user, todayTaskStats, todayHabitStats, upcomingTasks, pendingHabits, upcomingEvents, recentExpenses] = await Promise.all([
 		usersRepository.findById(userId),
@@ -14,8 +15,8 @@ async function getDashboard(userId) {
 		habitsRepository.findTodayStatsByUser(userId, today),
 		tasksRepository.findUpcomingByUser(userId, today),
 		habitsRepository.findPendingTodayByUser(userId, today),
-		eventsRepository.findUpcomingByUser(userId),
-		expensesRepository.findRecentByUser(userId),
+		eventsRepository.findUpcomingByUser(userId, today),
+		expensesRepository.findRecentByUser(userId, today),
 	]);
 
 	const completed = Number(todayTaskStats.completed) + Number(todayHabitStats.completed);
@@ -34,7 +35,7 @@ async function getDashboard(userId) {
 			type: 'event',
 			date: event.eventDate,
 		})),
-		...recentExpenses.map((expense) => ({
+		...recentExpenses.filter((expense) => expense.expenseDate >= today).map((expense) => ({
 			...expense,
 			type: 'expense',
 			date: expense.expenseDate,
@@ -69,18 +70,6 @@ async function getDashboard(userId) {
 	};
 }
 
-function getDateInTimeZone(date, timeZone) {
-	const parts = new Intl.DateTimeFormat('en-CA', {
-		timeZone,
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-	}).formatToParts(date);
-	const dateParts = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-
-	return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
-}
-
 function validateUserId(userId) {
 	if (!Number.isInteger(userId) || userId <= 0) {
 		const error = new Error('El usuario autenticado no es válido');
@@ -91,5 +80,4 @@ function validateUserId(userId) {
 
 module.exports = {
 	getDashboard,
-	getDateInTimeZone,
 };

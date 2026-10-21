@@ -9,6 +9,9 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  // DATE llega como "YYYY-MM-DD" y DATETIME como "YYYY-MM-DD HH:mm:ss", tal como están guardados.
+  // Así no se corre la hora (09:00 ya no se muestra como 14:00) ni el día.
+  dateStrings: true,
 });
 
 async function connectMySQL() {

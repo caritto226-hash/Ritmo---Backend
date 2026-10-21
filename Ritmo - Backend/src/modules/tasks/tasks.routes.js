@@ -6,8 +6,11 @@ const {
 } = require('./tasks.validator');
 const tasksController = require('./tasks.controller');
 const { verifyToken } = require('../../middlewares/auth.middleware');
+const { validateIdParam } = require('../../middlewares/id-param.middleware');
 
 const router = express.Router();
+
+router.param('id', validateIdParam);
 
 router.post('/', verifyToken, validateCreateTask, tasksController.create);
 router.get('/', verifyToken, tasksController.getTasks);

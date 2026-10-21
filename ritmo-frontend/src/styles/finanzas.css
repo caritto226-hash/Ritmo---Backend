@@ -612,3 +612,19 @@
     gap: 6px;
   }
 }
+/* Selector Gasto / Ingreso del formulario de movimientos */
+.movement-type-label { font-size: var(--type-label); font-weight: 700; color: var(--text-secondary); }
+.movement-type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.movement-type-option {
+  min-height: 44px;
+  border: 1.5px solid var(--surface-border);
+  border-radius: var(--radius-control);
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.movement-type-option.expense.active { background: #e0697e; border-color: #e0697e; color: #fff; }
+.movement-type-option.income.active { background: #4caf83; border-color: #4caf83; color: #fff; }
+.movement-type-option:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 2px; }

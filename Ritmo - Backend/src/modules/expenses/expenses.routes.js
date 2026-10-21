@@ -13,8 +13,11 @@ const {
 	validateCancelRecurrence,
 } = require('./recurrences.validator');
 const { verifyToken } = require('../../middlewares/auth.middleware');
+const { validateIdParam } = require('../../middlewares/id-param.middleware');
 
 const router = express.Router();
+
+router.param('id', validateIdParam);
 
 router.post('/', verifyToken, validateCreateExpense, expensesController.createExpense);
 router.post('/recurrences', verifyToken, validateCreateRecurrence, recurrencesController.createRecurrence);

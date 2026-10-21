@@ -123,7 +123,7 @@ function MainLayout() {
         </button>
 
         <div className="logo-wrapper">
-          <img src="/Ritmo-logo.png" alt="Logo de Ritmo" className="logo" style={{ width: "120px" }} />
+          <img src={theme === "dark" ? "/Ritmo-logo-mo.svg" : "/Ritmo-logo.png"} alt="Logo de Ritmo" className="logo" style={{ width: "120px" }} />
         </div>
 
         <button className="notif-btn" aria-label="Cerrar sesión" onClick={logout}>
@@ -149,7 +149,7 @@ function MainLayout() {
         inert={sideMenuHidden}
       >
         <div className="side-menu-header">
-          <img src="/Ritmo-logo.png" alt="Ritmo" className="logo" />
+          <img src={theme === "dark" ? "/Ritmo-logo-mo.svg" : "/Ritmo-logo.png"} alt="Ritmo" className="logo" />
           <button
             type="button"
             className="side-menu-close mobile-menu-close"

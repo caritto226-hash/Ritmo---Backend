@@ -318,6 +318,12 @@
   text-align: center;
 }
 
+.dashboard-upcoming-copy p {
+  margin-top: 2px;
+  color: var(--text-secondary);
+  font-size: var(--type-caption);
+}
+
 .dashboard-upcoming-copy h4 {
   color: var(--text-primary);
   font-size: var(--type-supporting);
@@ -361,7 +367,6 @@
   color: var(--text-primary);
   font-size: var(--type-body);
   font-weight: 600;
-  text-transform: capitalize;
 }
 
 .dashboard-calendar-month-nav button {

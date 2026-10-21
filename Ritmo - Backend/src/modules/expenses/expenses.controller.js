@@ -4,7 +4,7 @@ async function createExpense(req, res, next) {
 	try {
 		const expense = await expensesService.createExpense(req.user.id, req.body);
 
-		return res.status(201).json(expense);
+		return res.status(201).json({ data: expense });
 	} catch (error) {
 		return next(error);
 	}

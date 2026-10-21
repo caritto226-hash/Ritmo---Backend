@@ -2,9 +2,12 @@ const express = require('express');
 const { validateCreateUser, validateUpdateUser, validateStatus } = require('./users.validator');
 const usersController = require('./users.controller');
 const { verifyToken } = require('../../middlewares/auth.middleware');
+const { validateIdParam } = require('../../middlewares/id-param.middleware');
 const { requireRole, requireSelfOrRole } = require('../../middlewares/role.middleware');
 
 const router = express.Router();
+
+router.param('id', validateIdParam);
 
 router.post('/', validateCreateUser, usersController.createUser);
 router.get('/', verifyToken, requireRole(2), usersController.getAll);

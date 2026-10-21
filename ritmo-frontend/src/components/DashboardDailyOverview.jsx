@@ -3,6 +3,7 @@ import CategoryIconBadge from "./CategoryIconBadge";
 
 const filterGroups = [
   { module: "tasks", label: "Tareas" },
+  { module: "events", label: "Eventos" },
   { module: "finance", label: "Gastos" },
   { module: "habits", label: "Hábitos" },
 ];
@@ -32,6 +33,7 @@ function formatExpenseAmount(value) {
 function DashboardDailyOverview({
   date,
   tasks,
+  events = [],
   expenses,
   habits,
   reminders,
@@ -76,6 +78,16 @@ function DashboardDailyOverview({
         title: task.title,
         prefix: formatTaskTime(task.startAt),
         category: task.category,
+      })),
+    ...events
+      .filter((event) => event.status === "programado" && categoryIsVisible(event, "events"))
+      .map((event) => ({
+        id: `event-${event.id}`,
+        module: "events",
+        item: event,
+        title: event.title,
+        prefix: formatTaskTime(event.eventTime),
+        category: event.category,
       })),
     ...expenses
       .filter((expense) => categoryIsVisible(expense, "finance"))
@@ -188,7 +200,7 @@ function DashboardDailyOverview({
             >
               <CategoryIconBadge
                 category={entry.category}
-                fallbackIcon={entry.module === "finance" ? "wallet" : entry.module === "habits" ? "heart-pulse" : "list-checks"}
+                fallbackIcon={{ finance: "wallet", habits: "heart-pulse", events: "calendar-days" }[entry.module] || "list-checks"}
                 size={18}
                 className="dashboard-day-entry-icon"
               />

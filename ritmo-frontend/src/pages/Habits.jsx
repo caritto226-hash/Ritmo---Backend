@@ -55,10 +55,8 @@ function Habits() {
 
   function openCreateForm() {
     setEditingId(null);
-    setForm({
-      ...emptyForm,
-      categoryId: categories[0] ? String(categories[0].id) : "",
-    });
+    // La categoría es opcional: no se asigna ninguna sin que el usuario la elija.
+    setForm(emptyForm);
     setShowForm(true);
   }
 
@@ -118,6 +116,7 @@ function Habits() {
   }
 
   async function handleDelete(id) {
+    if (!window.confirm("¿Eliminar este hábito? Esta acción no se puede deshacer.")) return;
     try {
       await habitsService.remove(id);
       loadHabits();
@@ -129,7 +128,8 @@ function Habits() {
   async function handleDuplicate(habit) {
     try {
       await habitsService.create({
-        name: `${habit.name.slice(0, 142)} (copia)`,
+        // 92 + " (copia)" = 100, el máximo que admite el nombre del hábito.
+        name: `${habit.name.slice(0, 92)} (copia)`,
         frequency: habit.frequency,
         goal: habit.goal ?? null,
         categoryId: habit.categoryId ?? null,
@@ -177,11 +177,11 @@ function Habits() {
             <form onSubmit={handleSubmit}>
             <div className="input-group">
               <label>Nombre del hábito</label>
-              <input name="name" value={form.name} onChange={handleChange} required />
+              <input name="name" value={form.name} onChange={handleChange} maxLength={100} required />
             </div>
             <div className="input-group">
               <label>Frecuencia</label>
-              <input name="frequency" value={form.frequency} onChange={handleChange} required />
+              <input name="frequency" value={form.frequency} onChange={handleChange} maxLength={100} required />
             </div>
             <div className="input-group">
               <label>Categoría</label>

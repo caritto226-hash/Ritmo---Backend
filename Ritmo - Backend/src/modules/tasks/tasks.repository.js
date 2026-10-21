@@ -184,6 +184,8 @@ async function update(taskId, userId, fields) {
 		recurrenceFrequency: 'recurrence_frequency',
 		recurrenceAnchorDay: 'recurrence_anchor_day',
 		recurrenceAnchorMonth: 'recurrence_anchor_month',
+		start_at: 'start_at',
+		end_at: 'end_at',
 	};
 	const assignments = [];
 	const values = [];

@@ -1,5 +1,6 @@
 const expensesRepository = require('./expenses.repository');
 const categoriesRepository = require('../categories/categories.repository');
+const { getTodayInBogota } = require('../../utils/dates');
 
 async function createExpense(userId, expenseData) {
 	if (!Number.isInteger(userId) || userId <= 0) {
@@ -23,7 +24,7 @@ async function createExpense(userId, expenseData) {
 		concept,
 		categoryId,
 		amount,
-		expenseDate: expenseDate || new Date().toISOString().slice(0, 10),
+		expenseDate: expenseDate || getTodayInBogota(),
 		notes: notes ?? null,
 	});
 }
@@ -49,7 +50,7 @@ async function getMonthlySummary(userId) {
 		throw error;
 	}
 
-	const summary = await expensesRepository.getMonthlySummaryByUser(userId);
+	const summary = await expensesRepository.getMonthlySummaryByUser(userId, getTodayInBogota());
 
 	return {
 		income: Number(summary.income),

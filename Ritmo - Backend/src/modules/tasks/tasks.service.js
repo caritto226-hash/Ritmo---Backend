@@ -79,12 +79,23 @@ async function updateTask(taskId, userId, data) {
 	const task = await getTaskById(taskId, userId);
 
 	const dataFiltrada = {};
-	const allowedFields = ['title', 'description', 'due_date', 'priority', 'categoryId', 'recurrenceFrequency'];
+	const allowedFields = [
+		'title', 'description', 'due_date', 'priority', 'categoryId', 'recurrenceFrequency', 'start_at', 'end_at',
+	];
 
 	for (const field of allowedFields) {
 		if (Object.prototype.hasOwnProperty.call(data, field)) {
 			dataFiltrada[field] = data[field];
 		}
+	}
+
+	const nextStartAt = Object.prototype.hasOwnProperty.call(dataFiltrada, 'start_at') ? dataFiltrada.start_at : task.startAt;
+	const nextEndAt = Object.prototype.hasOwnProperty.call(dataFiltrada, 'end_at') ? dataFiltrada.end_at : task.endAt;
+
+	if (nextStartAt && nextEndAt && toTimestamp(nextEndAt) < toTimestamp(nextStartAt)) {
+		const error = new Error('La fecha de finalización no puede ser anterior a la fecha de inicio');
+		error.statusCode = 400;
+		throw error;
 	}
 
 	if (Object.prototype.hasOwnProperty.call(dataFiltrada, 'categoryId')
@@ -118,6 +129,11 @@ async function deleteTask(taskId, userId) {
 	await getTaskById(taskId, userId);
 
 	await tasksRepository.softDelete(taskId, userId);
+}
+
+// Acepta "YYYY-MM-DDTHH:mm" (cliente) y "YYYY-MM-DD HH:mm:ss" (MySQL) en la misma zona horaria.
+function toTimestamp(value) {
+	return new Date(String(value).replace(' ', 'T')).getTime();
 }
 
 async function validateTaskCategory(categoryId, userId, requireRecurrence = false) {

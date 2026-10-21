@@ -6,8 +6,11 @@ const {
 } = require('./categories.validator');
 const categoriesController = require('./categories.controller');
 const { verifyToken } = require('../../middlewares/auth.middleware');
+const { validateIdParam } = require('../../middlewares/id-param.middleware');
 
 const router = express.Router();
+
+router.param('id', validateIdParam);
 
 router.get('/', verifyToken, validateCategoryModule, categoriesController.getCategories);
 router.post('/', verifyToken, validateCreateCategory, categoriesController.createCategory);

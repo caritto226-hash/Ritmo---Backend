@@ -23,8 +23,10 @@ async function getDashboardData() {
 const categoryModulesByItemType = {
   task: "tasks",
   habit: "habits",
+  event: "events",
   expense: "finance",
 };
+const MAX_UPCOMING_ITEMS = 8;
 
 async function getDashboardCategories() {
   const modules = Object.values(categoryModulesByItemType);
@@ -32,15 +34,18 @@ async function getDashboardCategories() {
     modules.map((module) => categoriesService.getAll(module)),
   );
 
+  // Un módulo sin categorías (por ejemplo, eventos de un usuario nuevo) es válido;
+  // solo se reportan los módulos cuya petición falló.
   return results.reduce((catalogs, result, index) => {
     const module = modules[index];
     if (result.status === "fulfilled") {
       catalogs[module] = result.value;
     } else {
       catalogs[module] = [];
+      catalogs.failedModules.push(module);
     }
     return catalogs;
-  }, {});
+  }, { failedModules: [] });
 }
 
 function getCommitmentDate(value) {
@@ -62,6 +67,7 @@ async function getDashboardDayData() {
   ]);
   const dates = new Set();
   const tasks = taskResult.status === "fulfilled" ? taskResult.value : [];
+  const events = eventResult.status === "fulfilled" ? eventResult.value : [];
   const expenses = expenseResult.status === "fulfilled" ? expenseResult.value : [];
   const reminders = reminderResult.status === "fulfilled" ? reminderResult.value : [];
 
@@ -89,6 +95,7 @@ async function getDashboardDayData() {
   ].filter(Boolean);
   const failedDailySources = [
     taskResult.status === "rejected" ? "tareas" : null,
+    eventResult.status === "rejected" ? "eventos" : null,
     expenseResult.status === "rejected" ? "gastos" : null,
     reminderResult.status === "rejected" ? "recordatorios financieros" : null,
   ].filter(Boolean);
@@ -99,12 +106,21 @@ async function getDashboardDayData() {
       ? `No se pudieron cargar las fechas de ${failedSources.join(" y ")}.`
       : "",
     tasks,
+    events,
     expenses,
     reminders,
     dailyOverviewError: failedDailySources.length > 0
       ? `No se pudieron cargar ${failedDailySources.join(" y ")} de la agenda.`
       : "",
   };
+}
+
+function formatShortDate(value) {
+  const key = getCommitmentDate(value);
+  if (!key) return "";
+  const [year, month, day] = key.split("-").map(Number);
+  return new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short", timeZone: "UTC" })
+    .format(new Date(Date.UTC(year, month - 1, day)));
 }
 
 function getDateKey(date) {
@@ -123,6 +139,7 @@ function Dashboard() {
   const [data, setData] = useState(null);
   const [dashboardHabits, setDashboardHabits] = useState([]);
   const [dailyTasks, setDailyTasks] = useState([]);
+  const [dailyEvents, setDailyEvents] = useState([]);
   const [dailyExpenses, setDailyExpenses] = useState([]);
   const [recurrenceReminders, setRecurrenceReminders] = useState([]);
   const [dailyOverviewError, setDailyOverviewError] = useState("");
@@ -156,18 +173,17 @@ function Dashboard() {
           setData(result);
           setDashboardHabits(habits);
           setDailyTasks(dayData.tasks);
+          setDailyEvents(dayData.events);
           setDailyExpenses(dayData.expenses);
           setRecurrenceReminders(dayData.reminders);
           setDailyOverviewError(dayData.dailyOverviewError);
-          setCategoryCatalogs(catalogs);
+          const { failedModules, ...loadedCatalogs } = catalogs;
+          setCategoryCatalogs(loadedCatalogs);
           setCommitmentDates(dayData.dates);
           setCalendarError(dayData.error);
-          const missingCatalogs = Object.entries(catalogs)
-            .filter(([, categories]) => categories.length === 0)
-            .map(([module]) => module);
           setCategorySyncError(
-            missingCatalogs.length > 0
-              ? `No se pudieron sincronizar categorías de: ${missingCatalogs.join(", ")}.`
+            failedModules.length > 0
+              ? `No se pudieron sincronizar categorías de: ${failedModules.join(", ")}.`
               : "",
           );
           setError("");
@@ -382,6 +398,7 @@ function Dashboard() {
       setData(dashboardData);
       setDashboardHabits(habits);
       setDailyTasks(dayData.tasks);
+      setDailyEvents(dayData.events);
       setDailyExpenses(dayData.expenses);
       setRecurrenceReminders(dayData.reminders);
       setCommitmentDates(dayData.dates);
@@ -430,6 +447,7 @@ function Dashboard() {
   const todayDate = new Date();
   const todayKey = getDateKey(todayDate);
   const todayTasks = dailyTasks.filter((task) => getCommitmentDate(task.dueDate) === todayKey);
+  const todayEvents = dailyEvents.filter((event) => getCommitmentDate(event.eventDate) === todayKey);
   const todayExpenses = dailyExpenses.filter((expense) => getCommitmentDate(expense.expenseDate) === todayKey);
   const todayAndOverdueReminders = recurrenceReminders.filter((reminder) => (
     reminder.isOverdue || reminder.isDueToday
@@ -440,7 +458,9 @@ function Dashboard() {
     : overdueReminders.filter((reminder) => (
       !(hiddenCategoryIds.finance || []).includes(Number(reminder.categoryId))
     ));
-  const upcomingItems = data.upcoming.filter((item) => item.type !== "habit");
+  const upcomingItems = data.upcoming
+    .filter((item) => item.type !== "habit")
+    .slice(0, MAX_UPCOMING_ITEMS);
 
   function categoryFor(item) {
     const module = categoryModulesByItemType[item.type];
@@ -579,6 +599,7 @@ function Dashboard() {
         <DashboardDailyOverview
           date={todayDate}
           tasks={todayTasks}
+          events={todayEvents}
           expenses={todayExpenses}
           habits={habitsForDashboard}
           reminders={todayAndOverdueReminders}
@@ -623,6 +644,7 @@ function Dashboard() {
                   )}
                   <div className="dashboard-upcoming-copy">
                     <h4>{item.title || item.name || item.concept}</h4>
+                    {item.date && <p>{formatShortDate(item.date)}</p>}
                   </div>
                   </div>
                 );
