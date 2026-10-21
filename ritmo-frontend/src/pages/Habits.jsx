@@ -33,9 +33,7 @@ function Habits() {
       setHabits(data);
       setCategories(availableCategories);
     } catch (err) {
-      if (err.response?.status === 401) {
-        setError("Tu sesión expiró o no es válida. Cierra sesión e inicia sesión de nuevo.");
-      } else if (!err.response) {
+      if (!err.response) {
         setError("No se pudo conectar con el servidor. Comprueba que el backend esté activo.");
       } else {
         setError(
