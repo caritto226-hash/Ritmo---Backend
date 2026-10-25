@@ -77,3 +77,22 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+
+/* Casilla "Todo el día" del formulario de eventos */
+.event-all-day-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 12px;
+  color: var(--text-primary);
+  font-size: var(--type-supporting);
+  font-weight: 600;
+  cursor: pointer;
+}
+.event-all-day-option input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin: 0;
+  accent-color: var(--accent-solid);
+}

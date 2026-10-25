@@ -161,3 +161,11 @@
     max-height: 200px;
   }
 }
+
+/* Selector a. m. / p. m.: ocupa todo el ancho, arriba de las columnas de hora y minutos */
+.time-picker-period {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}

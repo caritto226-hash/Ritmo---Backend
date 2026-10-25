@@ -7,6 +7,7 @@ import TimePicker from "../components/TimePicker";
 import CategorySelect from "../components/CategorySelect";
 import CategoryManager from "../components/CategoryManager";
 import CategoryIconBadge from "../components/CategoryIconBadge";
+import { formatTime12 } from "../utils/time";
 import "../styles/eventos.css";
 
 const emptyForm = {
@@ -14,6 +15,7 @@ const emptyForm = {
   description: "",
   event_date: "",
   event_time: "",
+  allDay: false,
   duration: "",
   location: "",
   categoryId: "",
@@ -89,8 +91,8 @@ function Events() {
       return;
     }
 
-    if (!form.event_time) {
-      setError("Selecciona una hora para el evento");
+    if (!form.allDay && !form.event_time) {
+      setError("Selecciona una hora o marca «Todo el día»");
       return;
     }
 
@@ -98,8 +100,9 @@ function Events() {
       title: form.title,
       description: form.description || null,
       event_date: form.event_date,
-      event_time: form.event_time,
-      duration: Number(form.duration),
+      // Sin hora = evento de todo el día; la duración es opcional y no aplica a todo el día.
+      event_time: form.allDay ? null : form.event_time,
+      duration: form.allDay || form.duration === "" ? null : Number(form.duration),
       location: form.location || null,
       categoryId: form.categoryId ? Number(form.categoryId) : null,
       recurrenceFrequency: form.recurrenceFrequency || null,
@@ -129,6 +132,7 @@ function Events() {
       description: item.description || "",
       event_date: item.eventDate ? item.eventDate.slice(0, 10) : "",
       event_time: formatTime(item.eventTime),
+      allDay: !item.eventTime,
       duration: item.duration || "",
       location: item.location || "",
       categoryId: item.categoryId ? String(item.categoryId) : "",
@@ -168,8 +172,8 @@ function Events() {
         title: `${item.title.slice(0, 142)} (copia)`,
         description: item.description || null,
         event_date: item.eventDate ? item.eventDate.slice(0, 10) : "",
-        event_time: item.eventTime,
-        duration: Number(item.duration),
+        event_time: item.eventTime ? formatTime(item.eventTime) : null,
+        duration: item.duration ? Number(item.duration) : null,
         location: item.location || null,
         categoryId: item.categoryId ?? null,
       });
@@ -265,20 +269,42 @@ function Events() {
               label="Fecha"
               required
             />
-            <div className="time-row">
-              <TimePicker
-                name="event_time"
-                value={form.event_time}
-                onChange={handleChange}
-                label="Hora"
-                required
+            <label className="event-all-day-option">
+              <input
+                type="checkbox"
+                checked={form.allDay}
+                onChange={(event) => {
+                  const allDay = event.target.checked;
+                  // Al marcar todo el día se limpian la hora y la duración, que dejan de aplicar.
+                  setForm((previous) => ({
+                    ...previous,
+                    allDay,
+                    event_time: allDay ? "" : previous.event_time,
+                    duration: allDay ? "" : previous.duration,
+                  }));
+                  setError("");
+                }}
               />
-            </div>
-            <div className="time-row">
-              <div className="time-field">
-                <label htmlFor="event-duration">Duración (min)</label>
-                <input id="event-duration" type="number" min="1" max="1440" name="duration" value={form.duration} onChange={handleChange} required />
+              <span>Todo el día</span>
+            </label>
+            {!form.allDay && (
+              <div className="time-row">
+                <TimePicker
+                  name="event_time"
+                  value={form.event_time}
+                  onChange={handleChange}
+                  label="Hora"
+                  required
+                />
               </div>
+            )}
+            <div className="time-row">
+              {!form.allDay && (
+                <div className="time-field">
+                  <label htmlFor="event-duration">Duración en minutos (opcional)</label>
+                  <input id="event-duration" type="number" min="1" max="1440" step="1" name="duration" value={form.duration} onChange={handleChange} />
+                </div>
+              )}
               <div className="time-field">
                 <label htmlFor="event-location">Ubicación (opcional)</label>
                 <input id="event-location" name="location" value={form.location} onChange={handleChange} maxLength={150} />
@@ -319,7 +345,10 @@ function Events() {
                   <CategoryIconBadge category={item.category} size={18} />
                   {item.title}
                 </h4>
-                <p>{formatTime(item.eventTime)} · {item.duration} min</p>
+                <p>
+                  {item.eventTime ? formatTime12(item.eventTime) : "Todo el día"}
+                  {item.duration ? ` · ${item.duration} min` : ""}
+                </p>
                 {item.category?.name && <p>{item.category.name}</p>}
                 <p className="event-status">Estado: {statusLabels[item.status] || item.status}</p>
                 {item.status === "programado" ? (
@@ -356,8 +385,8 @@ function Events() {
         details={selectedEvent ? [
           { label: "Descripción", value: selectedEvent.description },
           { label: "Fecha", value: selectedEvent.eventDate?.slice(0, 10) },
-          { label: "Hora", value: formatTime(selectedEvent.eventTime) },
-          { label: "Duración", value: `${selectedEvent.duration} min` },
+          { label: "Hora", value: selectedEvent.eventTime ? formatTime12(selectedEvent.eventTime) : "Todo el día" },
+          { label: "Duración", value: selectedEvent.duration ? `${selectedEvent.duration} min` : "" },
           { label: "Ubicación", value: selectedEvent.location },
           { label: "Categoría", value: selectedEvent.category?.name || "Sin categoría" },
           { label: "Estado", value: statusLabels[selectedEvent.status] || selectedEvent.status },

@@ -115,6 +115,31 @@ async function getDashboardDayData() {
   };
 }
 
+// Cada tarjeta ocupa tantas filas pequeñas de la rejilla como mide su contenido;
+// así las tarjetas bajas dejan subir a las de abajo y no quedan huecos entre ellas.
+// La clase is-masonry solo se activa aquí: sin ResizeObserver la rejilla sigue siendo la normal.
+function useMasonryRows(gridRef, layoutKey) {
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid || typeof ResizeObserver === "undefined") return undefined;
+
+    grid.classList.add("is-masonry");
+    const observer = new ResizeObserver((entries) => {
+      const rowHeight = parseFloat(getComputedStyle(grid).gridAutoRows) || 1;
+      entries.forEach(({ target }) => {
+        const height = target.offsetHeight + parseFloat(getComputedStyle(target).marginBottom || 0);
+        target.style.gridRowEnd = `span ${Math.max(1, Math.ceil(height / rowHeight))}`;
+      });
+    });
+    [...grid.children].forEach((widget) => observer.observe(widget));
+
+    return () => {
+      observer.disconnect();
+      grid.classList.remove("is-masonry");
+    };
+  }, [gridRef, layoutKey]);
+}
+
 function formatShortDate(value) {
   const key = getCommitmentDate(value);
   if (!key) return "";
@@ -157,6 +182,7 @@ function Dashboard() {
   const [dropTargetWidget, setDropTargetWidget] = useState(null);
   const [updatingHabitId, setUpdatingHabitId] = useState(null);
   const dragState = useRef(null);
+  const widgetsGridRef = useRef(null);
 
   useEffect(() => {
     let active = true;
@@ -246,6 +272,9 @@ function Dashboard() {
       widgetOrder = defaultWidgetOrder;
     }
   }
+
+  const visibleWidgetIds = widgetOrder.filter((widgetId) => widgetVisibility[widgetId] !== false);
+  useMasonryRows(widgetsGridRef, loading || !data ? "" : visibleWidgetIds.join(","));
 
   function saveWidgetOrder(nextOrder) {
     try {
@@ -688,8 +717,8 @@ function Dashboard() {
         />
       )}
 
-      <div className="dashboard-widgets" aria-label="Tarjetas del dashboard">
-        {widgetOrder.filter((widgetId) => widgetVisibility[widgetId] !== false).map((widgetId) => (
+      <div className="dashboard-widgets" aria-label="Tarjetas del dashboard" ref={widgetsGridRef}>
+        {visibleWidgetIds.map((widgetId) => (
           <section
             className={[
               "dashboard-widget",

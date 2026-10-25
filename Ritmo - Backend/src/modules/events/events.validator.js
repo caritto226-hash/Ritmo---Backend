@@ -29,12 +29,14 @@ function validateCreateEvent(req, res, next) {
 		return next(createError('La fecha del evento es obligatoria y debe tener formato YYYY-MM-DD'));
 	}
 
-	if (typeof eventTime !== 'string' || !isValidTime(eventTime)) {
-		return next(createError('La hora del evento es obligatoria y debe tener formato HH:mm o HH:mm:ss'));
+	// Sin hora (null o ausente) el evento es de todo el día.
+	if (eventTime !== undefined && eventTime !== null && !isValidTime(eventTime)) {
+		return next(createError('La hora del evento debe tener formato HH:mm o HH:mm:ss'));
 	}
 
-	if (!Number.isInteger(duration) || duration <= 0 || duration > 1440) {
-		return next(createError('La duración es obligatoria y debe ser un entero entre 1 y 1440 minutos'));
+	// La duración es opcional.
+	if (duration !== undefined && duration !== null && !isValidDuration(duration)) {
+		return next(createError('La duración debe ser un entero entre 1 y 1440 minutos'));
 	}
 
 	if (description !== undefined && description !== null && !isValidOptionalText(description, MAX_DESCRIPTION_LENGTH)) {
@@ -55,8 +57,8 @@ function validateCreateEvent(req, res, next) {
 		title: title.trim(),
 		description: description ?? null,
 		event_date: eventDate.trim(),
-		event_time: eventTime.trim(),
-		duration,
+		event_time: eventTime ? eventTime.trim() : null,
+		duration: duration ?? null,
 		...(location !== undefined && location !== null ? { location } : { location: null }),
 		categoryId: categoryId ?? null,
 		recurrenceFrequency: recurrenceFrequency ?? null,
@@ -98,15 +100,16 @@ function validateUpdateEvent(req, res, next) {
 	}
 
 	if (Object.prototype.hasOwnProperty.call(data, 'event_time')) {
-		if (typeof data.event_time !== 'string' || !isValidTime(data.event_time)) {
+		// null convierte el evento en uno de todo el día.
+		if (data.event_time !== null && !isValidTime(data.event_time)) {
 			return next(createError('La hora del evento debe tener formato HH:mm o HH:mm:ss y ser válida'));
 		}
 
-		updateData.event_time = data.event_time.trim();
+		updateData.event_time = data.event_time === null ? null : data.event_time.trim();
 	}
 
 	if (Object.prototype.hasOwnProperty.call(data, 'duration')) {
-		if (!Number.isInteger(data.duration) || data.duration <= 0 || data.duration > 1440) {
+		if (data.duration !== null && !isValidDuration(data.duration)) {
 			return next(createError('La duración debe ser un entero entre 1 y 1440 minutos'));
 		}
 
@@ -175,6 +178,10 @@ function isValidDateOnly(value) {
 	const lastDayOfMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
 
 	return month >= 1 && month <= 12 && day >= 1 && day <= lastDayOfMonth;
+}
+
+function isValidDuration(value) {
+	return Number.isInteger(value) && value > 0 && value <= 1440;
 }
 
 function isValidTime(value) {

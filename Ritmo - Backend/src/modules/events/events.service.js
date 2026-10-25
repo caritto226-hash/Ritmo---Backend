@@ -17,8 +17,8 @@ async function createEvent(userId, eventData) {
 
 	validateTitle(title, true);
 	validateDate(eventDate, true);
-	validateTime(eventTime, true);
-	validateDuration(duration, true);
+	validateOptionalTime(eventTime);
+	validateOptionalDuration(duration);
 	validateOptionalText(description, 'La descripción');
 	validateOptionalText(location, 'La ubicación');
 	if (categoryId !== undefined && categoryId !== null) {
@@ -35,8 +35,9 @@ async function createEvent(userId, eventData) {
 		eventDate: eventDate.trim(),
 		location: location ?? null,
 		status: 'programado',
-		eventTime: eventTime.trim(),
-		duration,
+		eventTime: eventTime ? eventTime.trim() : null,
+		// Un evento de todo el día (sin hora) no tiene duración.
+		duration: eventTime ? duration ?? null : null,
 		categoryId: categoryId ?? null,
 		recurrenceFrequency: recurrenceFrequency ?? null,
 	});
@@ -83,8 +84,8 @@ async function updateEvent(eventId, userId, eventData) {
 	}
 
 	if (Object.prototype.hasOwnProperty.call(data, 'event_time')) {
-		validateTime(data.event_time, false);
-		fields.eventTime = data.event_time.trim();
+		validateOptionalTime(data.event_time);
+		fields.eventTime = data.event_time === null ? null : data.event_time.trim();
 	}
 
 	if (Object.prototype.hasOwnProperty.call(data, 'location')) {
@@ -93,8 +94,14 @@ async function updateEvent(eventId, userId, eventData) {
 	}
 
 	if (Object.prototype.hasOwnProperty.call(data, 'duration')) {
-		validateDuration(data.duration, false);
+		validateOptionalDuration(data.duration);
 		fields.duration = data.duration;
+	}
+
+	// Si el evento queda sin hora (todo el día), se borra la duración.
+	const nextEventTime = Object.prototype.hasOwnProperty.call(fields, 'eventTime') ? fields.eventTime : currentEvent.eventTime;
+	if (!nextEventTime) {
+		fields.duration = null;
 	}
 	if (Object.prototype.hasOwnProperty.call(data, 'categoryId')) {
 		const nextFrequency = Object.prototype.hasOwnProperty.call(data, 'recurrenceFrequency')
@@ -193,21 +200,16 @@ function validateDate(value, required) {
 	}
 }
 
-function validateTime(value, required) {
-	if (typeof value !== 'string' || !isValidTime(value)) {
-		const message = required
-			? 'La hora del evento es obligatoria y debe tener formato HH:mm o HH:mm:ss'
-			: 'La hora del evento debe tener formato HH:mm o HH:mm:ss y ser válida';
-		throw badRequestError(message);
+// null o ausente = evento de todo el día.
+function validateOptionalTime(value) {
+	if (value !== undefined && value !== null && (typeof value !== 'string' || !isValidTime(value))) {
+		throw badRequestError('La hora del evento debe tener formato HH:mm o HH:mm:ss y ser válida');
 	}
 }
 
-function validateDuration(value, required) {
-	if (!Number.isInteger(value) || value <= 0 || value > 1440) {
-		const message = required
-			? 'La duración es obligatoria y debe ser un entero entre 1 y 1440 minutos'
-			: 'La duración debe ser un entero entre 1 y 1440 minutos';
-		throw badRequestError(message);
+function validateOptionalDuration(value) {
+	if (value !== undefined && value !== null && (!Number.isInteger(value) || value <= 0 || value > 1440)) {
+		throw badRequestError('La duración debe ser un entero entre 1 y 1440 minutos');
 	}
 }
 

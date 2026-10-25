@@ -15,7 +15,8 @@
 .ritmo-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 12px;
   margin-bottom: 14px;
   padding-right: 20px;
 }
@@ -25,6 +26,8 @@
 .ver-link {
   font-size: var(--type-label); font-weight: 600; color: var(--orange);
   text-decoration: none; display: flex; align-items: center; gap: 2px;
+  /* El enlace nunca se parte en dos líneas; el título es el que cede espacio. */
+  flex-shrink: 0; white-space: nowrap;
 }
 
 .donut-wrap {
@@ -85,10 +88,22 @@
 }
 
 .dashboard-widgets {
+  --widgets-gap: var(--space-4);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-4);
+  gap: var(--widgets-gap);
   align-items: start;
+}
+
+/* Rejilla tupida: filas de 4px; useMasonryRows (dashboard.jsx) asigna a cada tarjeta
+   las filas que necesita. El espacio vertical lo da el margin, no row-gap. */
+.dashboard-widgets.is-masonry {
+  grid-auto-rows: 4px;
+  row-gap: 0;
+}
+
+.dashboard-widgets.is-masonry > * {
+  margin-bottom: var(--widgets-gap);
 }
 
 .dashboard-widget {
@@ -98,8 +113,9 @@
   transition: transform var(--motion-fast), opacity var(--motion-fast);
 }
 
+/* Cada tarjeta ajusta su contenido según su propio ancho (@container), no el de la pantalla. */
 .dashboard-widget-content {
-  height: 100%;
+  container-type: inline-size;
   padding-top: 12px;
 }
 
@@ -153,7 +169,7 @@
 
 .dashboard-habits-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
@@ -204,10 +220,12 @@
 .dashboard-habit-name {
   min-width: 0;
   color: var(--text-primary);
-  font-size: var(--type-supporting);
+  font-size: var(--type-label);
   font-weight: 600;
   line-height: 1.3;
-  overflow-wrap: anywhere;
+  /* Parte por palabras (o con guion), nunca letra por letra. */
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .dashboard-habit.completed {
@@ -294,7 +312,7 @@
 
 .dashboard-upcoming-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
   gap: 8px;
 }
 
@@ -738,6 +756,21 @@
   text-align: center;
 }
 
+/* ── TARJETAS ANGOSTAS (según el ancho de la tarjeta) ── */
+@container (max-width: 420px) {
+  .dashboard-habit-list { grid-template-columns: minmax(0, 1fr); }
+}
+
+@container (max-width: 380px) {
+  .dashboard-habits-header h2,
+  .ritmo-card-header span,
+  .dashboard-day-overview-header h2,
+  .dashboard-calendar-header h2,
+  .proximos-header span { font-size: var(--type-body); }
+
+  .ritmo-info .sub { font-size: var(--type-caption); }
+}
+
 @media (max-width: 600px) {
   .ritmo-card-header span { font-size: var(--type-title); }
   .dashboard-agenda-filters { grid-template-columns: 1fr; }
@@ -787,8 +820,8 @@
   .dashboard-page { grid-column: 1 / -1; }
 
   .dashboard-widgets {
+    --widgets-gap: 20px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
   }
 }
 
@@ -798,8 +831,10 @@
     padding: 24px 48px 100px;
   }
 
-  .dashboard-widgets {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 24px;
-  }
+  .dashboard-widgets { --widgets-gap: 24px; }
+}
+
+/* Entre 1024 y 1200px, con el menú lateral, tres columnas dejan las tarjetas demasiado angostas. */
+@media (min-width: 1200px) {
+  .dashboard-widgets { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

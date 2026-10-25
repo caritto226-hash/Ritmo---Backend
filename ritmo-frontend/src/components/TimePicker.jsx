@@ -1,11 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { formatTime12 } from "../utils/time";
 import "../styles/time-picker.css";
 
-const hours = Array.from({ length: 24 }, (_, hour) => hour);
+// Horas de 12 h: 12, 1, 2 … 11. El período (a. m. / p. m.) se elige aparte.
+const hours12 = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const minutes = Array.from({ length: 60 }, (_, minute) => minute);
 
 function pad(value) {
   return String(value).padStart(2, "0");
+}
+
+// Convierte la hora de 12 h + período a la hora de 24 h que se guarda.
+function to24Hour(hour12, period) {
+  return (hour12 % 12) + (period === "pm" ? 12 : 0);
 }
 
 function TimePicker({ name, value, onChange, label, required = false }) {
@@ -19,6 +26,10 @@ function TimePicker({ name, value, onChange, label, required = false }) {
   const selectedMinute = /^\d{2}:\d{2}$/.test(value || "")
     ? Number(value.slice(3, 5))
     : null;
+  const [period, setPeriod] = useState(() => (
+    /^\d{2}:\d{2}$/.test(value || "") && Number(value.slice(0, 2)) >= 12 ? "pm" : "am"
+  ));
+  const selectedHour12 = selectedHour === null ? null : selectedHour % 12 || 12;
 
   useEffect(() => {
     function closeOnOutsidePointer(event) {
@@ -33,13 +44,23 @@ function TimePicker({ name, value, onChange, label, required = false }) {
 
   useEffect(() => {
     if (!isOpen) return;
-    const selectedHourOption = hourOptionRefs.current[selectedHour];
+    const selectedHourOption = hourOptionRefs.current[selectedHour12];
     const selectedMinuteOption = minuteOptionRefs.current[selectedMinute];
     selectedHourOption?.scrollIntoView({ block: "nearest" });
     selectedMinuteOption?.scrollIntoView({ block: "nearest" });
-  }, [isOpen, selectedHour, selectedMinute]);
+  }, [isOpen, selectedHour12, selectedMinute]);
 
-  function selectHour(hour) {
+  function selectHour(hour12) {
+    const hour = to24Hour(hour12, period);
+    setSelectedHour(hour);
+    onChange({ target: { name, value: `${pad(hour)}:${pad(selectedMinute ?? 0)}` } });
+  }
+
+  // Cambiar a. m. / p. m. mueve la hora ya elegida 12 horas (2:00 a. m. → 2:00 p. m.).
+  function selectPeriod(nextPeriod) {
+    setPeriod(nextPeriod);
+    if (selectedHour === null) return;
+    const hour = to24Hour(selectedHour12, nextPeriod);
     setSelectedHour(hour);
     onChange({ target: { name, value: `${pad(hour)}:${pad(selectedMinute ?? 0)}` } });
   }
@@ -61,7 +82,7 @@ function TimePicker({ name, value, onChange, label, required = false }) {
         type="button"
         className={`time-picker-trigger ${isOpen ? "open" : ""}`}
         onClick={() => setIsOpen((open) => !open)}
-        aria-label={value ? `${label}: ${value}` : `${label}: seleccionar`}
+        aria-label={value ? `${label}: ${formatTime12(value)}` : `${label}: seleccionar`}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         aria-required={required}
@@ -71,29 +92,42 @@ function TimePicker({ name, value, onChange, label, required = false }) {
           <path d="M12 7v5l3 2" />
         </svg>
         <span className={value ? "" : "placeholder"}>
-          {value || "Seleccionar hora"}
+          {value ? formatTime12(value) : "Seleccionar hora"}
         </span>
         <span className="time-picker-trigger-chevron" aria-hidden="true" />
       </button>
 
       {isOpen && (
         <section className="time-picker-panel" role="dialog" aria-label={`Seleccionar ${label.toLowerCase()}`}>
+          <div className="time-picker-period" role="group" aria-label="a. m. o p. m.">
+            {[["am", "a. m."], ["pm", "p. m."]].map(([option, text]) => (
+              <button
+                type="button"
+                key={option}
+                className={`time-picker-option ${period === option ? "selected" : ""}`}
+                aria-pressed={period === option}
+                onClick={() => selectPeriod(option)}
+              >
+                {text}
+              </button>
+            ))}
+          </div>
           <div className="time-picker-column">
             <span className="time-picker-column-label">Hora</span>
             <div className="time-picker-options" role="listbox" aria-label="Hora">
-              {hours.map((hour) => (
+              {hours12.map((hour) => (
                 <button
                   type="button"
-                  className={`time-picker-option ${hour === selectedHour ? "selected" : ""}`}
+                  className={`time-picker-option ${hour === selectedHour12 ? "selected" : ""}`}
                   key={hour}
                   ref={(element) => {
                     if (element) hourOptionRefs.current[hour] = element;
                   }}
                   role="option"
-                  aria-selected={hour === selectedHour}
+                  aria-selected={hour === selectedHour12}
                   onClick={() => selectHour(hour)}
                 >
-                  {pad(hour)}
+                  {hour}
                 </button>
               ))}
             </div>

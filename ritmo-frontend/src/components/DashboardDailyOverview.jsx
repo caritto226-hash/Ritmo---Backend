@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CategoryIconBadge from "./CategoryIconBadge";
+import { formatTime12 } from "../utils/time";
 
 const filterGroups = [
   { module: "tasks", label: "Tareas" },
@@ -18,7 +19,7 @@ function getWeekday(date) {
 function formatTaskTime(value) {
   if (!value) return "";
   const match = String(value).match(/(?:T)?(\d{2}:\d{2})/);
-  return match ? `${match[1]} · ` : "";
+  return match ? `${formatTime12(match[1])} · ` : "";
 }
 
 function formatExpenseAmount(value) {
@@ -86,7 +87,7 @@ function DashboardDailyOverview({
         module: "events",
         item: event,
         title: event.title,
-        prefix: formatTaskTime(event.eventTime),
+        prefix: event.eventTime ? formatTaskTime(event.eventTime) : "Todo el día · ",
         category: event.category,
       })),
     ...expenses
