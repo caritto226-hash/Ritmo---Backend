@@ -475,3 +475,15 @@ El mismo sistema de categorías se reutiliza en **tareas, hábitos y eventos**, 
 | ❌ | Envío de correos y notificaciones (los recordatorios solo se guardan y se muestran dentro de la app) |
 | ❌ | Una categoría desactivada no deja crear otra con el mismo nombre |
 | ❌ | El login todavía no revisa el campo `status`: un usuario desactivado (pero no eliminado) puede iniciar sesión |
+
+## Verificación de navegación entre módulos
+
+Se definió una prueba de navegación para comprobar el funcionamiento de las vistas de Tareas, Hábitos, Finanzas y Eventos.
+
+**Aspectos por verificar:**
+- Navegación entre los módulos.
+- Ausencia de recargas completas durante los cambios de vista.
+- Funcionamiento de las URL internas, si la aplicación utiliza rutas.
+- Ausencia de errores durante la navegación.
+
+**Estado:** Pruebas pendientes de ejecución y documentación de resultados.
