@@ -8,7 +8,8 @@ import {
   Text,
   View,
 } from 'react-native';
-import { completeTask, getTasks } from '../api/tasks';
+import { completeTask, createTask, getTasks } from '../api/tasks';
+import TaskForm from '../components/TaskForm';
 import TaskItem from '../components/TaskItem';
 import { colors, radius, spacing } from '../theme';
 
@@ -23,6 +24,7 @@ export default function TasksScreen({ token, onLogout }) {
   const [refreshing, setRefreshing] = useState(false);
   const [completingIds, setCompletingIds] = useState([]);
   const [banner, setBanner] = useState(null);
+  const [formVisible, setFormVisible] = useState(false);
   const mountedRef = useRef(true);
   const hasLoadedRef = useRef(false);
   const bannerTimeoutRef = useRef(null);
@@ -127,6 +129,28 @@ export default function TasksScreen({ token, onLogout }) {
     }
   }
 
+  // Si falla, el error se relanza para que TaskForm lo muestre sin cerrarse; un 401 cierra la sesión.
+  async function handleCreate(data) {
+    try {
+      const createdTask = await createTask(token, data);
+
+      if (!mountedRef.current) {
+        return;
+      }
+
+      // El backend ordena por fecha de creación, así que la nueva tarea va al final.
+      setTasks((current) => [...current, createdTask]);
+      setFormVisible(false);
+      showBanner('success', 'Tarea creada');
+    } catch (error) {
+      if (handleUnauthorized(error)) {
+        return;
+      }
+
+      throw error;
+    }
+  }
+
   let body;
 
   if (screenState === 'loading') {
@@ -194,6 +218,16 @@ export default function TasksScreen({ token, onLogout }) {
         </Pressable>
       </View>
 
+      {screenState === 'ready' ? (
+        <Pressable
+          style={({ pressed }) => [styles.newTaskButton, pressed && styles.pressed]}
+          onPress={() => setFormVisible(true)}
+          accessibilityRole="button"
+        >
+          <Text style={styles.newTaskText}>+ Nueva tarea</Text>
+        </Pressable>
+      ) : null}
+
       {banner ? (
         <Text
           style={[styles.banner, banner.type === 'success' ? styles.bannerSuccess : styles.bannerError]}
@@ -204,6 +238,10 @@ export default function TasksScreen({ token, onLogout }) {
       ) : null}
 
       {body}
+
+      {formVisible ? (
+        <TaskForm onSubmit={handleCreate} onClose={() => setFormVisible(false)} />
+      ) : null}
     </View>
   );
 }
@@ -239,6 +277,19 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.7,
+  },
+  newTaskButton: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.pill,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  newTaskText: {
+    color: colors.onPrimary,
+    fontSize: 15,
+    fontWeight: '700',
   },
   banner: {
     marginHorizontal: spacing.md,

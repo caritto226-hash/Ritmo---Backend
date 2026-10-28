@@ -10,6 +10,20 @@ export async function getTasks(token) {
   return data.data;
 }
 
+export async function createTask(token, { title, description, date, priority }) {
+  const data = await request('/tasks', {
+    method: 'POST',
+    token,
+    body: { title, description, date, priority },
+  });
+
+  if (!data || !data.data) {
+    throw new ApiError('El servidor respondió con un formato inesperado.');
+  }
+
+  return data.data;
+}
+
 export async function completeTask(token, id) {
   const data = await request(`/tasks/${encodeURIComponent(id)}/status`, {
     method: 'PATCH',
