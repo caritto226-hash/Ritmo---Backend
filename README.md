@@ -1,6 +1,8 @@
+
+Readme · MD
 # Ritmo — Organizador Personal
 
-Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanzas (ingresos y gastos), con un dashboard que busca resumir el día y permitir al usuario organizarse. Está formado por una API REST (backend) y una aplicación web en React (frontend).
+Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanzas (ingresos y gastos), con un dashboard que busca resumir el día y permitir al usuario organizarse. Está formado por una API REST (backend), una aplicación web en React (frontend) y una app móvil para Android que consume la misma API.
 
 ## Contenido
 
@@ -10,6 +12,7 @@ Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanz
   - [Cómo está organizado el backend](#cómo-está-organizado-el-backend)
 - [Requisitos](#requisitos)
 - [Instalación y ejecución](#instalación-y-ejecución)
+- [App móvil](#app-móvil)
 - [Base de datos y migraciones](#base-de-datos-y-migraciones)
 - [Autenticación (JWT)](#autenticación-jwt)
 - [Endpoints](#endpoints)
@@ -50,6 +53,7 @@ Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanz
 |---|---|---|
 | `Ritmo - Backend/` | La API, que guarda y entrega los datos | Node.js, Express, MySQL, JWT |
 | `ritmo-frontend/` | La interfaz que usa la persona | React, Vite, Axios |
+| `ritmo-mobile/` | App móvil para Android: inicio de sesión y tareas | React Native, Expo |
 | `docs/` | Documentación de la API y colección de Postman | — |
 
 ### Herramientas del backend
@@ -116,6 +120,7 @@ Ritmo - Backend/
 - Node.js `^20.19.0` o `>=22.12.0`. El backend funciona desde Node 18, pero Vite (frontend) pide esta versión.
 - MySQL 8 o compatible (phpMyAdmin sirve para verla y administrarla).
 - Una base de datos creada (por ejemplo `ritmo_organizadorpersonal`).
+- Para la app móvil: Android Studio con un emulador, o un celular Android (ver [App móvil](#app-móvil)).
 
 ## Instalación y ejecución
 
@@ -137,10 +142,10 @@ npm install
 2. Preparar la base de datos (ver [Base de datos y migraciones](#base-de-datos-y-migraciones)).
 3. Iniciar el servidor:
 
-   ```bash
+```bash
    npm run dev      # modo desarrollo, se reinicia solo
    npm start        # modo normal
-   ```
+```
 
 La API queda en `http://localhost:3000`. Para comprobar que funciona, abrir `http://localhost:3000/health`; debe responder `{ "status": "ok" }`. Esa ruta está fuera de `/api`; todas las demás empiezan por `/api`.
 
@@ -185,11 +190,69 @@ npm install
 1. Copiar `.env.example` como `.env`. Trae `VITE_API_URL=http://localhost:3000/api`, que es la dirección de la API.
 2. Iniciar el frontend:
 
-   ```bash
+```bash
    npm run dev
-   ```
+```
 
 El frontend abre en `http://localhost:5173`, el único origen que el backend acepta por CORS, así que el backend debe estar corriendo al mismo tiempo. Se inicia sesión con un usuario existente. Por ahora no hay pantalla de registro: los usuarios se crean con `POST /api/users` desde Postman.
+
+## App móvil
+
+Ritmo Móvil es una app para Android que se conecta a la misma API. Permite iniciar sesión, ver las tareas, crear tareas nuevas y marcarlas como completadas. Lo que se hace en la app se guarda en la misma base de datos que usa la web.
+
+| Pantalla | Endpoint que usa |
+|---|---|
+| Inicio de sesión | `POST /api/auth/login` |
+| Mis tareas | `GET /api/tasks` y `PATCH /api/tasks/:id/status` |
+| Nueva tarea | `POST /api/tasks` |
+
+El token se guarda cifrado en el celular con `expo-secure-store`, y la dirección de la API se lee de una variable de entorno, no del código.
+
+### Configuración
+
+Dentro de `ritmo-mobile/`, copiar `.env.example` como `.env` y ajustar la dirección de la API:
+
+```env
+EXPO_PUBLIC_API_URL=http://10.0.2.2:3000/api
+```
+
+| Dónde se prueba | Dirección de la API |
+|---|---|
+| Emulador de Android Studio | `http://10.0.2.2:3000/api` (así el emulador llega al computador) |
+| Celular físico | `http://IP_DEL_COMPUTADOR:3000/api` (la IP se consulta con `ipconfig`) |
+
+Para probar en un celular físico, el celular debe estar en la misma red WiFi que el computador, y el firewall de Windows debe permitir Node.js en redes privadas.
+
+### Ejecutar en desarrollo
+
+Con el backend corriendo (terminal 1), en otra terminal:
+
+```bash
+cd ritmo-mobile
+npm install
+npx expo start --android
+```
+
+Si se cambia el `.env`, hay que detener Expo y volver a iniciarlo con `npx expo start --android --clear`, porque las variables solo se leen al arrancar.
+
+### Generar el APK
+
+El APK se compila con EAS Build, el servicio en la nube de Expo. Se necesita una cuenta gratuita en [expo.dev](https://expo.dev).
+
+```bash
+npx eas-cli login
+npx eas-cli env:create --environment preview --name EXPO_PUBLIC_API_URL --value http://IP_DEL_COMPUTADOR:3000/api --visibility plaintext
+npx eas-cli build -p android --profile preview
+```
+
+Al terminar, EAS entrega un enlace para descargar el APK. La dirección de la API queda fija dentro del APK, así que si cambia la red o la IP del computador, hay que volver a compilarlo.
+
+### Instalar el APK
+
+- **Emulador:** arrastrar el archivo `.apk` sobre la ventana del emulador.
+- **Celular:** copiar el archivo al celular, abrirlo y permitir "Instalar apps desconocidas" si Android lo pide.
+
+El APK no contiene la base de datos: para usar la app, el backend debe estar funcionando y el celular debe estar en la misma red WiFi que el computador.
 
 ## Base de datos y migraciones
 
@@ -236,9 +299,9 @@ Un **JWT** (JSON Web Token) es un texto firmado que la API entrega al iniciar se
 1. Se inicia sesión con `POST /api/auth/login` y se recibe `{ "token": "..." }`.
 2. En las rutas privadas se envía ese token en el header:
 
-   ```http
+```http
    Authorization: Bearer <token>
-   ```
+```
 
 3. Si no se envía, la API responde `401`. Si se envía pero no hay permiso, responde `403`.
 
@@ -390,11 +453,11 @@ Ritmo se construyó a partir de los requisitos funcionales (RF), los requisitos 
 | ID | Requisito | Dónde se cumple | Estado |
 |---|---|---|---|
 | RF-01 | Registro de usuarios mediante formulario | API: `POST /api/users` | API completa; la pantalla de registro está pendiente |
-| RF-02 | Inicio de sesión con correo y contraseña | API: `POST /api/auth/login`; pantalla de login | Completo |
+| RF-02 | Inicio de sesión con correo y contraseña | API: `POST /api/auth/login`; pantalla de login en la web y en la app móvil | Completo |
 | RF-03 | Validar los campos obligatorios | Validators de cada módulo (respuesta `400`) | Completo |
 | RF-04 | Mostrar mensajes de error cuando hay campos inválidos | Middleware de errores (`{ "message": "..." }`) y mensajes en las pantallas | Completo |
 | RF-05 | Dashboard principal con resumen de actividades | API: `GET /api/dashboard`; pantalla del dashboard | Completo |
-| RF-06 | Visualizar tareas pendientes | API: `GET /api/tasks` (devuelve las tareas con su estado) | Completo |
+| RF-06 | Visualizar tareas pendientes | API: `GET /api/tasks` (devuelve las tareas con su estado); pantallas de tareas en la web y en la app móvil | Completo |
 | RF-07 | Visualizar hábitos registrados | API: `/api/habits` | Completo |
 | RF-08 | Registrar gastos personales | API: `/api/expenses` y `/api/categories` | Completo, ampliado a finanzas |
 | RF-09 | Visualizar eventos programados | API: `/api/events` | Completo |
@@ -424,6 +487,7 @@ Además de lo planteado en el documento, durante el desarrollo se agregó:
 - **Dashboard personalizable:** progreso del día, agenda con filtros por módulo y categoría, widgets que la persona acomoda y calendario con los días que tienen compromisos.
 - **Roles:** usuario y soporte, con rutas de administración solo para soporte.
 - **Recuperación de contraseña** con token.
+- **App móvil para Android** que consume la API: inicio de sesión, lista de tareas, creación de tareas y cambio de estado.
 
 ### Cómo evolucionó el módulo de finanzas
 
@@ -445,7 +509,8 @@ El mismo sistema de categorías se reutiliza en **tareas, hábitos y eventos**, 
 
 - Las contraseñas se guardan cifradas con bcrypt, nunca en texto plano.
 - Las consultas SQL usan parámetros (`?`), que evitan la inyección SQL.
-- Los archivos `.env` del backend y del frontend están en `.gitignore`. En GitHub solo están los `.env.example`.
+- Los archivos `.env` del backend, del frontend y de la app móvil están en `.gitignore`. En GitHub solo están los `.env.example`.
+- En la app móvil, el token se guarda cifrado con `expo-secure-store`.
 - La recuperación de contraseña (`/api/auth/forgot-password`) **nunca devuelve el token en la respuesta**. Mientras no haya envío de correos, con `NODE_ENV=development` el token se muestra solo en la consola del servidor para poder probar `/api/auth/reset-password`.
 - Los JWT dejan de servir (401) si el usuario se elimina, se desactiva o cambia su contraseña.
 - `/api/auth/login` admite 5 intentos fallidos cada 15 minutos por IP y correo; después responde 429.
@@ -466,6 +531,7 @@ El mismo sistema de categorías se reutiliza en **tareas, hábitos y eventos**, 
 | ✅ | Dashboard con el resumen del día |
 | ✅ | Frontend en React que consume la API (login, dashboard, tareas, hábitos, eventos, finanzas y categorías) |
 | ✅ | Colección de Postman en `docs/postman/` |
+| ✅ | App móvil para Android (inicio de sesión, lista, creación y cambio de estado de tareas) y APK compilado con EAS |
 | ❌ | Calendario con detalle del día al hacer clic (en desarrollo) |
 | ❌ | Mensaje motivacional personalizable en el dashboard (en desarrollo) |
 | ❌ | Hábitos con recordatorios repetidos durante el día (por ejemplo, cada 2 o 3 horas) |
