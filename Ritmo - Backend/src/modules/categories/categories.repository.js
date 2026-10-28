@@ -1,12 +1,19 @@
 const { pool } = require('../../config/mysql');
 
 const defaultCategories = {
+	// Categorías por rubro. Lo fijo se maneja con isRecurring y los pagos recurrentes.
 	finance: [
-		{ name: 'Ingresos', icon: 'circle-dollar-sign', color: '#2E7D32' },
-		{ name: 'Gastos fijos', icon: 'house', color: '#1565C0' },
-		{ name: 'Gastos variables', icon: 'shopping-bag', color: '#EF6C00' },
-		{ name: 'Gastos Hormiga', icon: 'coffee', color: '#F9A825' },
-		{ name: 'Cuentas por cobrar', icon: 'receipt', color: '#00897B' },
+		{ name: 'Ingresos', icon: 'circle-dollar-sign', color: '#2E7D32', isRecurring: true },
+		{ name: 'Vivienda y servicios', icon: 'house', color: '#1565C0', isRecurring: true },
+		{ name: 'Alimentación', icon: 'shopping-bag', color: '#EF6C00', isRecurring: true },
+		{ name: 'Transporte', icon: 'credit-card', color: '#596579', isRecurring: true },
+		{ name: 'Salud y cuidado personal', icon: 'heart-pulse', color: '#4A9CD6', isRecurring: true },
+		{ name: 'Educación', icon: 'book-open', color: '#6D4C41', isRecurring: true },
+		{ name: 'Compras y ocio', icon: 'tag', color: '#D35A9A', isRecurring: true },
+		{ name: 'Ahorro', icon: 'piggy-bank', color: '#7558C7', isRecurring: true },
+		{ name: 'Deudas y créditos', icon: 'landmark', color: '#C62828', isRecurring: true },
+		{ name: 'Gastos Hormiga', icon: 'coffee', color: '#F9A825', isRecurring: false },
+		{ name: 'Cuentas por cobrar', icon: 'receipt', color: '#00897B', isRecurring: false },
 	],
 	tasks: [
 		{
@@ -187,7 +194,13 @@ async function ensureDefaultCategories(userId, module) {
 	}
 
 	const moduleDefaults = defaultCategories[module];
-	const values = moduleDefaults.flatMap(({ name, description = null, icon, color }) => [
+	const values = moduleDefaults.flatMap(({
+		name,
+		description = null,
+		icon,
+		color,
+		isRecurring = false,
+	}) => [
 		userId,
 		module,
 		name,
@@ -195,12 +208,13 @@ async function ensureDefaultCategories(userId, module) {
 		name.toLowerCase(),
 		icon,
 		color,
+		isRecurring ? 1 : 0,
 	]);
-	const placeholders = moduleDefaults.map(() => '(?, ?, ?, ?, ?, ?, ?, 1, 1)');
+	const placeholders = moduleDefaults.map(() => '(?, ?, ?, ?, ?, ?, ?, ?, 1, 1)');
 
 	await pool.query(
 		`INSERT INTO categories
-			(user_id, module, name, description, normalized_name, icon, color, is_default, is_active)
+			(user_id, module, name, description, normalized_name, icon, color, is_recurring, is_default, is_active)
 		VALUES ${placeholders.join(', ')}
 		ON DUPLICATE KEY UPDATE id = id`,
 		values,
