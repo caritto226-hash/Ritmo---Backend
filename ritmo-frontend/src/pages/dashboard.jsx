@@ -59,11 +59,12 @@ function getCommitmentDate(value) {
 }
 
 async function getDashboardDayData() {
-  const [taskResult, eventResult, expenseResult, reminderResult] = await Promise.allSettled([
+  const [taskResult, eventResult, expenseResult, reminderResult, recurrenceResult] = await Promise.allSettled([
     tasksService.getAll(),
     eventsService.getAll(),
     expensesService.getAll(),
     expensesService.getRecurrenceReminders(),
+    expensesService.getRecurrences(),
   ]);
   const dates = new Set();
   const tasks = taskResult.status === "fulfilled" ? taskResult.value : [];
@@ -83,15 +84,20 @@ async function getDashboardDayData() {
     });
   }
 
-  reminders.forEach((reminder) => {
-    const date = getCommitmentDate(reminder.scheduledDate);
-    if (date) dates.add(date);
-  });
+  // El calendario solo informa la próxima fecha de cada pago recurrente activo; no se confirma desde ahí.
+  if (recurrenceResult.status === "fulfilled") {
+    recurrenceResult.value
+      .filter((recurrence) => recurrence.isActive)
+      .forEach((recurrence) => {
+        const date = getCommitmentDate(recurrence.nextScheduledDate);
+        if (date) dates.add(date);
+      });
+  }
 
   const failedSources = [
     taskResult.status === "rejected" ? "tareas" : null,
     eventResult.status === "rejected" ? "eventos" : null,
-    reminderResult.status === "rejected" ? "recordatorios financieros" : null,
+    recurrenceResult.status === "rejected" ? "pagos recurrentes" : null,
   ].filter(Boolean);
   const failedDailySources = [
     taskResult.status === "rejected" ? "tareas" : null,
@@ -433,8 +439,8 @@ function Dashboard() {
       setCommitmentDates(dayData.dates);
       setCalendarError(dayData.error);
       setDailyOverviewError(dayData.dailyOverviewError);
-    } catch {
-      setError(`No se pudo confirmar "${reminder.concept}".`);
+    } catch (err) {
+      setError(err.response?.data?.message || `No se pudo confirmar "${reminder.concept}".`);
     }
   }
 
@@ -481,10 +487,12 @@ function Dashboard() {
   const todayAndOverdueReminders = recurrenceReminders.filter((reminder) => (
     reminder.isOverdue || reminder.isDueToday
   ));
-  const overdueReminders = recurrenceReminders.filter((reminder) => reminder.isOverdue);
-  const visibleOverdueReminders = hiddenAgendaModules.finance
+  const overdueAndUpcomingReminders = recurrenceReminders.filter((reminder) => (
+    reminder.isOverdue || reminder.isUpcoming
+  ));
+  const visibleCompactReminders = hiddenAgendaModules.finance
     ? []
-    : overdueReminders.filter((reminder) => (
+    : overdueAndUpcomingReminders.filter((reminder) => (
       !(hiddenCategoryIds.finance || []).includes(Number(reminder.categoryId))
     ));
   const upcomingItems = data.upcoming
@@ -708,11 +716,10 @@ function Dashboard() {
       {preferenceError && <p className="dashboard-error" role="alert">{preferenceError}</p>}
       {categorySyncError && <p className="dashboard-error" role="status">{categorySyncError}</p>}
 
-      {widgetVisibility.dayOverview !== false && visibleOverdueReminders.length > 0 && (
+      {widgetVisibility.dayOverview !== false && visibleCompactReminders.length > 0 && (
         <FinanceRecurrenceReminders
-          reminders={visibleOverdueReminders}
+          reminders={visibleCompactReminders}
           onConfirm={confirmRecurrenceReminder}
-          onCancel={() => {}}
           compact
         />
       )}

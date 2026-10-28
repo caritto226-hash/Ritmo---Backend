@@ -27,6 +27,11 @@ async function remove(id) {
   return response.data;
 }
 
+async function getRecurrences() {
+  const response = await api.get("/expenses/recurrences");
+  return response.data.data;
+}
+
 async function getRecurrenceReminders() {
   const response = await api.get("/expenses/recurrences/reminders");
   return response.data.data;
@@ -57,6 +62,7 @@ export default {
   create,
   update,
   remove,
+  getRecurrences,
   getRecurrenceReminders,
   createRecurrence,
   confirmRecurrenceOccurrence,

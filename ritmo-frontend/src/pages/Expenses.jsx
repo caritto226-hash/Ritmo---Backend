@@ -5,6 +5,7 @@ import CategoryIconBadge from "../components/CategoryIconBadge";
 import CategorySelect from "../components/CategorySelect";
 import CategoryManager from "../components/CategoryManager";
 import FinanceRecurrenceReminders from "../components/FinanceRecurrenceReminders";
+import FinanceRecurringPayments from "../components/FinanceRecurringPayments";
 import MobileItemDetails from "../components/MobileItemDetails";
 import DateCalendar from "../components/DateCalendar";
 import "../styles/finanzas.css";
@@ -64,6 +65,7 @@ function formatCurrency(value) {
 function Expenses() {
   const [expenses, setExpenses] = useState([]);
   const [recurrenceReminders, setRecurrenceReminders] = useState([]);
+  const [recurrences, setRecurrences] = useState([]);
   const [categories, setCategories] = useState([]);
   const [summary, setSummary] = useState(emptySummary);
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -88,14 +90,16 @@ function Expenses() {
 
   async function loadPage(filter = categoryFilter) {
     try {
-      const [data, monthlySummary, availableCategories, reminders] = await Promise.all([
+      const [data, monthlySummary, availableCategories, reminders, recurringPayments] = await Promise.all([
         expensesService.getAll(filter || undefined),
         expensesService.getMonthlySummary(),
         categoriesService.getAll(),
         expensesService.getRecurrenceReminders(),
+        expensesService.getRecurrences(),
       ]);
       setExpenses(data);
       setRecurrenceReminders(reminders);
+      setRecurrences(recurringPayments);
       setSummary(monthlySummary);
       setCategories(availableCategories);
     } catch (err) {
@@ -255,14 +259,14 @@ function Expenses() {
     }
   }
 
-  async function cancelRecurrenceReminder(reminder, scope) {
+  async function cancelRecurrence(recurrence, scope) {
     const confirmationMessage = scope === "future"
-      ? `¿Detener las próximas fechas de "${reminder.concept}"? Los movimientos históricos y los recordatorios vencidos se conservarán.`
-      : `¿Eliminar todos los recordatorios de "${reminder.concept}"? Los movimientos históricos ya registrados se conservarán.`;
+      ? `¿Detener las próximas fechas de "${recurrence.concept}"? Los movimientos históricos y los recordatorios vencidos se conservarán.`
+      : `¿Eliminar todos los recordatorios de "${recurrence.concept}"? Los movimientos históricos ya registrados se conservarán.`;
     if (!window.confirm(confirmationMessage)) return;
 
     try {
-      await expensesService.cancelRecurrence(reminder.recurrenceId, scope);
+      await expensesService.cancelRecurrence(recurrence.recurrenceId, scope);
       setSuccess(scope === "future"
         ? "Se detuvieron las próximas fechas. Los recordatorios vencidos siguen disponibles."
         : "Se eliminó la recurrencia y se conservaron los movimientos históricos.");
@@ -358,7 +362,11 @@ function Expenses() {
       <FinanceRecurrenceReminders
         reminders={recurrenceReminders}
         onConfirm={confirmRecurrenceReminder}
-        onCancel={cancelRecurrenceReminder}
+      />
+
+      <FinanceRecurringPayments
+        recurrences={recurrences}
+        onCancel={cancelRecurrence}
       />
 
       <div className="proximos-header finance-movements-header" style={{ marginTop: "16px" }}>

@@ -38,15 +38,32 @@ function formatAmount(value) {
   })}`;
 }
 
+function getScheduleLabel(reminder) {
+  if (reminder.isOverdue) return `Vencido desde ${formatDate(reminder.scheduledDate)}`;
+  if (reminder.isUpcoming) return `Próximo · ${formatDate(reminder.scheduledDate)}`;
+  return `Programado para ${formatDate(reminder.scheduledDate)}`;
+}
+
 function FinanceRecurrenceReminders({
   reminders,
   onConfirm,
-  onCancel,
   compact = false,
 }) {
   const [paymentDates, setPaymentDates] = useState({});
+  const [confirmingId, setConfirmingId] = useState(null);
 
   if (!reminders.length) return null;
+
+  // Bloquea el botón mientras la confirmación está en curso para no enviarla dos veces.
+  async function handleConfirm(reminder, paidDate) {
+    if (confirmingId !== null) return;
+    setConfirmingId(reminder.occurrenceId);
+    try {
+      await onConfirm(reminder, paidDate);
+    } finally {
+      setConfirmingId(null);
+    }
+  }
 
   return (
     <section className={`finance-reminders ${compact ? "finance-reminders-compact" : ""}`} aria-label="Recordatorios de finanzas">
@@ -62,7 +79,7 @@ function FinanceRecurrenceReminders({
         {reminders.map((reminder) => {
           const isIncome = Number(reminder.amount) > 0;
           const paidDate = paymentDates[reminder.occurrenceId] || getTodayDate();
-          const canCancelFuture = reminder.isActive;
+          const isConfirming = confirmingId === reminder.occurrenceId;
 
           return (
             <article
@@ -82,7 +99,7 @@ function FinanceRecurrenceReminders({
                 </div>
                 <p>
                   {reminder.category?.name} · {frequencyLabels[reminder.frequency] || reminder.frequency}
-                  {" · "}{reminder.isOverdue ? "Vencido desde" : "Programado para"} {formatDate(reminder.scheduledDate)}
+                  {" · "}{getScheduleLabel(reminder)}
                 </p>
                 {!compact && <strong className={isIncome ? "income" : "expense"}>{formatAmount(reminder.amount)}</strong>}
               </div>
@@ -103,30 +120,12 @@ function FinanceRecurrenceReminders({
                 <button
                   type="button"
                   className="finance-reminder-confirm"
-                  onClick={() => onConfirm(reminder, paidDate)}
+                  onClick={() => handleConfirm(reminder, paidDate)}
+                  disabled={confirmingId !== null}
+                  aria-busy={isConfirming}
                 >
-                  {isIncome ? "Recibido" : "Pagado"}
+                  {isConfirming ? "Confirmando..." : isIncome ? "Recibido" : "Pagado"}
                 </button>
-                {!compact && (canCancelFuture || reminder.isCanceled) && (
-                  <div className="finance-reminder-cancel-actions">
-                    {canCancelFuture && (
-                      <button
-                        type="button"
-                        onClick={() => onCancel(reminder, "future")}
-                        aria-label={`Detener futuras fechas de ${reminder.concept}`}
-                      >
-                        Detener futuras
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => onCancel(reminder, "all")}
-                      aria-label={`Eliminar toda la recurrencia de ${reminder.concept}`}
-                    >
-                      Eliminar recurrencia
-                    </button>
-                  </div>
-                )}
               </div>
             </article>
           );
