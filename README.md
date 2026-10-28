@@ -13,7 +13,7 @@ Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanz
 - [Requisitos](#requisitos)
 - [Instalación y ejecución](#instalación-y-ejecución)
 - [App móvil](#app-móvil)
-- [Base de datos y migraciones](#base-de-datos-y-migraciones)
+- [Base de datos](#base-de-datos)
 - [Autenticación (JWT)](#autenticación-jwt)
 - [Endpoints](#endpoints)
 - [Usuarios](#usuarios)
@@ -97,7 +97,7 @@ Ritmo - Backend/
   .env.example
   package.json
   database/
-    migrations/             ← cambios a la base de datos (ver "Base de datos")
+    schema.sql              ← estructura de la base y datos de roles (ver "Base de datos")
   src/
     app.js                  ← registra las rutas y los middlewares
     server.js               ← revisa el .env, conecta a MySQL y arranca el servidor
@@ -139,7 +139,7 @@ npm install
 ```
 
 1. Copiar `.env.example` como `.env` y cambiar los valores por los propios (ver la tabla de abajo).
-2. Preparar la base de datos (ver [Base de datos y migraciones](#base-de-datos-y-migraciones)).
+2. Crear la base de datos e importar `database/schema.sql` (ver [Base de datos](#base-de-datos)).
 3. Iniciar el servidor:
 
 ```bash
@@ -254,43 +254,24 @@ Al terminar, EAS entrega un enlace para descargar el APK. La dirección de la AP
 
 El APK no contiene la base de datos: para usar la app, el backend debe estar funcionando y el celular debe estar en la misma red WiFi que el computador.
 
-## Base de datos y migraciones
+## Base de datos
 
-### Esquema base (pendiente de incluir en el repositorio)
+La estructura completa de la base está en `Ritmo - Backend/database/schema.sql`: las 11 tablas con sus índices y claves foráneas, y los datos de la tabla `roles` (`1` usuario y `2` soporte), que la API necesita.
 
-Las tablas principales (`users`, `roles`, `tasks`, `habits`, `events`, `expenses` y `password_reset_tokens`) se crearon directamente en MySQL - phpMyAdmin. **Todavía no hay un script en el repositorio para crearlas.** Para generarlo:
+Para instalarla:
 
-1. En MySQL - phpMyAdmin, seleccionar la base `ritmo_organizadorpersonal` y entrar a **Exportar**.
-2. Elegir el método **Personalizado** y marcar solo la **estructura** de las tablas, sin datos.
-3. En la tabla `roles` sí incluir los datos, porque la API necesita los roles `1` (usuario) y `2` (soporte).
-4. Guardar el archivo como `Ritmo - Backend/database/schema.sql`.
-
-> Si la base desde donde se exporta ya tiene aplicadas las migraciones, ese `schema.sql` ya trae esos cambios. En ese caso **no** hay que volver a correrlas.
-
-### Migraciones
-
-Una **migración** es un archivo `.sql` que cambia la estructura de la base de datos (por ejemplo, agrega una tabla o una columna) sin borrar los datos existentes. Están en `Ritmo - Backend/database/migrations/`.
-
-**Hay que correrlas en este orden.** Si se ordenan por nombre falla, porque `add_task_habit_categories` necesita que la tabla `categories` ya exista.
-
-| Orden | Archivo | Qué hace |
-|---|---|---|
-| 1 | `20261007_create_habit_completions.sql` | Crea la tabla donde se guarda qué día se cumplió cada hábito |
-| 2 | `20261007_create_categories_and_migrate_expenses.sql` | Crea `categories`, pasa las categorías de texto de los gastos a la tabla nueva y borra la columna vieja `expenses.category` |
-| 3 | `20261007_add_task_habit_categories.sql` | Agrega `description` a categorías y `category_id` a tareas y hábitos |
-| 4 | `20261007_create_expense_recurrences.sql` | Crea las tablas de pagos e ingresos recurrentes |
-| 5 | `20261008_add_category_recurrence_and_activity_reminders.sql` | Agrega `is_recurring` a categorías, recurrencia a tareas y eventos, categoría a eventos y `reminder_time` a hábitos |
-
-Cada una se puede correr desde la terminal (pide la contraseña) o con la pestaña **Importar** de phpMyAdmin:
+1. Crear una base de datos vacía con el mismo nombre de `DB_NAME` (por ejemplo `ritmo_organizadorpersonal`).
+2. Importar `schema.sql` en esa base, con la pestaña **Importar** de phpMyAdmin o desde la terminal (pide la contraseña):
 
 ```sh
-mysql --host=DB_HOST --user=DB_USER --password DB_NAME < "Ritmo - Backend/database/migrations/20261007_create_habit_completions.sql"
+mysql --host=DB_HOST --user=DB_USER --password DB_NAME < "Ritmo - Backend/database/schema.sql"
 ```
 
-Importante:
+### Cambios durante el desarrollo
 
-- **Hacer una copia de seguridad antes**, sobre todo antes de la migración 2, porque borra una columna.
-- Solo la migración 1 se puede repetir sin problema (usa `CREATE TABLE IF NOT EXISTS`). Las demás fallan si se corren dos veces.
+Mientras se desarrollaba el proyecto, la base se fue modificando con **migraciones**: archivos `.sql` que cambiaban la estructura sin borrar los datos existentes. Por ejemplo, una de ellas creó la tabla `categories` y pasó a esa tabla las categorías de los gastos, que antes eran un texto dentro de cada gasto.
+
+Al consolidar el esquema, todos esos cambios quedaron incluidos en `schema.sql`, así que una instalación nueva no necesita correr ninguna migración. Los archivos originales se conservan en el historial de Git (carpeta `Ritmo - Backend/database/migrations/`).
 
 ## Autenticación (JWT)
 
@@ -379,13 +360,28 @@ Los hábitos se marcan por día. Al completar un hábito se guarda una fila en `
 
 ## Categorías
 
-Las categorías permiten clasificar la información. Se crearon para facilitar la gestión de las finanzas (por ejemplo, separar gastos fijos de gastos variables), y después se extendieron a tareas, hábitos y eventos. Cada persona puede usar las categorías predeterminadas o **crear, editar y desactivar las suyas**.
+Las categorías permiten clasificar la información. Se crearon para las finanzas y después se extendieron a tareas, hábitos y eventos. Cada persona puede usar las categorías predeterminadas o **crear, editar y desactivar las suyas**.
 
 Cada usuario tiene sus propias categorías por módulo (`finance`, `tasks`, `habits`, `events`). La primera vez que pide `GET /api/categories?module=...`, la API le crea unas predeterminadas para `finance`, `tasks` y `habits`. `events` no tiene predeterminadas.
 
+Las categorías de finanzas se organizan **por rubro** (en qué se usa el dinero). Al principio eran Ingresos, Gastos fijos, Gastos variables, Gastos Hormiga y Cuentas por cobrar, pero esa lista mezclaba la naturaleza del gasto (fijo, variable, hormiga) con su uso. Lo que se repite cada periodo ahora se maneja con `isRecurring` y los pagos recurrentes.
+
+| Categoría de finanzas | Qué incluye | `isRecurring` |
+|---|---|---|
+| Ingresos | Salario, quincena, ventas, pagos de clientes, propinas | Sí |
+| Vivienda y servicios | Arriendo, administración, predial, seguro de hogar, luz, agua, gas, internet, plan o recarga del celular | Sí |
+| Alimentación | Mercado, almuerzos, corrientazo, restaurantes, domicilios de comida | Sí |
+| Transporte | Bus, TransMilenio, gasolina, taxi, peajes, parqueadero y gastos del vehículo (SOAT, seguro, impuesto, mantenimiento) | Sí |
+| Salud y cuidado personal | EPS, farmacia, odontólogo, medicina prepagada, peluquería, seguros de vida y exequiales | Sí |
+| Educación | Colegio, universidad, cursos, útiles, libros | Sí |
+| Compras y ocio | Ropa, salidas, regalos, viajes, suscripciones, cine, mascotas | Sí |
+| Ahorro | Ahorro programado, fondo de empleados, natillero, CDT | Sí |
+| Deudas y créditos | Lo que yo debo: cuotas de créditos, tarjeta de crédito, préstamos que pago | Sí |
+| Gastos Hormiga | Gastos pequeños, frecuentes y prescindibles: tinto, mecato, chance, gaseosa, fotocopias | No |
+| Cuentas por cobrar | Lo que me deben: dinero prestado o que falta por recibir | No |
+
 | Módulo | Categoría | Descripción inicial |
 |---|---|---|
-| `finance` | Ingresos, Gastos fijos, Gastos variables, Gastos Hormiga, Cuentas por cobrar | — |
 | `tasks` | Top 3 del día | Innegociables del día |
 | `tasks` | Secundarias | Puede reprogramarse |
 | `tasks` | Mantenimiento | Tareas mecánicas o repetitivas |
@@ -495,9 +491,9 @@ El requisito inicial (RF-08, HU-16 a HU-18) planteaba solo el **registro de gast
 
 Al desarrollar el módulo se vio que ese enfoque era limitado: la persona necesita también registrar sus **ingresos** y poder **clasificar** sus movimientos para entender en qué se le va el dinero. Por eso se hicieron estos ajustes:
 
-- Se creó una **tabla de categorías** (`categories`) y cada movimiento se asocia a una categoría con `categoryId`. La migración 2 pasó las categorías de texto de los gastos a esa tabla y eliminó la columna vieja `expenses.category`.
+- Se creó una **tabla de categorías** (`categories`) y cada movimiento se asocia a una categoría con `categoryId`. Una migración pasó las categorías de texto de los gastos a esa tabla y eliminó la columna vieja `expenses.category`; hoy ese cambio ya está incluido en `schema.sql` (ver [Base de datos](#base-de-datos)).
 - El módulo pasó de "gastos" a **finanzas**: ingresos y gastos en la misma tabla, diferenciados por el signo del valor (positivo = ingreso, negativo = gasto).
-- Cada persona recibe **categorías predeterminadas** para clasificar sus movimientos (Ingresos, Gastos fijos, Gastos variables, Gastos hormiga y Cuentas por cobrar) y también puede **crear sus propias categorías**, con nombre, ícono y color.
+- Cada persona recibe **categorías predeterminadas** por rubro para clasificar sus movimientos (Ingresos, Vivienda y servicios, Alimentación, Transporte, Salud y cuidado personal, Educación, Compras y ocio, Ahorro, Deudas y créditos, Gastos Hormiga y Cuentas por cobrar) y también puede **crear sus propias categorías**, con nombre, ícono y color. Al principio eran Ingresos, Gastos fijos, Gastos variables, Gastos Hormiga y Cuentas por cobrar, pero esa lista mezclaba la naturaleza del gasto (fijo, variable, hormiga) con su uso; lo fijo ahora se maneja con categorías que se repiten (`isRecurring`) y con los pagos recurrentes (ver [Categorías](#categorías)).
 - Los movimientos se pueden **filtrar por categoría** (`GET /api/expenses?categoryId=`), y `GET /api/expenses/summary` entrega el resumen del mes (ingresos, gastos y balance).
 - Se agregaron los **pagos recurrentes**, para cosas que se repiten, como el arriendo.
 
@@ -532,11 +528,11 @@ El mismo sistema de categorías se reutiliza en **tareas, hábitos y eventos**, 
 | ✅ | Frontend en React que consume la API (login, dashboard, tareas, hábitos, eventos, finanzas y categorías) |
 | ✅ | Colección de Postman en `docs/postman/` |
 | ✅ | App móvil para Android (inicio de sesión, lista, creación y cambio de estado de tareas) y APK compilado con EAS |
+| ✅ | Script del esquema de la base de datos en el repositorio (`database/schema.sql`) |
 | ❌ | Calendario con detalle del día al hacer clic (en desarrollo) |
 | ❌ | Mensaje motivacional personalizable en el dashboard (en desarrollo) |
 | ❌ | Hábitos con recordatorios repetidos durante el día (por ejemplo, cada 2 o 3 horas) |
 | ❌ | Pruebas automatizadas (`npm test` todavía no tiene pruebas) |
-| ❌ | Script del esquema base de la base de datos en el repositorio |
 | ❌ | Pantallas de registro, recuperación de contraseña y administración de usuarios en el frontend |
 | ❌ | Envío de correos y notificaciones (los recordatorios solo se guardan y se muestran dentro de la app) |
 | ❌ | Una categoría desactivada no deja crear otra con el mismo nombre |

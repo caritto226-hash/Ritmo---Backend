@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-10-2026 a las 09:58:13
+-- Tiempo de generación: 28-10-2026 a las 10:20:24
 -- Versión del servidor: 8.0.46
 -- Versión de PHP: 8.2.12
 
@@ -288,7 +288,6 @@ ALTER TABLE `categories`
 -- Filtros para la tabla `events`
 --
 ALTER TABLE `events`
-  ADD CONSTRAINT `fk_eventos_usuario` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_events_category_owner` FOREIGN KEY (`category_id`,`user_id`) REFERENCES `categories` (`id`, `user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   ADD CONSTRAINT `fk_events_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
