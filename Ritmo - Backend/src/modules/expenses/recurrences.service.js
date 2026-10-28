@@ -42,6 +42,29 @@ async function getRecurrences(userId) {
 	return recurrencesRepository.findRecurrencesByUser(userId);
 }
 
+// Solo cambia los valores con que se registrarán los próximos movimientos (incluido el pendiente actual);
+// los movimientos ya registrados guardaron su propia copia y no se tocan.
+async function updateRecurrence(recurrenceId, userId, data) {
+	validateUserId(userId);
+	if (!Number.isInteger(recurrenceId) || recurrenceId <= 0) {
+		throw badRequestError('El identificador de la recurrencia no es válido');
+	}
+
+	const recurrence = await recurrencesRepository.findRecurrenceByIdAndUser(recurrenceId, userId);
+	if (!recurrence) {
+		throw httpError('Recurrencia financiera no encontrada', 404);
+	}
+	if (!recurrence.isActive && recurrence.pendingOccurrenceId === null) {
+		throw httpError('Esta recurrencia está detenida y no tiene recordatorios pendientes', 409);
+	}
+	if (data.categoryId !== undefined && data.categoryId !== recurrence.categoryId) {
+		await validateFinanceCategory(data.categoryId, userId);
+	}
+
+	await recurrencesRepository.update(recurrenceId, userId, data);
+	return recurrencesRepository.findRecurrenceByIdAndUser(recurrenceId, userId);
+}
+
 async function getReminders(userId) {
 	validateUserId(userId);
 	const today = getTodayInBogota();
@@ -81,6 +104,43 @@ async function confirmOccurrence(occurrenceId, userId, paidDate) {
 		userId,
 		paidDate || getTodayInBogota(),
 	);
+}
+
+async function undoConfirmation(occurrenceId, userId) {
+	validateUserId(userId);
+	if (!Number.isInteger(occurrenceId) || occurrenceId <= 0) {
+		throw badRequestError('El identificador del recordatorio no es válido');
+	}
+
+	const occurrence = await recurrencesRepository.findOccurrenceByIdAndUser(occurrenceId, userId);
+	if (!occurrence) {
+		throw httpError('Recordatorio financiero no encontrado', 404);
+	}
+	return undoOccurrence(occurrence, userId);
+}
+
+// Usado al borrar un movimiento: si vino de una recurrencia vigente, se deshace su confirmación.
+// Devuelve false cuando no hay recurrencia vigente y el movimiento se borra como cualquier otro.
+async function undoConfirmationByExpense(expenseId, userId) {
+	const occurrence = await recurrencesRepository.findOccurrenceByExpense(expenseId, userId);
+	if (!occurrence) return false;
+
+	await undoOccurrence(occurrence, userId);
+	return true;
+}
+
+// Solo se puede deshacer la confirmación más reciente, para que la cadena de fechas no quede con huecos.
+async function undoOccurrence(occurrence, userId) {
+	if (occurrence.status !== 'confirmed') {
+		throw httpError('Este recordatorio no está confirmado', 409);
+	}
+	const latest = await recurrencesRepository.findLatestConfirmedOccurrence(occurrence.recurrenceId, userId);
+	if (latest && latest.occurrenceId !== occurrence.occurrenceId) {
+		throw httpError(`Primero deshaz la confirmación del ${latest.scheduledDate}`, 409);
+	}
+
+	// El repositorio vuelve a verificar con bloqueo para evitar reversiones o confirmaciones simultáneas.
+	return recurrencesRepository.undoConfirmation(occurrence.occurrenceId, occurrence.recurrenceId, userId);
 }
 
 async function cancelRecurrence(recurrenceId, userId, scope) {
@@ -134,7 +194,10 @@ function httpError(message, statusCode) {
 module.exports = {
 	createRecurrence,
 	getRecurrences,
+	updateRecurrence,
 	getReminders,
 	confirmOccurrence,
+	undoConfirmation,
+	undoConfirmationByExpense,
 	cancelRecurrence,
 };

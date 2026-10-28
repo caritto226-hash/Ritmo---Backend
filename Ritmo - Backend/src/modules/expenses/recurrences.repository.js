@@ -108,6 +108,7 @@ async function findOccurrenceByIdAndUser(occurrenceId, userId) {
 			occurrence.id AS occurrenceId,
 			DATE_FORMAT(occurrence.scheduled_date, '%Y-%m-%d') AS scheduledDate,
 			occurrence.status,
+			occurrence.recurrence_id AS recurrenceId,
 			recurrence.frequency
 		FROM expense_recurrence_occurrences AS occurrence
 		JOIN expense_recurrences AS recurrence
@@ -118,13 +119,70 @@ async function findOccurrenceByIdAndUser(occurrenceId, userId) {
 			AND recurrence.deleted_at IS NULL`,
 		[occurrenceId, userId],
 	);
-	if (!rows[0]) return null;
+	return rows[0] ? mapOccurrenceState(rows[0]) : null;
+}
+
+// Ocurrencia confirmada que generó un movimiento; null si la recurrencia ya fue eliminada.
+async function findOccurrenceByExpense(expenseId, userId) {
+	const [rows] = await pool.query(
+		`SELECT
+			occurrence.id AS occurrenceId,
+			DATE_FORMAT(occurrence.scheduled_date, '%Y-%m-%d') AS scheduledDate,
+			occurrence.status,
+			occurrence.recurrence_id AS recurrenceId,
+			recurrence.frequency
+		FROM expense_recurrence_occurrences AS occurrence
+		JOIN expense_recurrences AS recurrence
+			ON recurrence.id = occurrence.recurrence_id
+			AND recurrence.user_id = occurrence.user_id
+		WHERE occurrence.expense_id = ?
+			AND occurrence.user_id = ?
+			AND recurrence.deleted_at IS NULL`,
+		[expenseId, userId],
+	);
+	return rows[0] ? mapOccurrenceState(rows[0]) : null;
+}
+
+async function findLatestConfirmedOccurrence(recurrenceId, userId, connection = pool) {
+	const [rows] = await connection.query(
+		`SELECT id AS occurrenceId, DATE_FORMAT(scheduled_date, '%Y-%m-%d') AS scheduledDate
+		FROM expense_recurrence_occurrences
+		WHERE recurrence_id = ? AND user_id = ? AND status = 'confirmed'
+		ORDER BY scheduled_date DESC, id DESC
+		LIMIT 1`,
+		[recurrenceId, userId],
+	);
+	return rows[0]
+		? { occurrenceId: rows[0].occurrenceId, scheduledDate: formatDate(rows[0].scheduledDate) }
+		: null;
+}
+
+function mapOccurrenceState(row) {
 	return {
-		occurrenceId: rows[0].occurrenceId,
-		scheduledDate: formatDate(rows[0].scheduledDate),
-		status: rows[0].status,
-		frequency: rows[0].frequency,
+		occurrenceId: row.occurrenceId,
+		recurrenceId: row.recurrenceId,
+		scheduledDate: formatDate(row.scheduledDate),
+		status: row.status,
+		frequency: row.frequency,
 	};
+}
+
+async function update(recurrenceId, userId, fields) {
+	const columns = {
+		concept: 'concept',
+		categoryId: 'category_id',
+		amount: 'amount',
+		notes: 'notes',
+	};
+	const entries = Object.entries(fields).filter(([field]) => columns[field]);
+	if (entries.length === 0) return;
+
+	await pool.query(
+		`UPDATE expense_recurrences
+		SET ${entries.map(([field]) => `${columns[field]} = ?`).join(', ')}
+		WHERE id = ? AND user_id = ? AND deleted_at IS NULL`,
+		[...entries.map(([, value]) => value), recurrenceId, userId],
+	);
 }
 
 // visibleUntil: última fecha programada visible por frecuencia ({ daily, weekly, monthly, yearly }).
@@ -301,6 +359,76 @@ async function confirmOccurrence(occurrenceId, userId, paidDate) {
 	}
 }
 
+// Revierte una confirmación: borra (lógicamente) el movimiento, devuelve la ocurrencia a pendiente
+// y elimina el siguiente recordatorio que esa confirmación había generado.
+async function undoConfirmation(occurrenceId, recurrenceId, userId) {
+	const connection = await pool.getConnection();
+
+	try {
+		await connection.beginTransaction();
+		// Bloquear la recurrencia serializa las confirmaciones y reversiones de la misma cadena.
+		await connection.query(
+			'SELECT id FROM expense_recurrences WHERE id = ? AND user_id = ? FOR UPDATE',
+			[recurrenceId, userId],
+		);
+		const [rows] = await connection.query(
+			`SELECT
+				id,
+				DATE_FORMAT(scheduled_date, '%Y-%m-%d') AS scheduledDate,
+				status,
+				expense_id AS expenseId
+			FROM expense_recurrence_occurrences
+			WHERE id = ? AND recurrence_id = ? AND user_id = ?
+			FOR UPDATE`,
+			[occurrenceId, recurrenceId, userId],
+		);
+		const occurrence = rows[0];
+		const latest = await findLatestConfirmedOccurrence(recurrenceId, userId, connection);
+		if (!occurrence || occurrence.status !== 'confirmed' || latest?.occurrenceId !== occurrenceId) {
+			const error = new Error('El recordatorio cambió mientras se procesaba; vuelve a intentarlo');
+			error.statusCode = 409;
+			throw error;
+		}
+		const scheduledDate = formatDate(occurrence.scheduledDate);
+
+		if (occurrence.expenseId !== null) {
+			await connection.query(
+				'UPDATE expenses SET deleted_at = NOW() WHERE id = ? AND user_id = ? AND deleted_at IS NULL',
+				[occurrence.expenseId, userId],
+			);
+		}
+		await connection.query(
+			`UPDATE expense_recurrence_occurrences
+			SET status = 'pending', expense_id = NULL, confirmed_at = NULL
+			WHERE id = ? AND user_id = ?`,
+			[occurrenceId, userId],
+		);
+		await connection.query(
+			`DELETE FROM expense_recurrence_occurrences
+			WHERE recurrence_id = ? AND user_id = ?
+				AND status = 'pending' AND scheduled_date > ?`,
+			[recurrenceId, userId, scheduledDate],
+		);
+		await connection.query(
+			'UPDATE expense_recurrences SET next_scheduled_date = ? WHERE id = ? AND user_id = ?',
+			[scheduledDate, recurrenceId, userId],
+		);
+
+		await connection.commit();
+		return {
+			occurrenceId,
+			recurrenceId,
+			scheduledDate,
+			expenseId: occurrence.expenseId,
+		};
+	} catch (error) {
+		await connection.rollback();
+		throw error;
+	} finally {
+		connection.release();
+	}
+}
+
 async function cancel(recurrenceId, userId, scope, today) {
 	const connection = await pool.getConnection();
 
@@ -418,8 +546,12 @@ module.exports = {
 	findRecurrencesByUser,
 	findRecurrenceByIdAndUser,
 	findOccurrenceByIdAndUser,
+	findOccurrenceByExpense,
+	findLatestConfirmedOccurrence,
 	findRemindersByUser,
+	update,
 	confirmOccurrence,
+	undoConfirmation,
 	cancel,
 	getNextScheduledDate,
 };
