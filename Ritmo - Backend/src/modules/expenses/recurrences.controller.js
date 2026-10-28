@@ -9,6 +9,15 @@ async function createRecurrence(req, res, next) {
 	}
 }
 
+async function getRecurrences(req, res, next) {
+	try {
+		const recurrences = await recurrencesService.getRecurrences(req.user.id);
+		return res.status(200).json({ data: recurrences });
+	} catch (error) {
+		return next(error);
+	}
+}
+
 async function getReminders(req, res, next) {
 	try {
 		const reminders = await recurrencesService.getReminders(req.user.id);
@@ -46,6 +55,7 @@ async function cancelRecurrence(req, res, next) {
 
 module.exports = {
 	createRecurrence,
+	getRecurrences,
 	getReminders,
 	confirmOccurrence,
 	cancelRecurrence,

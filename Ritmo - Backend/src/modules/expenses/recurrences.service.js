@@ -1,6 +1,27 @@
 const categoriesRepository = require('../categories/categories.repository');
 const recurrencesRepository = require('./recurrences.repository');
-const { getTodayInBogota } = require('../../utils/dates');
+const { getTodayInBogota, addDaysToDate } = require('../../utils/dates');
+
+// Días antes de la fecha programada en que un recordatorio se vuelve visible y confirmable.
+// Después de esa fecha sigue visible mientras esté pendiente (vencido).
+const REMINDER_LEAD_DAYS = {
+	daily: 0,
+	weekly: 2,
+	monthly: 2,
+	yearly: 2,
+};
+
+function getReminderVisibleFrom(scheduledDate, frequency) {
+	return addDaysToDate(scheduledDate, -REMINDER_LEAD_DAYS[frequency]);
+}
+
+// Última fecha programada visible hoy para cada frecuencia.
+function getReminderVisibleUntil(today) {
+	return Object.fromEntries(Object.entries(REMINDER_LEAD_DAYS).map(([frequency, leadDays]) => [
+		frequency,
+		addDaysToDate(today, leadDays),
+	]));
+}
 
 async function createRecurrence(userId, data) {
 	validateUserId(userId);
@@ -13,17 +34,26 @@ async function createRecurrence(userId, data) {
 		anchorDay: day,
 		anchorMonth: month,
 	});
-	const reminders = await recurrencesRepository.findRemindersByUser(userId);
-	return reminders.find((reminder) => reminder.recurrenceId === recurrenceId);
+	return recurrencesRepository.findRecurrenceByIdAndUser(recurrenceId, userId);
+}
+
+async function getRecurrences(userId) {
+	validateUserId(userId);
+	return recurrencesRepository.findRecurrencesByUser(userId);
 }
 
 async function getReminders(userId) {
 	validateUserId(userId);
 	const today = getTodayInBogota();
-	return (await recurrencesRepository.findRemindersByUser(userId)).map((reminder) => ({
+	const reminders = await recurrencesRepository.findRemindersByUser(
+		userId,
+		getReminderVisibleUntil(today),
+	);
+	return reminders.map((reminder) => ({
 		...reminder,
 		isOverdue: reminder.scheduledDate < today,
 		isDueToday: reminder.scheduledDate === today,
+		isUpcoming: reminder.scheduledDate > today,
 	}));
 }
 
@@ -32,6 +62,20 @@ async function confirmOccurrence(occurrenceId, userId, paidDate) {
 	if (!Number.isInteger(occurrenceId) || occurrenceId <= 0) {
 		throw badRequestError('El identificador del recordatorio no es válido');
 	}
+
+	const occurrence = await recurrencesRepository.findOccurrenceByIdAndUser(occurrenceId, userId);
+	if (!occurrence) {
+		throw httpError('Recordatorio financiero no encontrado', 404);
+	}
+	if (occurrence.status !== 'pending') {
+		throw httpError('Este recordatorio ya fue atendido', 409);
+	}
+	const visibleFrom = getReminderVisibleFrom(occurrence.scheduledDate, occurrence.frequency);
+	if (getTodayInBogota() < visibleFrom) {
+		throw httpError(`Este recordatorio estará disponible desde el ${visibleFrom}`, 409);
+	}
+
+	// El repositorio vuelve a verificar el estado con bloqueo para evitar confirmaciones simultáneas.
 	return recurrencesRepository.confirmOccurrence(
 		occurrenceId,
 		userId,
@@ -78,13 +122,18 @@ function validateUserId(userId) {
 }
 
 function badRequestError(message) {
+	return httpError(message, 400);
+}
+
+function httpError(message, statusCode) {
 	const error = new Error(message);
-	error.statusCode = 400;
+	error.statusCode = statusCode;
 	return error;
 }
 
 module.exports = {
 	createRecurrence,
+	getRecurrences,
 	getReminders,
 	confirmOccurrence,
 	cancelRecurrence,

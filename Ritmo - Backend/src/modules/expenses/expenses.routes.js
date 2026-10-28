@@ -21,6 +21,7 @@ router.param('id', validateIdParam);
 
 router.post('/', verifyToken, validateCreateExpense, expensesController.createExpense);
 router.post('/recurrences', verifyToken, validateCreateRecurrence, recurrencesController.createRecurrence);
+router.get('/recurrences', verifyToken, recurrencesController.getRecurrences);
 router.get('/recurrences/reminders', verifyToken, recurrencesController.getReminders);
 router.patch('/recurrences/occurrences/:occurrenceId/confirm', verifyToken, validateOccurrenceId, validateConfirmOccurrence, recurrencesController.confirmOccurrence);
 router.delete('/recurrences/:id', verifyToken, validateCancelRecurrence, recurrencesController.cancelRecurrence);

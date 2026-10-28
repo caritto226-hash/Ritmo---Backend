@@ -15,7 +15,10 @@
     { "key": "correo", "value": "" },
     { "key": "token", "value": "" },
     { "key": "taskId", "value": "" },
-    { "key": "finCatId", "value": "" }
+    { "key": "finCatId", "value": "" },
+    { "key": "recCatId", "value": "" },
+    { "key": "recOtherEmail", "value": "" },
+    { "key": "recOtherToken", "value": "" }
   ],
   "item": [
     {
@@ -377,6 +380,986 @@
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Recurrencias",
+      "description": "Pagos recurrentes y su ventana de recordatorios: un recordatorio es visible y confirmable desde 2 días antes de su fecha (0 días para los diarios) y mientras siga pendiente. Las fechas se calculan en la primera petición a partir de hoy en America/Bogota.",
+      "item": [
+        {
+          "name": "Preparar fechas y categoría recurrente",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Fechas relativas a hoy en America/Bogota (UTC-5 todo el año, sin horario de verano),",
+                  "// para que la colección se pueda repetir cualquier día.",
+                  "const DAY = 24 * 60 * 60 * 1000;",
+                  "const todayUtc = Date.parse(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10));",
+                  "const dateFromToday = (days) => new Date(todayUtc + days * DAY).toISOString().slice(0, 10);",
+                  "const offsets = { recToday: 0, recPlus1: 1, recPlus2: 2, recPlus3: 3, recPlus10: 10, recMinus2: -2, recMinus3: -3, recMinus5: -5 };",
+                  "Object.entries(offsets).forEach(([key, days]) => pm.collectionVariables.set(key, dateFromToday(days)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Existe una categoría de finanzas que permite recurrencias', () => {",
+                  "  const category = (pm.response.json().data || []).find((item) => item.name === 'Vivienda y servicios');",
+                  "  pm.expect(category, 'Categoría \"Vivienda y servicios\"').to.be.an('object');",
+                  "  pm.expect(category.isRecurring).to.eql(true);",
+                  "  pm.collectionVariables.set('recCatId', category.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/categories?module=finance"
+          }
+        },
+        {
+          "name": "Crear mensual con inicio hoy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.test('Devuelve la recurrencia con su pendiente', () => {",
+                  "  pm.expect(recurrence).to.be.an('object');",
+                  "  pm.expect(recurrence.frequency).to.eql('monthly');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(pm.collectionVariables.get('recToday'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('recToday'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('recMonthTodayId', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('recMonthTodayOcc', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Arriendo\",\n  \"categoryId\": {{recCatId}},\n  \"amount\": -100000,\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recToday}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear mensual con inicio en 2 días",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.test('Devuelve la recurrencia con su pendiente', () => {",
+                  "  pm.expect(recurrence).to.be.an('object');",
+                  "  pm.expect(recurrence.frequency).to.eql('monthly');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(pm.collectionVariables.get('recPlus2'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('recPlus2'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('recMonthPlus2Id', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('recMonthPlus2Occ', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Internet\",\n  \"categoryId\": {{recCatId}},\n  \"amount\": -100000,\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recPlus2}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear mensual con inicio en 3 días",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.test('Devuelve la recurrencia con su pendiente', () => {",
+                  "  pm.expect(recurrence).to.be.an('object');",
+                  "  pm.expect(recurrence.frequency).to.eql('monthly');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(pm.collectionVariables.get('recPlus3'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('recPlus3'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('recMonthPlus3Id', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('recMonthPlus3Occ', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Gimnasio\",\n  \"categoryId\": {{recCatId}},\n  \"amount\": -100000,\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recPlus3}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear mensual vencida hace 5 días",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.test('Devuelve la recurrencia con su pendiente', () => {",
+                  "  pm.expect(recurrence).to.be.an('object');",
+                  "  pm.expect(recurrence.frequency).to.eql('monthly');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(pm.collectionVariables.get('recMinus5'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('recMinus5'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('recMonthMinus5Id', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('recMonthMinus5Occ', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Energía\",\n  \"categoryId\": {{recCatId}},\n  \"amount\": -100000,\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recMinus5}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear diaria con inicio hoy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.test('Devuelve la recurrencia con su pendiente', () => {",
+                  "  pm.expect(recurrence).to.be.an('object');",
+                  "  pm.expect(recurrence.frequency).to.eql('daily');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(pm.collectionVariables.get('recToday'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('recToday'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('recDailyTodayId', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('recDailyTodayOcc', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Parqueadero\",\n  \"categoryId\": {{recCatId}},\n  \"amount\": -8000,\n  \"frequency\": \"daily\",\n  \"startDate\": \"{{recToday}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Crear diaria vencida hace 3 días",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.test('Devuelve la recurrencia con su pendiente', () => {",
+                  "  pm.expect(recurrence).to.be.an('object');",
+                  "  pm.expect(recurrence.frequency).to.eql('daily');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(pm.collectionVariables.get('recMinus3'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('recMinus3'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('recDailyLateId', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('recDailyLateOcc', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Almuerzo\",\n  \"categoryId\": {{recCatId}},\n  \"amount\": -15000,\n  \"frequency\": \"daily\",\n  \"startDate\": \"{{recMinus3}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 8 · Crear mensual con inicio en 10 días devuelve datos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.test('Devuelve la recurrencia con su pendiente', () => {",
+                  "  pm.expect(recurrence).to.be.an('object');",
+                  "  pm.expect(recurrence.frequency).to.eql('monthly');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(pm.collectionVariables.get('recPlus10'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('recPlus10'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.be.a('number');",
+                  "});",
+                  "pm.collectionVariables.set('recMonthPlus10Id', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('recMonthPlus10Occ', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Seguro\",\n  \"categoryId\": {{recCatId}},\n  \"amount\": -100000,\n  \"frequency\": \"monthly\",\n  \"startDate\": \"{{recPlus10}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 1 · Recordatorios solo dentro de la ventana",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const byRecurrence = (items, key) => items.filter((item) => item.recurrenceId === Number(v(key)));",
+                  "const reminders = pm.response.json().data;",
+                  "pm.test('Muestra hoy, en 2 días, vencidos y la diaria de hoy', () => {",
+                  "  ['recMonthToday', 'recMonthPlus2', 'recMonthMinus5', 'recDailyToday', 'recDailyLate'].forEach((key) => {",
+                  "    pm.expect(byRecurrence(reminders, key + 'Id'), key).to.have.lengthOf(1);",
+                  "  });",
+                  "});",
+                  "pm.test('No muestra los que están a más de 2 días', () => {",
+                  "  pm.expect(byRecurrence(reminders, 'recMonthPlus3Id')).to.have.lengthOf(0);",
+                  "  pm.expect(byRecurrence(reminders, 'recMonthPlus10Id')).to.have.lengthOf(0);",
+                  "});",
+                  "pm.test('Marca vencido, hoy y próximo', () => {",
+                  "  const [today] = byRecurrence(reminders, 'recMonthTodayId');",
+                  "  const [upcoming] = byRecurrence(reminders, 'recMonthPlus2Id');",
+                  "  const [overdue] = byRecurrence(reminders, 'recMonthMinus5Id');",
+                  "  pm.expect([today.isDueToday, today.isOverdue, today.isUpcoming]).to.eql([true, false, false]);",
+                  "  pm.expect([upcoming.isDueToday, upcoming.isOverdue, upcoming.isUpcoming]).to.eql([false, false, true]);",
+                  "  pm.expect([overdue.isDueToday, overdue.isOverdue, overdue.isUpcoming]).to.eql([false, true, false]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/reminders"
+          }
+        },
+        {
+          "name": "Prueba 1 · La lista de pagos recurrentes incluye todos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const byRecurrence = (items, key) => items.filter((item) => item.recurrenceId === Number(v(key)));",
+                  "pm.test('Incluye también los que están fuera de la ventana', () => {",
+                  "  const recurrences = pm.response.json().data;",
+                  "  ['recMonthToday', 'recMonthPlus2', 'recMonthPlus3', 'recMonthMinus5', 'recDailyToday', 'recDailyLate', 'recMonthPlus10'].forEach((key) => {",
+                  "    pm.expect(byRecurrence(recurrences, key + 'Id'), key).to.have.lengthOf(1);",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "Prueba 2 · Confirmar el de dentro de 3 días es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica desde cuándo estará disponible', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Este recordatorio estará disponible desde el ' + pm.collectionVariables.get('recPlus1'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recMonthPlus3Occ}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 3 · Confirmar el de dentro de 2 días es aceptado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Registra el movimiento con la fecha programada', () => {",
+                  "  const result = pm.response.json().data;",
+                  "  pm.expect(result.expenseId).to.be.a('number');",
+                  "  pm.expect(result.scheduledDate).to.eql(pm.collectionVariables.get('recPlus2'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recMonthPlus2Occ}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 4 · Confirmar el mensual de hoy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Programa el siguiente para el próximo mes', () => {",
+                  "  const result = pm.response.json().data;",
+                  "  pm.expect(result.nextScheduledDate > pm.collectionVariables.get('recPlus10')).to.eql(true);",
+                  "  pm.collectionVariables.set('recMonthTodayNext', result.nextScheduledDate);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recMonthTodayOcc}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 4 · Confirmar dos veces el mismo es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica que ya fue atendido', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Este recordatorio ya fue atendido');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recMonthTodayOcc}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 5 · Confirmar la diaria de hoy",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Programa la siguiente para mañana', () => {",
+                  "  pm.expect(pm.response.json().data.nextScheduledDate).to.eql(pm.collectionVariables.get('recPlus1'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recDailyTodayOcc}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 4 y 5 · La lista expone los siguientes pendientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const byRecurrence = (items, key) => items.filter((item) => item.recurrenceId === Number(v(key)));",
+                  "const recurrences = pm.response.json().data;",
+                  "pm.test('El mensual de hoy pasó al próximo mes', () => {",
+                  "  const [recurrence] = byRecurrence(recurrences, 'recMonthTodayId');",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(v('recMonthTodayNext'));",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('recMonthTodayNext'));",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.not.eql(Number(v('recMonthTodayOcc')));",
+                  "  pm.collectionVariables.set('recMonthTodayNextOcc', recurrence.pendingOccurrenceId);",
+                  "});",
+                  "pm.test('La diaria de hoy pasó a mañana', () => {",
+                  "  const [recurrence] = byRecurrence(recurrences, 'recDailyTodayId');",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('recPlus1'));",
+                  "  pm.collectionVariables.set('recDailyTodayNextOcc', recurrence.pendingOccurrenceId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "Prueba 4 y 5 · Los confirmados desaparecen y el siguiente no aparece",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const byRecurrence = (items, key) => items.filter((item) => item.recurrenceId === Number(v(key)));",
+                  "const reminders = pm.response.json().data;",
+                  "pm.test('No aparece ningún recordatorio del mensual de hoy, del de 2 días ni de la diaria de hoy', () => {",
+                  "  pm.expect(byRecurrence(reminders, 'recMonthTodayId')).to.have.lengthOf(0);",
+                  "  pm.expect(byRecurrence(reminders, 'recMonthPlus2Id')).to.have.lengthOf(0);",
+                  "  pm.expect(byRecurrence(reminders, 'recDailyTodayId')).to.have.lengthOf(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/reminders"
+          }
+        },
+        {
+          "name": "Prueba 4 · Confirmar el del próximo mes es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica desde cuándo estará disponible', () => {",
+                  "  pm.expect(pm.response.json().message).to.match(/^Este recordatorio estará disponible desde el \\d{4}-\\d{2}-\\d{2}$/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recMonthTodayNextOcc}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 5 · Confirmar la diaria de mañana es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Indica desde cuándo estará disponible', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Este recordatorio estará disponible desde el ' + pm.collectionVariables.get('recPlus1'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recDailyTodayNextOcc}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 6 · Confirmar la diaria vencida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('La siguiente también está vencida', () => {",
+                  "  pm.expect(pm.response.json().data.nextScheduledDate).to.eql(pm.collectionVariables.get('recMinus2'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recDailyLateOcc}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Prueba 6 · Aparece el siguiente día vencido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const byRecurrence = (items, key) => items.filter((item) => item.recurrenceId === Number(v(key)));",
+                  "pm.test('Muestra la diaria vencida de hace 2 días', () => {",
+                  "  const matches = byRecurrence(pm.response.json().data, 'recDailyLateId');",
+                  "  pm.expect(matches).to.have.lengthOf(1);",
+                  "  pm.expect(matches[0].scheduledDate).to.eql(v('recMinus2'));",
+                  "  pm.expect(matches[0].isOverdue).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/reminders"
+          }
+        },
+        {
+          "name": "Prueba 7 · Registrar un segundo usuario",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('recOtherEmail', `ajeno${Date.now()}@ritmo.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Ajeno\",\n  \"correo\": \"{{recOtherEmail}}\",\n  \"password\": \"123456\",\n  \"idRol\": 1\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Prueba 7 · Iniciar sesión con el segundo usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('recOtherToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{recOtherEmail}}\",\n  \"contraseña\": \"123456\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Prueba 7 · Otro usuario no puede confirmar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{recMonthPlus3Occ}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recOtherToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Prueba 7 · Otro usuario no puede cancelar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{recMonthPlus3Id}}?scope=all",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{recOtherToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Prueba 7 · Detener futuras de la mensual de 10 días",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{recMonthPlus10Id}}?scope=future"
+          }
+        },
+        {
+          "name": "Prueba 7 · Detener futuras de la mensual vencida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{recMonthMinus5Id}}?scope=future"
+          }
+        },
+        {
+          "name": "Prueba 7 · La lista refleja las detenidas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const byRecurrence = (items, key) => items.filter((item) => item.recurrenceId === Number(v(key)));",
+                  "const recurrences = pm.response.json().data;",
+                  "pm.test('La de 10 días sale de la lista (sin pendientes)', () => {",
+                  "  pm.expect(byRecurrence(recurrences, 'recMonthPlus10Id')).to.have.lengthOf(0);",
+                  "});",
+                  "pm.test('La vencida sigue en la lista, detenida y con su pendiente', () => {",
+                  "  const [recurrence] = byRecurrence(recurrences, 'recMonthMinus5Id');",
+                  "  pm.expect(recurrence.isActive).to.eql(false);",
+                  "  pm.expect(recurrence.isCanceled).to.eql(true);",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('recMinus5'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "Prueba 7 · Eliminar toda la recurrencia vencida",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{recMonthMinus5Id}}?scope=all"
+          }
+        },
+        {
+          "name": "Prueba 7 · La eliminada desaparece de lista y recordatorios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const byRecurrence = (items, key) => items.filter((item) => item.recurrenceId === Number(v(key)));",
+                  "pm.test('No queda el recordatorio vencido', () => {",
+                  "  pm.expect(byRecurrence(pm.response.json().data, 'recMonthMinus5Id')).to.have.lengthOf(0);",
+                  "});",
+                  "pm.test('Tampoco aparece en la lista de pagos recurrentes', (done) => {",
+                  "  pm.sendRequest({",
+                  "    url: v('baseUrl') + '/api/expenses/recurrences',",
+                  "    method: 'GET',",
+                  "    header: { Authorization: 'Bearer ' + v('token') },",
+                  "  }, (error, response) => {",
+                  "    if (error) return done(error);",
+                  "    pm.expect(byRecurrence(response.json().data, 'recMonthMinus5Id')).to.have.lengthOf(0);",
+                  "    done();",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/reminders"
           }
         }
       ]

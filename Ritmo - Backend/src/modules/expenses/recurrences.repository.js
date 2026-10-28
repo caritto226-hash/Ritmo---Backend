@@ -41,7 +41,94 @@ async function create(data) {
 	}
 }
 
-async function findRemindersByUser(userId) {
+const RECURRENCE_SELECT = `SELECT
+		recurrence.id AS recurrenceId,
+		recurrence.concept,
+		recurrence.amount,
+		recurrence.notes,
+		recurrence.frequency,
+		DATE_FORMAT(recurrence.start_date, '%Y-%m-%d') AS startDate,
+		DATE_FORMAT(recurrence.next_scheduled_date, '%Y-%m-%d') AS nextScheduledDate,
+		recurrence.is_active AS isActive,
+		recurrence.canceled_at AS canceledAt,
+		recurrence.category_id AS categoryId,
+		category.name AS categoryName,
+		category.icon AS categoryIcon,
+		category.color AS categoryColor,
+		(
+			SELECT pending.id
+			FROM expense_recurrence_occurrences AS pending
+			WHERE pending.recurrence_id = recurrence.id
+				AND pending.user_id = recurrence.user_id
+				AND pending.status = 'pending'
+			ORDER BY pending.scheduled_date ASC, pending.id ASC
+			LIMIT 1
+		) AS pendingOccurrenceId,
+		(
+			SELECT DATE_FORMAT(pending.scheduled_date, '%Y-%m-%d')
+			FROM expense_recurrence_occurrences AS pending
+			WHERE pending.recurrence_id = recurrence.id
+				AND pending.user_id = recurrence.user_id
+				AND pending.status = 'pending'
+			ORDER BY pending.scheduled_date ASC, pending.id ASC
+			LIMIT 1
+		) AS pendingScheduledDate
+	FROM expense_recurrences AS recurrence
+	JOIN categories AS category
+		ON category.id = recurrence.category_id
+		AND category.user_id = recurrence.user_id`;
+
+// Lista de configuración: recurrencias activas y las detenidas que aún tienen un pendiente vencido.
+async function findRecurrencesByUser(userId) {
+	const [rows] = await pool.query(
+		`${RECURRENCE_SELECT}
+		WHERE recurrence.user_id = ?
+			AND recurrence.deleted_at IS NULL
+		HAVING isActive = 1 OR pendingOccurrenceId IS NOT NULL
+		ORDER BY recurrence.next_scheduled_date ASC, recurrence.id ASC`,
+		[userId],
+	);
+	return rows.map(mapRecurrence);
+}
+
+async function findRecurrenceByIdAndUser(recurrenceId, userId) {
+	const [rows] = await pool.query(
+		`${RECURRENCE_SELECT}
+		WHERE recurrence.id = ?
+			AND recurrence.user_id = ?
+			AND recurrence.deleted_at IS NULL`,
+		[recurrenceId, userId],
+	);
+	return rows[0] ? mapRecurrence(rows[0]) : null;
+}
+
+async function findOccurrenceByIdAndUser(occurrenceId, userId) {
+	const [rows] = await pool.query(
+		`SELECT
+			occurrence.id AS occurrenceId,
+			DATE_FORMAT(occurrence.scheduled_date, '%Y-%m-%d') AS scheduledDate,
+			occurrence.status,
+			recurrence.frequency
+		FROM expense_recurrence_occurrences AS occurrence
+		JOIN expense_recurrences AS recurrence
+			ON recurrence.id = occurrence.recurrence_id
+			AND recurrence.user_id = occurrence.user_id
+		WHERE occurrence.id = ?
+			AND occurrence.user_id = ?
+			AND recurrence.deleted_at IS NULL`,
+		[occurrenceId, userId],
+	);
+	if (!rows[0]) return null;
+	return {
+		occurrenceId: rows[0].occurrenceId,
+		scheduledDate: formatDate(rows[0].scheduledDate),
+		status: rows[0].status,
+		frequency: rows[0].frequency,
+	};
+}
+
+// visibleUntil: última fecha programada visible por frecuencia ({ daily, weekly, monthly, yearly }).
+async function findRemindersByUser(userId, visibleUntil) {
 	const [rows] = await pool.query(
 		`SELECT
 			occurrence.id AS occurrenceId,
@@ -69,8 +156,20 @@ async function findRemindersByUser(userId) {
 		WHERE occurrence.user_id = ?
 			AND occurrence.status = 'pending'
 			AND recurrence.deleted_at IS NULL
+			AND occurrence.scheduled_date <= CASE recurrence.frequency
+				WHEN 'daily' THEN ?
+				WHEN 'weekly' THEN ?
+				WHEN 'monthly' THEN ?
+				WHEN 'yearly' THEN ?
+			END
 		ORDER BY occurrence.scheduled_date ASC, occurrence.id ASC`,
-		[userId],
+		[
+			userId,
+			visibleUntil.daily,
+			visibleUntil.weekly,
+			visibleUntil.monthly,
+			visibleUntil.yearly,
+		],
 	);
 
 	return rows.map((row) => ({
@@ -282,6 +381,31 @@ function getNextScheduledDate(dateValue, frequency, anchorDay, anchorMonth) {
 	return formatDate(current);
 }
 
+function mapRecurrence(row) {
+	return {
+		id: row.recurrenceId,
+		recurrenceId: row.recurrenceId,
+		concept: row.concept,
+		amount: Number(row.amount),
+		notes: row.notes,
+		frequency: row.frequency,
+		startDate: formatDate(row.startDate),
+		nextScheduledDate: formatDate(row.nextScheduledDate),
+		isActive: Boolean(row.isActive),
+		isCanceled: row.canceledAt !== null,
+		pendingOccurrenceId: row.pendingOccurrenceId,
+		pendingScheduledDate: row.pendingScheduledDate === null ? null : formatDate(row.pendingScheduledDate),
+		categoryId: row.categoryId,
+		category: {
+			id: row.categoryId,
+			module: 'finance',
+			name: row.categoryName,
+			icon: row.categoryIcon,
+			color: row.categoryColor,
+		},
+	};
+}
+
 function formatDate(value) {
 	if (value instanceof Date) {
 		return `${value.getUTCFullYear()}-${String(value.getUTCMonth() + 1).padStart(2, '0')}-${String(value.getUTCDate()).padStart(2, '0')}`;
@@ -291,6 +415,9 @@ function formatDate(value) {
 
 module.exports = {
 	create,
+	findRecurrencesByUser,
+	findRecurrenceByIdAndUser,
+	findOccurrenceByIdAndUser,
 	findRemindersByUser,
 	confirmOccurrence,
 	cancel,
