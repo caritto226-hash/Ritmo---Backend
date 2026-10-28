@@ -3,15 +3,14 @@ import { StatusBar } from 'expo-status-bar';
 import {
   ActivityIndicator,
   Platform,
-  Pressable,
   StatusBar as NativeStatusBar,
   StyleSheet,
-  Text,
   View,
 } from 'react-native';
 import LoginScreen from './src/screens/LoginScreen';
+import TasksScreen from './src/screens/TasksScreen';
 import { clearToken, getToken } from './src/storage/session';
-import { colors, radius, spacing } from './src/theme';
+import { colors, spacing } from './src/theme';
 
 export default function App() {
   // 'checking' mientras se lee el token; luego 'loggedOut' o 'loggedIn'. Así se navega sin librerías.
@@ -73,19 +72,7 @@ export default function App() {
   } else if (screen === 'loggedOut') {
     content = <LoginScreen onLogin={handleLogin} notice={notice} />;
   } else {
-    // Temporal: en la fase 3 se reemplaza por la pantalla de tareas, que recibirá "token".
-    content = (
-      <View style={styles.centered}>
-        <Text style={styles.title}>Sesión iniciada</Text>
-        <Pressable
-          style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
-          onPress={() => handleLogout()}
-          accessibilityRole="button"
-        >
-          <Text style={styles.logoutText}>Cerrar sesión</Text>
-        </Pressable>
-      </View>
-    );
+    content = <TasksScreen token={token} onLogout={handleLogout} />;
   }
 
   return (
@@ -107,26 +94,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: spacing.lg,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: spacing.lg,
-  },
-  logoutButton: {
-    borderWidth: 1,
-    borderColor: colors.accent,
-    borderRadius: radius.pill,
-    paddingVertical: 12,
-    paddingHorizontal: spacing.lg,
-  },
-  pressed: {
-    opacity: 0.7,
-  },
-  logoutText: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '600',
   },
 });
