@@ -13,6 +13,8 @@ const {
 	validateOccurrenceId,
 	validateCancelRecurrence,
 } = require('./recurrences.validator');
+const categorySuggestionController = require('./category-suggestion.controller');
+const { validateSuggestCategory } = require('./category-suggestion.validator');
 const { verifyToken } = require('../../middlewares/auth.middleware');
 const { validateIdParam } = require('../../middlewares/id-param.middleware');
 
@@ -21,6 +23,7 @@ const router = express.Router();
 router.param('id', validateIdParam);
 
 router.post('/', verifyToken, validateCreateExpense, expensesController.createExpense);
+router.post('/suggest-category', verifyToken, validateSuggestCategory, categorySuggestionController.suggestCategory);
 router.post('/recurrences', verifyToken, validateCreateRecurrence, recurrencesController.createRecurrence);
 router.get('/recurrences', verifyToken, recurrencesController.getRecurrences);
 router.get('/recurrences/reminders', verifyToken, recurrencesController.getReminders);

@@ -23,7 +23,9 @@
     { "key": "editOtherCatId", "value": "" },
     { "key": "editNonRecCatId", "value": "" },
     { "key": "editOtherEmail", "value": "" },
-    { "key": "editOtherToken", "value": "" }
+    { "key": "editOtherToken", "value": "" },
+    { "key": "suggestCatId", "value": "" },
+    { "key": "expenseCount", "value": "" }
   ],
   "item": [
     {
@@ -2389,6 +2391,235 @@
             "method": "DELETE",
             "header": [],
             "url": "{{baseUrl}}/api/expenses/{{editExpenseB3}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Sugerencia de categoría",
+      "description": "Sugerencia de categoría para un concepto de finanzas. Va al final porque desactiva la categoría Transporte del usuario, que usa la carpeta 6.",
+      "item": [
+        {
+          "name": "Contar movimientos antes de sugerir",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Guarda cuántos movimientos hay', () => {",
+                  "  const expenses = pm.response.json().data;",
+                  "  pm.expect(expenses).to.be.an('array');",
+                  "  pm.collectionVariables.set('expenseCount', expenses.length);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses"
+          }
+        },
+        {
+          "name": "Sugerir la categoría de un concepto conocido",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Consulta las categorías de finanzas (se crean las predeterminadas la primera vez)",
+                  "pm.collectionVariables.unset('suggestCatId');",
+                  "pm.sendRequest({",
+                  "  url: pm.collectionVariables.get('baseUrl') + '/api/categories?module=finance',",
+                  "  method: 'GET',",
+                  "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('token') }",
+                  "}, (error, response) => {",
+                  "  if (error) { console.log(error); return; }",
+                  "  const categories = response.json().data || [];",
+                  "  const category = categories.find((item) => item.name === 'Transporte');",
+                  "  if (!category) {",
+                  "    throw new Error('No existe la categoría de finanzas \"Transporte\". Revisa las categorías predeterminadas de la API.');",
+                  "  }",
+                  "  pm.collectionVariables.set('suggestCatId', category.id);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Sugiere la categoría Transporte del usuario', () => {",
+                  "  const suggestion = pm.response.json().data.suggestion;",
+                  "  pm.expect(suggestion).to.be.an('object');",
+                  "  pm.expect(suggestion.name).to.eql('Transporte');",
+                  "  pm.expect(suggestion.categoryId).to.eql(Number(pm.collectionVariables.get('suggestCatId')));",
+                  "  pm.expect(suggestion.confidence).to.be.at.least(0.6);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"gasolina para la moto\"\n}"
+            },
+            "url": "{{baseUrl}}/api/expenses/suggest-category"
+          }
+        },
+        {
+          "name": "Concepto sin sugerencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('No sugiere ninguna categoría', () => {",
+                  "  pm.expect(pm.response.json().data.suggestion).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"asdfgh\"\n}"
+            },
+            "url": "{{baseUrl}}/api/expenses/suggest-category"
+          }
+        },
+        {
+          "name": "Sugerir con concepto vacío (validación)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje de validación', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('El concepto es obligatorio');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"   \"\n}"
+            },
+            "url": "{{baseUrl}}/api/expenses/suggest-category"
+          }
+        },
+        {
+          "name": "Sugerir sin token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 401 Unauthorized', () => pm.response.to.have.status(401));",
+                  "pm.test('Mensaje de token requerido', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Token de autenticación requerido');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"gasolina para la moto\"\n}"
+            },
+            "url": "{{baseUrl}}/api/expenses/suggest-category"
+          }
+        },
+        {
+          "name": "Sugerir con la categoría desactivada por el usuario",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Desactiva la categoría Transporte de este usuario antes de pedir la sugerencia",
+                  "pm.sendRequest({",
+                  "  url: pm.collectionVariables.get('baseUrl') + '/api/categories/' + pm.collectionVariables.get('suggestCatId'),",
+                  "  method: 'DELETE',",
+                  "  header: { Authorization: 'Bearer ' + pm.collectionVariables.get('token') }",
+                  "}, (error, response) => {",
+                  "  if (error) { console.log(error); return; }",
+                  "  if (response.code !== 200) {",
+                  "    throw new Error('No se pudo desactivar la categoría Transporte (respuesta ' + response.code + ').');",
+                  "  }",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('No sugiere una categoría desactivada', () => {",
+                  "  pm.expect(pm.response.json().data.suggestion).to.eql(null);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"gasolina para la moto\"\n}"
+            },
+            "url": "{{baseUrl}}/api/expenses/suggest-category"
+          }
+        },
+        {
+          "name": "Pedir sugerencias no crea movimientos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('La cantidad de movimientos no cambió', () => {",
+                  "  pm.expect(pm.response.json().data.length).to.eql(Number(pm.collectionVariables.get('expenseCount')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses"
           }
         }
       ]
