@@ -42,6 +42,12 @@ async function createRecurrence(recurrenceData) {
   return response.data.data;
 }
 
+// Solo concepto, categoría, monto y notas; afecta lo que aún no se ha registrado.
+async function updateRecurrence(recurrenceId, recurrenceData) {
+  const response = await api.patch(`/expenses/recurrences/${recurrenceId}`, recurrenceData);
+  return response.data.data;
+}
+
 async function confirmRecurrenceOccurrence(occurrenceId, paidDate) {
   const response = await api.patch(`/expenses/recurrences/occurrences/${occurrenceId}/confirm`, {
     paidDate,
@@ -65,6 +71,7 @@ export default {
   getRecurrences,
   getRecurrenceReminders,
   createRecurrence,
+  updateRecurrence,
   confirmRecurrenceOccurrence,
   cancelRecurrence,
 };

@@ -20,7 +20,8 @@
 
   /* Texto */
   --text-primary: #1D2B44;
-  --text-secondary: #B4B4B4;
+  /* #616b7c: 5.38:1 sobre blanco (antes #B4B4B4, 2.07:1). */
+  --text-secondary: #616b7c;
 
   /* Énfasis (acento de marca) */
   --accent-gradient: linear-gradient(135deg, rgba(29, 35, 56, 0.78) 0%, #1d2b44 100%);
@@ -98,6 +99,16 @@
   --gris-texto: var(--text-secondary);
   --naranja-ritmo: #f9a03f;
   --rojo-error: #c0392b;
+
+  /* Dinero y acción principal. Derivados de la paleta; contraste ≥ 4.5:1 sobre --surface-primary. */
+  --income: color-mix(in srgb, #25875e 88%, #1d2b44);
+  --danger: var(--rojo-error);
+  --primary-solid: #1d2b44;
+  --primary-border: transparent;
+  --on-primary: #ffffff;
+  --accent-soft: var(--surface-quaternary);
+  --balance-income-arrow: #4caf83;
+  --balance-expense-arrow: var(--orange-light);
 }
 
 
@@ -114,6 +125,13 @@
   --navy-soft: #d7dcef;
   --beige-fondo: #11162a;
   --blanco: rgba(29, 35, 56, 0.78);
+
+  --income: #4caf83;
+  --danger: #e0697e;
+  /* El navy se perdería sobre el fondo oscuro: se usa la superficie elevada con borde. */
+  --primary-solid: rgba(45, 58, 92, 0.65);
+  --primary-border: var(--surface-border);
+  --accent-soft: #875ab640;
   
   --app-bg-gradient: linear-gradient(160deg, #1a1a2e 0%, #16213e 72%, #0f3460 100%);
 }
