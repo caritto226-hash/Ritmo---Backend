@@ -51,6 +51,57 @@ function validateCreateRecurrence(req, res, next) {
 	return next();
 }
 
+// Edición parcial: concepto, categoría, monto (su signo define gasto o ingreso) y notas.
+// La frecuencia y la fecha no se editan; para cambiarlas se detiene la recurrencia y se crea otra.
+function validateUpdateRecurrence(req, res, next) {
+	if (!isPositiveIntegerId(req.params.id)) {
+		return next(badRequestError('El identificador de la recurrencia no es válido'));
+	}
+	const body = req.body || {};
+	if (['frequency', 'startDate', 'nextScheduledDate'].some((field) => body[field] !== undefined)) {
+		return next(badRequestError('La frecuencia y la fecha de una recurrencia no se pueden editar'));
+	}
+
+	const { concept, categoryId, amount, notes } = body;
+	const fields = {};
+	if (concept !== undefined) {
+		if (typeof concept !== 'string' || concept.trim() === '' || concept.trim().length > 100) {
+			return next(badRequestError('El concepto es obligatorio y no puede superar los 100 caracteres'));
+		}
+		fields.concept = concept.trim();
+	}
+	if (categoryId !== undefined) {
+		if (!Number.isInteger(categoryId) || categoryId <= 0) {
+			return next(badRequestError('categoryId debe ser un entero positivo'));
+		}
+		fields.categoryId = categoryId;
+	}
+	if (amount !== undefined) {
+		if (typeof amount !== 'number' || !Number.isFinite(amount) || amount === 0) {
+			return next(badRequestError('El monto debe ser un número diferente de cero'));
+		}
+		if (!hasAtMostTwoDecimals(amount)) {
+			return next(badRequestError('El monto debe tener máximo dos decimales'));
+		}
+		if (Math.abs(amount) > MAX_ABSOLUTE_AMOUNT) {
+			return next(badRequestError('El monto no puede superar 99.999.999,99'));
+		}
+		fields.amount = amount;
+	}
+	if (notes !== undefined) {
+		if (notes !== null && (typeof notes !== 'string' || notes.length > MAX_NOTES_LENGTH)) {
+			return next(badRequestError(`Las notas deben ser un texto de hasta ${MAX_NOTES_LENGTH} caracteres`));
+		}
+		fields.notes = notes === null ? null : notes.trim();
+	}
+	if (Object.keys(fields).length === 0) {
+		return next(badRequestError('Envía al menos un campo para actualizar: concept, categoryId, amount o notes'));
+	}
+
+	req.body = fields;
+	return next();
+}
+
 function validateConfirmOccurrence(req, res, next) {
 	const { paidDate } = req.body || {};
 	if (paidDate !== undefined && !isValidDateOnly(paidDate)) {
@@ -104,6 +155,7 @@ function badRequestError(message) {
 
 module.exports = {
 	validateCreateRecurrence,
+	validateUpdateRecurrence,
 	validateConfirmOccurrence,
 	validateOccurrenceId,
 	validateCancelRecurrence,

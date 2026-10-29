@@ -4,7 +4,6 @@ import categoriesService from "../services/categories.service";
 import CategoryIconBadge from "../components/CategoryIconBadge";
 import CategorySelect from "../components/CategorySelect";
 import CategoryManager from "../components/CategoryManager";
-import FinanceRecurrenceReminders from "../components/FinanceRecurrenceReminders";
 import FinanceRecurringPayments from "../components/FinanceRecurringPayments";
 import MobileItemDetails from "../components/MobileItemDetails";
 import DateCalendar from "../components/DateCalendar";
@@ -359,13 +358,10 @@ function Expenses() {
       {error && <p style={{ color: "#e0697e" }}>{error}</p>}
       {success && <p className="finance-success" role="status">{success}</p>}
 
-      <FinanceRecurrenceReminders
-        reminders={recurrenceReminders}
-        onConfirm={confirmRecurrenceReminder}
-      />
-
       <FinanceRecurringPayments
         recurrences={recurrences}
+        reminders={recurrenceReminders}
+        onConfirm={confirmRecurrenceReminder}
         onCancel={cancelRecurrence}
       />
 

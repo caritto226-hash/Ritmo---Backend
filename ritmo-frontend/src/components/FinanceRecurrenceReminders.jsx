@@ -44,10 +44,14 @@ function getScheduleLabel(reminder) {
   return `Programado para ${formatDate(reminder.scheduledDate)}`;
 }
 
+// embedded: solo la lista de tarjetas, para incrustarla dentro de la sección de pagos recurrentes.
+// onCancel (opcional): muestra Detener futuras / Eliminar en cada tarjeta.
 function FinanceRecurrenceReminders({
   reminders,
   onConfirm,
+  onCancel,
   compact = false,
+  embedded = false,
 }) {
   const [paymentDates, setPaymentDates] = useState({});
   const [confirmingId, setConfirmingId] = useState(null);
@@ -65,16 +69,7 @@ function FinanceRecurrenceReminders({
     }
   }
 
-  return (
-    <section className={`finance-reminders ${compact ? "finance-reminders-compact" : ""}`} aria-label="Recordatorios de finanzas">
-      {!compact && (
-        <header className="finance-reminders-header">
-          <div>
-            <h2>Pagos e ingresos programados</h2>
-            <p>Confirma cuando hayas pagado o recibido el movimiento.</p>
-          </div>
-        </header>
-      )}
+  const list = (
       <div className="finance-reminder-list">
         {reminders.map((reminder) => {
           const isIncome = Number(reminder.amount) > 0;
@@ -126,12 +121,54 @@ function FinanceRecurrenceReminders({
                 >
                   {isConfirming ? "Confirmando..." : isIncome ? "Recibido" : "Pagado"}
                 </button>
+                {onCancel && !compact && (
+                  <RecurrenceCancelActions recurrence={reminder} onCancel={onCancel} />
+                )}
               </div>
             </article>
           );
         })}
       </div>
+  );
+
+  if (embedded) return list;
+
+  return (
+    <section className={`finance-reminders ${compact ? "finance-reminders-compact" : ""}`} aria-label="Recordatorios de finanzas">
+      {!compact && (
+        <header className="finance-reminders-header">
+          <div>
+            <h2>Pagos e ingresos programados</h2>
+            <p>Confirma cuando hayas pagado o recibido el movimiento.</p>
+          </div>
+        </header>
+      )}
+      {list}
     </section>
+  );
+}
+
+// Detener futuras solo aplica a una recurrencia activa; Eliminar siempre está disponible.
+export function RecurrenceCancelActions({ recurrence, onCancel }) {
+  return (
+    <div className="finance-reminder-cancel-actions">
+      {recurrence.isActive && (
+        <button
+          type="button"
+          onClick={() => onCancel(recurrence, "future")}
+          aria-label={`Detener futuras fechas de ${recurrence.concept}`}
+        >
+          Detener futuras
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={() => onCancel(recurrence, "all")}
+        aria-label={`Eliminar toda la recurrencia de ${recurrence.concept}`}
+      >
+        Eliminar
+      </button>
+    </div>
   );
 }
 

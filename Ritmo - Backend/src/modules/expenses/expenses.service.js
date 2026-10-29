@@ -1,4 +1,5 @@
 const expensesRepository = require('./expenses.repository');
+const recurrencesService = require('./recurrences.service');
 const categoriesRepository = require('../categories/categories.repository');
 const { getTodayInBogota } = require('../../utils/dates');
 
@@ -97,7 +98,14 @@ async function updateExpense(expenseId, userId, data) {
 }
 
 async function deleteExpense(expenseId, userId) {
-	await getExpenseById(expenseId, userId);
+	const expense = await getExpenseById(expenseId, userId);
+
+	// Un movimiento que vino de una recurrencia vigente se borra deshaciendo su confirmación,
+	// para que el recordatorio vuelva a quedar pendiente.
+	if (expense.recurrenceId !== null
+		&& await recurrencesService.undoConfirmationByExpense(expenseId, userId)) {
+		return;
+	}
 
 	await expensesRepository.softDelete(expenseId, userId);
 }

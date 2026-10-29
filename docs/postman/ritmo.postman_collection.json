@@ -18,7 +18,12 @@
     { "key": "finCatId", "value": "" },
     { "key": "recCatId", "value": "" },
     { "key": "recOtherEmail", "value": "" },
-    { "key": "recOtherToken", "value": "" }
+    { "key": "recOtherToken", "value": "" },
+    { "key": "editCatId", "value": "" },
+    { "key": "editOtherCatId", "value": "" },
+    { "key": "editNonRecCatId", "value": "" },
+    { "key": "editOtherEmail", "value": "" },
+    { "key": "editOtherToken", "value": "" }
   ],
   "item": [
     {
@@ -1360,6 +1365,1030 @@
             "method": "GET",
             "header": [],
             "url": "{{baseUrl}}/api/expenses/recurrences/reminders"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Editar y deshacer recurrencias",
+      "description": "Edición de recurrencias (concepto, valor, categoría y notas; solo afecta lo que aún no se registra) y reversión de confirmaciones: solo se puede deshacer la más reciente, y borrar un movimiento que vino de una recurrencia vigente equivale a deshacerla. Las fechas se calculan en la primera petición a partir de hoy en America/Bogota.",
+      "item": [
+        {
+          "name": "Preparar fechas y categorías",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Fechas relativas a hoy en America/Bogota (UTC-5 todo el año, sin horario de verano).",
+                  "const DAY = 24 * 60 * 60 * 1000;",
+                  "const todayUtc = Date.parse(new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString().slice(0, 10));",
+                  "const dateFromToday = (days) => new Date(todayUtc + days * DAY).toISOString().slice(0, 10);",
+                  "const offsets = { editMinus3: -3, editMinus2: -2, editMinus1: -1 };",
+                  "Object.entries(offsets).forEach(([key, days]) => pm.collectionVariables.set(key, dateFromToday(days)));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const categories = pm.response.json().data || [];",
+                  "const byName = (name) => categories.find((item) => item.name === name);",
+                  "pm.test('Existen las categorías usadas en las pruebas', () => {",
+                  "  pm.expect(byName('Transporte').isRecurring).to.eql(true);",
+                  "  pm.expect(byName('Vivienda y servicios').isRecurring).to.eql(true);",
+                  "  pm.expect(byName('Gastos Hormiga').isRecurring).to.eql(false);",
+                  "});",
+                  "pm.collectionVariables.set('editCatId', byName('Transporte').id);",
+                  "pm.collectionVariables.set('editOtherCatId', byName('Vivienda y servicios').id);",
+                  "pm.collectionVariables.set('editNonRecCatId', byName('Gastos Hormiga').id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/categories?module=finance"
+          }
+        },
+        {
+          "name": "Crear diaria vencida hace 3 días",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));",
+                  "const recurrence = pm.response.json().data;",
+                  "pm.collectionVariables.set('editRecId', recurrence.recurrenceId);",
+                  "pm.collectionVariables.set('editOccA', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Bus\",\n  \"categoryId\": {{editCatId}},\n  \"amount\": -20000,\n  \"frequency\": \"daily\",\n  \"startDate\": \"{{editMinus3}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Confirmar el día A (hace 3 días)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const result = pm.response.json().data;",
+                  "pm.test('Programa el siguiente día', () => {",
+                  "  pm.expect(result.nextScheduledDate).to.eql(v('editMinus2'));",
+                  "});",
+                  "pm.collectionVariables.set('editExpenseA', result.expenseId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccA}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Leer el pendiente B (hace 2 días)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const recurrence = pm.response.json().data.find((item) => item.recurrenceId === Number(v('editRecId')));",
+                  "pm.test('El pendiente es el de hace 2 días', () => {",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('editMinus2'));",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(v('editMinus2'));",
+                  "});",
+                  "pm.collectionVariables.set('editOccB', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "Confirmar el día B (hace 2 días)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const result = pm.response.json().data;",
+                  "pm.test('Programa el siguiente día', () => {",
+                  "  pm.expect(result.nextScheduledDate).to.eql(v('editMinus1'));",
+                  "});",
+                  "pm.collectionVariables.set('editExpenseB', result.expenseId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccB}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Deshacer A, que no es la más reciente, es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje esperado', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Primero deshaz la confirmación del ' + pm.collectionVariables.get('editMinus2'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccA}}/undo"
+          }
+        },
+        {
+          "name": "Borrar el movimiento de A, que no es el más reciente, es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje esperado', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Primero deshaz la confirmación del ' + pm.collectionVariables.get('editMinus2'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseA}}"
+          }
+        },
+        {
+          "name": "Editar el movimiento de A sigue permitido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Guarda el nuevo valor solo en ese movimiento', () => {",
+                  "  pm.expect(Number(pm.response.json().data.amount)).to.eql(-21000);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseA}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -21000,\n  \"notes\": \"Pagué con sobrecargo\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Deshacer B (la más reciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "pm.test('Devuelve la ocurrencia y el movimiento revertidos', () => {",
+                  "  const result = pm.response.json().data;",
+                  "  pm.expect(result.occurrenceId).to.eql(Number(v('editOccB')));",
+                  "  pm.expect(result.scheduledDate).to.eql(v('editMinus2'));",
+                  "  pm.expect(result.expenseId).to.eql(Number(v('editExpenseB')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccB}}/undo"
+          }
+        },
+        {
+          "name": "El recordatorio B vuelve a estar pendiente y el siguiente desaparece",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "pm.test('Solo queda el recordatorio de hace 2 días, vencido', () => {",
+                  "  const reminders = pm.response.json().data.filter((item) => item.recurrenceId === Number(v('editRecId')));",
+                  "  pm.expect(reminders).to.have.lengthOf(1);",
+                  "  pm.expect(reminders[0].occurrenceId).to.eql(Number(v('editOccB')));",
+                  "  pm.expect(reminders[0].scheduledDate).to.eql(v('editMinus2'));",
+                  "  pm.expect(reminders[0].isOverdue).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/reminders"
+          }
+        },
+        {
+          "name": "La lista vuelve a apuntar a B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const recurrence = pm.response.json().data.find((item) => item.recurrenceId === Number(v('editRecId')));",
+                  "pm.test('El pendiente es el de hace 2 días', () => {",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('editMinus2'));",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(v('editMinus2'));",
+                  "});",
+                  "pm.collectionVariables.set('editOccB', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "El movimiento de B quedó borrado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseB}}"
+          }
+        },
+        {
+          "name": "Deshacer B otra vez es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 409 Conflict', () => pm.response.to.have.status(409));",
+                  "pm.test('Mensaje esperado', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Este recordatorio no está confirmado');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccB}}/undo"
+          }
+        },
+        {
+          "name": "Volver a confirmar B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const result = pm.response.json().data;",
+                  "pm.test('Programa el siguiente día', () => {",
+                  "  pm.expect(result.nextScheduledDate).to.eql(v('editMinus1'));",
+                  "});",
+                  "pm.collectionVariables.set('editExpenseB2', result.expenseId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccB}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Borrar el movimiento de B equivale a deshacer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseB2}}"
+          }
+        },
+        {
+          "name": "B vuelve a quedar pendiente tras el borrado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const recurrence = pm.response.json().data.find((item) => item.recurrenceId === Number(v('editRecId')));",
+                  "pm.test('El pendiente es el de hace 2 días', () => {",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('editMinus2'));",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(v('editMinus2'));",
+                  "});",
+                  "pm.collectionVariables.set('editOccB', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "Borrar el movimiento de A (ahora el más reciente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseA}}"
+          }
+        },
+        {
+          "name": "A vuelve a quedar pendiente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const recurrence = pm.response.json().data.find((item) => item.recurrenceId === Number(v('editRecId')));",
+                  "pm.test('El pendiente es el de hace 3 días', () => {",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('editMinus3'));",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(v('editMinus3'));",
+                  "});",
+                  "pm.collectionVariables.set('editOccA', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "Confirmar A antes de editar la recurrencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const result = pm.response.json().data;",
+                  "pm.test('Programa el siguiente día', () => {",
+                  "  pm.expect(result.nextScheduledDate).to.eql(v('editMinus2'));",
+                  "});",
+                  "pm.collectionVariables.set('editExpenseA2', result.expenseId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccA}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Leer el pendiente B tras confirmar A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const recurrence = pm.response.json().data.find((item) => item.recurrenceId === Number(v('editRecId')));",
+                  "pm.test('El pendiente es el de hace 2 días', () => {",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(v('editMinus2'));",
+                  "  pm.expect(recurrence.nextScheduledDate).to.eql(v('editMinus2'));",
+                  "});",
+                  "pm.collectionVariables.set('editOccB', recurrence.pendingOccurrenceId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences"
+          }
+        },
+        {
+          "name": "Editar valor y concepto de la recurrencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "pm.test('Devuelve la recurrencia con los nuevos valores', () => {",
+                  "  const recurrence = pm.response.json().data;",
+                  "  pm.expect(recurrence.concept).to.eql('Bus ajustado');",
+                  "  pm.expect(recurrence.amount).to.eql(-25000);",
+                  "  pm.expect(recurrence.categoryId).to.eql(Number(v('editOtherCatId')));",
+                  "  pm.expect(recurrence.frequency).to.eql('daily');",
+                  "  pm.expect(recurrence.pendingOccurrenceId).to.eql(Number(v('editOccB')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"concept\": \"Bus ajustado\",\n  \"amount\": -25000,\n  \"categoryId\": {{editOtherCatId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "Confirmar B con los valores nuevos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "const result = pm.response.json().data;",
+                  "pm.test('Programa el siguiente día', () => {",
+                  "  pm.expect(result.nextScheduledDate).to.eql(v('editMinus1'));",
+                  "});",
+                  "pm.collectionVariables.set('editExpenseB3', result.expenseId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccB}}/confirm",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "El movimiento ya registrado (A) conserva sus valores",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "pm.test('Sigue con el valor, concepto y categoría originales', () => {",
+                  "  const expense = pm.response.json().data;",
+                  "  pm.expect(Number(expense.amount)).to.eql(-20000);",
+                  "  pm.expect(expense.concept).to.eql('Bus');",
+                  "  pm.expect(expense.categoryId).to.eql(Number(v('editCatId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseA2}}"
+          }
+        },
+        {
+          "name": "El movimiento nuevo (B) usa los valores editados",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "const v = (key) => pm.collectionVariables.get(key);",
+                  "pm.test('Usa el valor, concepto y categoría nuevos', () => {",
+                  "  const expense = pm.response.json().data;",
+                  "  pm.expect(Number(expense.amount)).to.eql(-25000);",
+                  "  pm.expect(expense.concept).to.eql('Bus ajustado');",
+                  "  pm.expect(expense.categoryId).to.eql(Number(v('editOtherCatId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseB3}}"
+          }
+        },
+        {
+          "name": "Editar la frecuencia es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje esperado', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('La frecuencia y la fecha de una recurrencia no se pueden editar');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"frequency\": \"weekly\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Editar sin campos es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400 Bad Request', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "Editar con una categoría no recurrente es rechazado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 400 Bad Request', () => pm.response.to.have.status(400));",
+                  "pm.test('Mensaje esperado', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('La categoría seleccionada no permite recurrencias');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": {{editNonRecCatId}}\n}"
+            }
+          }
+        },
+        {
+          "name": "Registrar un segundo usuario",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('editOtherEmail', `ajeno-edicion${Date.now()}@ritmo.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 201 Created', () => pm.response.to.have.status(201));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Usuario Ajeno\",\n  \"correo\": \"{{editOtherEmail}}\",\n  \"password\": \"123456\",\n  \"idRol\": 1\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Iniciar sesión con el segundo usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.set('editOtherToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"correo\": \"{{editOtherEmail}}\",\n  \"contraseña\": \"123456\"\n}"
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Otro usuario no puede editar la recurrencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": -1\n}"
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{editOtherToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Otro usuario no puede deshacer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/occurrences/{{editOccB}}/undo",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{editOtherToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Detener futuras de la diaria",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}?scope=future"
+          }
+        },
+        {
+          "name": "Una recurrencia detenida con pendiente vencido se puede editar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));",
+                  "pm.test('Sigue detenida y guarda la nota', () => {",
+                  "  const recurrence = pm.response.json().data;",
+                  "  pm.expect(recurrence.isActive).to.eql(false);",
+                  "  pm.expect(recurrence.notes).to.eql('Ruta nueva');",
+                  "  pm.expect(recurrence.pendingScheduledDate).to.eql(pm.collectionVariables.get('editMinus1'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Ruta nueva\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Eliminar toda la recurrencia",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}?scope=all"
+          }
+        },
+        {
+          "name": "Una recurrencia eliminada no se puede editar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 404 Not Found', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/expenses/recurrences/{{editRecId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Otra\"\n}"
+            }
+          }
+        },
+        {
+          "name": "El movimiento de una recurrencia eliminada se borra como cualquier otro",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Responde 200 OK', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/expenses/{{editExpenseB3}}"
           }
         }
       ]

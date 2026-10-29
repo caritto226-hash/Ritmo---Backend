@@ -8,6 +8,7 @@ const expensesController = require('./expenses.controller');
 const recurrencesController = require('./recurrences.controller');
 const {
 	validateCreateRecurrence,
+	validateUpdateRecurrence,
 	validateConfirmOccurrence,
 	validateOccurrenceId,
 	validateCancelRecurrence,
@@ -24,7 +25,9 @@ router.post('/recurrences', verifyToken, validateCreateRecurrence, recurrencesCo
 router.get('/recurrences', verifyToken, recurrencesController.getRecurrences);
 router.get('/recurrences/reminders', verifyToken, recurrencesController.getReminders);
 router.patch('/recurrences/occurrences/:occurrenceId/confirm', verifyToken, validateOccurrenceId, validateConfirmOccurrence, recurrencesController.confirmOccurrence);
-router.delete('/recurrences/:id', verifyToken, validateCancelRecurrence, recurrencesController.cancelRecurrence);
+router.patch('/recurrences/occurrences/:occurrenceId/undo', verifyToken, validateOccurrenceId, recurrencesController.undoConfirmation);
+router.patch('/recurrences/:id', verifyToken, validateUpdateRecurrence, recurrencesController.updateRecurrence);
+router.delete('/recurrences/:id',verifyToken, validateCancelRecurrence, recurrencesController.cancelRecurrence);
 router.get('/', verifyToken, validateExpenseCategoryFilter, expensesController.getExpenses);
 router.get('/summary', verifyToken, expensesController.getMonthlySummary);
 router.get('/:id', verifyToken, expensesController.getExpenseById);

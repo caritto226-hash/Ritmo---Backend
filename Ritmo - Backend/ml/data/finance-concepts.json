@@ -1,0 +1,3551 @@
+{
+  "description": "Conceptos sintéticos de movimientos financieros en español colombiano, generados con apoyo de IA y revisados manualmente, para entrenar el sugeridor de categorías de Ritmo.",
+  "categories": [
+    "Ingresos",
+    "Vivienda y servicios",
+    "Alimentación",
+    "Transporte",
+    "Salud y cuidado personal",
+    "Educación",
+    "Compras y ocio",
+    "Ahorro",
+    "Deudas y créditos",
+    "Gastos Hormiga",
+    "Cuentas por cobrar"
+  ],
+  "criteria": {
+    "Ingresos": "Dinero que ya entró: salario, ventas, honorarios, propinas recibidas, arriendos cobrados, intereses o rendimientos y devoluciones ya recibidas.",
+    "Vivienda y servicios": "Gastos de la casa y del hogar: arriendo que pago, administración, servicios públicos, internet, celular, predial, seguro y reparaciones.",
+    "Alimentación": "Comidas principales y compras de comida para la casa: mercado, desayuno, almuerzo, comida, restaurantes y domicilios de comida.",
+    "Transporte": "Movilidad diaria y gastos del vehículo: pasajes, TransMilenio, taxis, gasolina, peajes, parqueadero, SOAT, impuestos y mantenimiento.",
+    "Salud y cuidado personal": "Salud, medicamentos, citas, exámenes, gafas, cuidado de la apariencia y seguros de vida o exequiales.",
+    "Educación": "Estudios propios o de la familia: matrículas, pensiones, cursos, útiles, libros de estudio y uniformes.",
+    "Compras y ocio": "Ropa, entretenimiento, salidas, viajes, regalos, suscripciones, gimnasio, videojuegos y mascotas.",
+    "Ahorro": "Plata que guardo o aparto para el futuro o una meta: ahorro programado, natillero, fondo de empleados, CDT o alcancía.",
+    "Deudas y créditos": "Pagos de lo que yo debo: cuotas de créditos, tarjeta de crédito, préstamos de bancos o personas, compras a cuotas y gota a gota.",
+    "Gastos Hormiga": "Gastos pequeños, frecuentes y prescindibles: antojos entre comidas, bebidas sueltas, apuestas, cigarrillos, fotocopias y propinas menores.",
+    "Cuentas por cobrar": "Plata que me deben o que falta por recibir: préstamos que hice, cuentas de cobro sin pagar, reembolsos pendientes y ventas fiadas."
+  },
+  "examples": [
+    {
+      "concept": "salario del mes",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "quincena",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me pagaron la quincena",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "nómina de octubre",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "sueldo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pago de nómina",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "recivo de sueldo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "quinsena",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "salrio",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "onorarios del mes",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "comicion por ventas",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "propinas resividas",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "arrendo que me pagan",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "intereces de los ahorros",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "devolusion de impuestos",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me pago el cliente",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "venta de arepas",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "ventas del día",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me pagó un cliente",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pago cliente página web",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "honorarios diseño de logo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "honorarios consultoría",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "propinas de la semana",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "propinas del turno",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "arriendo del apartamento que alquilo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me consignaron el arriendo del local",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "intereses cuenta de ahorros",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "rendimientos del CDT",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "rendimientos del fondo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "devolución de la DIAN",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me devolvieron la plata del pedido",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "reembolso recibido de la empresa",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "prima de junio",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "prima de diciembre",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "cesantías",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "intereses de cesantías",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "bonificación",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "horas extras",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "camello del fin de semana",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me pagaron el camello",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pago por un trabajito",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "vendí la bici",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "venta de ropa usada",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me pagaron 200 lucas",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "entró la plata del cliente",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pagaron la cuenta de cobro",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "transferencia recibida de un cliente",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "abono recibido del cliente",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "mi primo me pagó lo que debía",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "la vecina por fin me pagó el fiado",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "ya me pagaron las polas",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "auxilio de transporte",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "auxilio de alimentación",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "liquidación del trabajo anterior",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "mesada de la pensión",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "plata que me mandó mi mamá",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "regalo de cumpleaños en efectivo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "ganancia venta de postres",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "ventas tienda virtual",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "ventas por catálogo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pago freelance",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me pagaron",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "sueldo de 1.5 millones",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "ingreso extra",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pagaron el contrato",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pago del contrato de prestación",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "clases particulares que di",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "cobré la clase de inglés",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "venta de empanadas en el barrio",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me gané la rifa",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "utilidades del negocio",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "dividendos",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "incapacidad pagada por la EPS",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "devolución de compra cancelada",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "me pagaron el turno del domingo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "vendí el celular viejo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "pago de vacaciones",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "llegó el pago del mes",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "recibí 80 mil por el arreglo",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "ya cobré la factura",
+      "category": "Ingresos"
+    },
+    {
+      "concept": "arriendo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "pago arriendo del apto",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arriendo de noviembre",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arrendo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "administración del conjunto",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "cuota de administracion",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "recibo de la luz",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "luz",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "factura de energía",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "recivo del agua",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "agua",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "acueducto y alcantarillado",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "gas natural",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "pipeta de gas",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "cilindro de gas 40 lucas",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "internet del mes",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "internet y tv",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "plan del celular",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "recargué el celular 10 mil",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "recarga del cel",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "recarga de selular",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "paquete de datos",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "impuesto predial",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "predial primera cuota",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "seguro de hogar",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "plomero",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arreglo de la gotera",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "reparación de la ducha",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "pintura de la casa",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "cerrajero",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "cambio de chapa",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "electricista",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arreglo del calentador",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "bombillos para la casa",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "pago a la señora del aseo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "servicios públicos",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "factura luz y agua",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "factura de enerjia",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "inpuesto predial",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "servisios publicos",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "resibo del gas",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "tuveria rota",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "admon",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "cuota de admon del edificio",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "parte mía del arriendo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "vaca para el arriendo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "depósito del apartamento nuevo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "trasteo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "camión de la mudanza",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "minutos de celular",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "factura del celular",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "teléfono fijo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "TV por cable",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "cuota extraordinaria del edificio",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "lavada de tanque",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "fumigación del apartamento",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arreglo del techo",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "reja de la ventana",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "cemento y arena",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "repuesto llave del lavaplatos",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "impermeabilización de la terraza",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "vigilancia del barrio",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "recolección de basuras",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "gas del mes",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "luz 85 mil",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arriendo 900 mil",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "agua bimestral",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "reconexión de la luz",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "recargo por mora del agua",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "copia de llaves del apto",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arreglo de la lavadora",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "técnico de la nevera",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "plan postpago",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "datos para el cel",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "arreglo del baño",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "materiales para el piso",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "seguro del apartamento",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "abono al arriendo atrasado",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "pago del agua y el gas",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "intenet hogar",
+      "category": "Vivienda y servicios"
+    },
+    {
+      "concept": "mercado del mes",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "mercado de la semana",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "mercadito",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "corrientazo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo ejecutivo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "desayuno",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "comida de la noche",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "cena con la familia",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "restaurante",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo en restaurante",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "domicilio de pizza",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "domicilio hamburguesas",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pedí comida a domicilio",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "plaza de mercado",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "frutas y verduras de la plaza",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "carne para la semana",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pollo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "huevos y leche",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "arroz, aceite y panela",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pan para el desayuno",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "compras del súper",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "granos",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "queso y arepas",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "lonchera de los niños",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo del trabajo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "corrientazo 14 mil",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "bandeja paisa",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "sancocho del domingo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "asado familiar",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pescado para semana santa",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "verduras",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "fruta para la semana",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo con los del camello",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo con un cliente",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "menú del día",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "desayuno completo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "caldo de costilla",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "tamales del domingo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "lechona para la familia",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "mercado en la tienda del barrio",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "surtido de la casa",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "compra de la semana",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "leche para el mes",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "carnicería",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "mercao",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuersso",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "corrientaso",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "desayno",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "restorante",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "domisilio de comida",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "berduras",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "plasa de mercado",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pollo azado",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "huebos",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerso ejecutivo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo 18 mil",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "cena de aniversario",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo de domingo afuera",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pizza para la cena",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "sushi a domicilio",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "comida china",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "ajiaco",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "mercado 350 mil",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "enlatados y granos",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "abarrotes",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "vaca para el mercado",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo corriente en la esquina",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "desayuno en la panadería",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "comida para el paseo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pan tajado y mantequilla",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "carne pa la semana",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "pollo y papas para el almuerzo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "comida del día",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "cena en casa de la suegra",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "almuerzo familiar",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "frijolada del domingo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "mercado quincenal",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "cena con los parceros",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "domicilio de almuerzo",
+      "category": "Alimentación"
+    },
+    {
+      "concept": "bus",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pasaje",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pasajes de la semana",
+      "category": "Transporte"
+    },
+    {
+      "concept": "TransMilenio",
+      "category": "Transporte"
+    },
+    {
+      "concept": "recarga tarjeta TransMilenio",
+      "category": "Transporte"
+    },
+    {
+      "concept": "recarga tarjeta SITP",
+      "category": "Transporte"
+    },
+    {
+      "concept": "SITP",
+      "category": "Transporte"
+    },
+    {
+      "concept": "taxi",
+      "category": "Transporte"
+    },
+    {
+      "concept": "taxi al aeropuerto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "carrera en app",
+      "category": "Transporte"
+    },
+    {
+      "concept": "carro de aplicación",
+      "category": "Transporte"
+    },
+    {
+      "concept": "gasolina",
+      "category": "Transporte"
+    },
+    {
+      "concept": "tanqueada",
+      "category": "Transporte"
+    },
+    {
+      "concept": "tanqueo 50 lucas",
+      "category": "Transporte"
+    },
+    {
+      "concept": "peaje",
+      "category": "Transporte"
+    },
+    {
+      "concept": "peajes del paseo",
+      "category": "Transporte"
+    },
+    {
+      "concept": "parqueadero",
+      "category": "Transporte"
+    },
+    {
+      "concept": "parqueo en el centro comercial",
+      "category": "Transporte"
+    },
+    {
+      "concept": "SOAT",
+      "category": "Transporte"
+    },
+    {
+      "concept": "SOAT de la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "impuesto vehicular",
+      "category": "Transporte"
+    },
+    {
+      "concept": "seguro del carro",
+      "category": "Transporte"
+    },
+    {
+      "concept": "mecánico",
+      "category": "Transporte"
+    },
+    {
+      "concept": "revisión técnico-mecánica",
+      "category": "Transporte"
+    },
+    {
+      "concept": "tecnomecánica",
+      "category": "Transporte"
+    },
+    {
+      "concept": "llantas nuevas",
+      "category": "Transporte"
+    },
+    {
+      "concept": "cambio de aceite",
+      "category": "Transporte"
+    },
+    {
+      "concept": "lavada del carro",
+      "category": "Transporte"
+    },
+    {
+      "concept": "lavada de la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "repuestos de la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pastillas de freno",
+      "category": "Transporte"
+    },
+    {
+      "concept": "batería del carro",
+      "category": "Transporte"
+    },
+    {
+      "concept": "alineación y balanceo",
+      "category": "Transporte"
+    },
+    {
+      "concept": "despinchada",
+      "category": "Transporte"
+    },
+    {
+      "concept": "mototaxi",
+      "category": "Transporte"
+    },
+    {
+      "concept": "bicitaxi",
+      "category": "Transporte"
+    },
+    {
+      "concept": "colectivo",
+      "category": "Transporte"
+    },
+    {
+      "concept": "buseta",
+      "category": "Transporte"
+    },
+    {
+      "concept": "flota al pueblo",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pasaje intermunicipal",
+      "category": "Transporte"
+    },
+    {
+      "concept": "metro y alimentador",
+      "category": "Transporte"
+    },
+    {
+      "concept": "tiquete de bus a la costa",
+      "category": "Transporte"
+    },
+    {
+      "concept": "multa de tránsito",
+      "category": "Transporte"
+    },
+    {
+      "concept": "fotomulta",
+      "category": "Transporte"
+    },
+    {
+      "concept": "renovación licencia de conducción",
+      "category": "Transporte"
+    },
+    {
+      "concept": "grúa",
+      "category": "Transporte"
+    },
+    {
+      "concept": "sacar el carro de patios",
+      "category": "Transporte"
+    },
+    {
+      "concept": "casco para la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "aceite de la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "gazolina",
+      "category": "Transporte"
+    },
+    {
+      "concept": "parquiadero",
+      "category": "Transporte"
+    },
+    {
+      "concept": "trasmilenio",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pasage",
+      "category": "Transporte"
+    },
+    {
+      "concept": "peage",
+      "category": "Transporte"
+    },
+    {
+      "concept": "mecanico de confianza",
+      "category": "Transporte"
+    },
+    {
+      "concept": "taxy",
+      "category": "Transporte"
+    },
+    {
+      "concept": "despinche",
+      "category": "Transporte"
+    },
+    {
+      "concept": "cambio de aseite",
+      "category": "Transporte"
+    },
+    {
+      "concept": "lavada del caro",
+      "category": "Transporte"
+    },
+    {
+      "concept": "renovasion del soat",
+      "category": "Transporte"
+    },
+    {
+      "concept": "bus 3 mil",
+      "category": "Transporte"
+    },
+    {
+      "concept": "taxi 15 lucas",
+      "category": "Transporte"
+    },
+    {
+      "concept": "gasolina 80 mil",
+      "category": "Transporte"
+    },
+    {
+      "concept": "plata para el bus",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pasaje ida y vuelta",
+      "category": "Transporte"
+    },
+    {
+      "concept": "carrera de taxi en la noche",
+      "category": "Transporte"
+    },
+    {
+      "concept": "parqueadero mensual",
+      "category": "Transporte"
+    },
+    {
+      "concept": "permiso pico y placa",
+      "category": "Transporte"
+    },
+    {
+      "concept": "arreglo del embrague",
+      "category": "Transporte"
+    },
+    {
+      "concept": "ajuste cadena de la bici",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pasajes del camello",
+      "category": "Transporte"
+    },
+    {
+      "concept": "transporte de la semana",
+      "category": "Transporte"
+    },
+    {
+      "concept": "combustible",
+      "category": "Transporte"
+    },
+    {
+      "concept": "ACPM de la camioneta",
+      "category": "Transporte"
+    },
+    {
+      "concept": "arreglo de la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "cadena de la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "pasaje al centro",
+      "category": "Transporte"
+    },
+    {
+      "concept": "llanta de la bici",
+      "category": "Transporte"
+    },
+    {
+      "concept": "parqueo de la moto",
+      "category": "Transporte"
+    },
+    {
+      "concept": "taxi de vuelta a la casa",
+      "category": "Transporte"
+    },
+    {
+      "concept": "EPS",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "aporte a salud",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "medicina prepagada",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "cuota moderadora",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "copago de la cita",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "farmacia",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "droguería",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "drogeria",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "acetaminofén",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "medicamentos del mes",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "pastillas para la tensión",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "cita con el médico general",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "cita con el especialista",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "odontólogo",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "limpieza dental",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "calza de muela",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "control de ortodoncia",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "exámenes de sangre",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "exámenes de laboratorio",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "ecografía",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "radiografía",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "gafas nuevas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "lentes de contacto",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "examen de optometría",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "peluquería",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "corte de pelo",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "barbería",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "motilada",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "manicure",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "manicure y pedicure",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "uñas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "tinte del pelo",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "depilación",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "arreglo de cejas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "seguro de vida",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "seguro exequial",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "plan exequial",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "cuota de la funeraria",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "vacuna",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "psicólogo",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "terapia física",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "fisioterapia",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "urgencias",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "crema para la cara",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "bloqueador solar",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "champú y jabón",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "desodorante",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "crema dental y cepillo",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "toallas higiénicas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "vitaminas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "suero oral",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "inyección en la droguería",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "tapabocas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "curitas y alcohol",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "masaje terapéutico",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "medicina prepagda",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "sita medica",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "peluqueria y sejas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "barveria",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "manicur",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "seguro exekial",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "farmasia",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "examen de la bista",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "medisinas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "odontologo de urgencia",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "droguería 35 mil",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "corte 20 lucas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "pastillas para el dolor",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "jarabe para la tos",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "antibiótico",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "consulta médica particular",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "cita del dentista",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "audiometría",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "plantillas ortopédicas",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "pañitos y crema",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "pago de salud independiente",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "remedios de la abuela",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "pedicure",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "cepillado del pelo",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "brackets cuota de control",
+      "category": "Salud y cuidado personal"
+    },
+    {
+      "concept": "matrícula universidad",
+      "category": "Educación"
+    },
+    {
+      "concept": "semestre",
+      "category": "Educación"
+    },
+    {
+      "concept": "pensión del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "matrícula del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "uniformes del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "útiles escolares",
+      "category": "Educación"
+    },
+    {
+      "concept": "lista de útiles",
+      "category": "Educación"
+    },
+    {
+      "concept": "libros del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "libro de inglés",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso de inglés",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso de programación",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso virtual",
+      "category": "Educación"
+    },
+    {
+      "concept": "diplomado",
+      "category": "Educación"
+    },
+    {
+      "concept": "inscripción a la universidad",
+      "category": "Educación"
+    },
+    {
+      "concept": "derechos de grado",
+      "category": "Educación"
+    },
+    {
+      "concept": "carnet estudiantil",
+      "category": "Educación"
+    },
+    {
+      "concept": "cuadernos",
+      "category": "Educación"
+    },
+    {
+      "concept": "colores y plastilina",
+      "category": "Educación"
+    },
+    {
+      "concept": "calculadora científica",
+      "category": "Educación"
+    },
+    {
+      "concept": "zapatos del uniforme",
+      "category": "Educación"
+    },
+    {
+      "concept": "sudadera del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "ruta escolar",
+      "category": "Educación"
+    },
+    {
+      "concept": "salida pedagógica",
+      "category": "Educación"
+    },
+    {
+      "concept": "bono del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "clases de guitarra",
+      "category": "Educación"
+    },
+    {
+      "concept": "clases de natación",
+      "category": "Educación"
+    },
+    {
+      "concept": "tutorías de matemáticas",
+      "category": "Educación"
+    },
+    {
+      "concept": "profesor particular",
+      "category": "Educación"
+    },
+    {
+      "concept": "preicfes",
+      "category": "Educación"
+    },
+    {
+      "concept": "inscripción ICFES",
+      "category": "Educación"
+    },
+    {
+      "concept": "certificado de notas",
+      "category": "Educación"
+    },
+    {
+      "concept": "maletín del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "morral para la universidad",
+      "category": "Educación"
+    },
+    {
+      "concept": "jardín infantil",
+      "category": "Educación"
+    },
+    {
+      "concept": "pensión del jardín",
+      "category": "Educación"
+    },
+    {
+      "concept": "certificación profesional",
+      "category": "Educación"
+    },
+    {
+      "concept": "examen de inglés internacional",
+      "category": "Educación"
+    },
+    {
+      "concept": "plataforma de cursos",
+      "category": "Educación"
+    },
+    {
+      "concept": "seminario",
+      "category": "Educación"
+    },
+    {
+      "concept": "congreso académico",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso de cocina",
+      "category": "Educación"
+    },
+    {
+      "concept": "taller de fotografía",
+      "category": "Educación"
+    },
+    {
+      "concept": "empaste de la tesis",
+      "category": "Educación"
+    },
+    {
+      "concept": "materiales de arte para la clase",
+      "category": "Educación"
+    },
+    {
+      "concept": "diccionario",
+      "category": "Educación"
+    },
+    {
+      "concept": "pago de la U",
+      "category": "Educación"
+    },
+    {
+      "concept": "unifome del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "semestre de la universida",
+      "category": "Educación"
+    },
+    {
+      "concept": "curzo de ingles",
+      "category": "Educación"
+    },
+    {
+      "concept": "livros del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "cuadenos",
+      "category": "Educación"
+    },
+    {
+      "concept": "matricla",
+      "category": "Educación"
+    },
+    {
+      "concept": "diplomado virtul",
+      "category": "Educación"
+    },
+    {
+      "concept": "pencion del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "utiles escolarez",
+      "category": "Educación"
+    },
+    {
+      "concept": "inscrisión universidad",
+      "category": "Educación"
+    },
+    {
+      "concept": "matrícula 2 millones",
+      "category": "Educación"
+    },
+    {
+      "concept": "útiles 120 mil",
+      "category": "Educación"
+    },
+    {
+      "concept": "pensión 350 mil",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso de hojas de cálculo",
+      "category": "Educación"
+    },
+    {
+      "concept": "guías del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "kit escolar",
+      "category": "Educación"
+    },
+    {
+      "concept": "lápices y borradores",
+      "category": "Educación"
+    },
+    {
+      "concept": "regla y compás",
+      "category": "Educación"
+    },
+    {
+      "concept": "cartulina para la tarea",
+      "category": "Educación"
+    },
+    {
+      "concept": "maqueta del colegio",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso de diseño gráfico",
+      "category": "Educación"
+    },
+    {
+      "concept": "bootcamp de programación",
+      "category": "Educación"
+    },
+    {
+      "concept": "especialización",
+      "category": "Educación"
+    },
+    {
+      "concept": "maestría",
+      "category": "Educación"
+    },
+    {
+      "concept": "homologación de materias",
+      "category": "Educación"
+    },
+    {
+      "concept": "habilitación",
+      "category": "Educación"
+    },
+    {
+      "concept": "supletorio",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso de belleza",
+      "category": "Educación"
+    },
+    {
+      "concept": "técnico en enfermería",
+      "category": "Educación"
+    },
+    {
+      "concept": "inscripción al preuniversitario",
+      "category": "Educación"
+    },
+    {
+      "concept": "costos educativos del niño",
+      "category": "Educación"
+    },
+    {
+      "concept": "clases de refuerzo",
+      "category": "Educación"
+    },
+    {
+      "concept": "escuela de música",
+      "category": "Educación"
+    },
+    {
+      "concept": "curso de inglés virtual",
+      "category": "Educación"
+    },
+    {
+      "concept": "ropa",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "camisa nueva",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "jean",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "zapatos",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "tenis",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "chaqueta",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "vestido para el matrimonio",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "salida con los parceros",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "cine",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "crispetas y cine",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "concierto",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "boletas del concierto",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "viaje a la costa",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "tiquetes de avión",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "hotel del paseo",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "paseo de fin de semana",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "regalo de cumpleaños",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "regalo para mi mamá",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "amigo secreto",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "suscripción de streaming",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "plataforma de música",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "gimnasio",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "mensualidad del gym",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "videojuego",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "consola",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "recarga del juego en línea",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "concentrado del perro",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "comida del gato",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "veterinario",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "vacunas del perro",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "baño del perro",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "arena para el gato",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "juguetes para el perro",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "rumba",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "discoteca",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "cover de la discoteca",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "botella de aguardiente para la fiesta",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "tejo con los parceros",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "bolos",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "parque de diversiones",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "entrada al museo",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "teatro",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "boleta para el partido",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "camiseta de la selección",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "aretes",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "bolso",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "perfume",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "audífonos",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "celular nuevo",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "funda del celular",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "decoración navideña",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "plantas para el balcón",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "novela para leer",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "detalle para la sobrina",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "vaca para el cumple",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "piscina el domingo",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "finca con la familia",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "alquiler de cabaña",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "carpa para acampar",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "materiales para manualidades",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "ropa nueba",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "sapatos",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "consierto",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "rregalo",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "jimnasio",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "veterinaro",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "consentrado del perro",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "suscrisión",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "biaje",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "chaketa",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "boletas de sine",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "tenis 180 mil",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "cine 25 lucas",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "pijama",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "medias y ropa interior",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "vestido de baño",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "gafas de sol",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "regalo de navidad",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "entrada a la feria",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "zapatos para la fiesta",
+      "category": "Compras y ocio"
+    },
+    {
+      "concept": "ahorro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro del mes",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro programado",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "natillero",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "cuota del natillero",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "natillero de la oficina",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "fondo de empleados",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "aporte fondo de empleados",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "CDT",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "abrí un CDT",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "alcancía",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "monedas a la alcancía",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el viaje",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el carro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para la casa",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro cuota inicial apartamento",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "guardé plata",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "separé para la meta",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "bolsillo de ahorro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "pasé a ahorros",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "meta vacaciones",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "fondo de emergencia",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para la moto",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro navidad",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro de la prima",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "guardé 50 lucas",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro 100 mil",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "cadena de ahorro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "la cadena de la oficina",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "aporte voluntario a pensión",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el estudio",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para la U del niño",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "marranito",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "plata pal marrano",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro semanal",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "reto de ahorro 52 semanas",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "guardar para el SOAT",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "apartar para la matrícula",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para imprevistos",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "cajita de ahorro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el celular",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "inversión en fondo",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "traslado a cuenta de ahorros",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro en pareja",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el matrimonio",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el bebé",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "natillero del barrio",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "cuenta AFC",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el computador",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "plata debajo del colchón",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "sobre de ahorro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro de las propinas",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorrito",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "guardadito",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro de diciembre",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el arriendo",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro en dólares",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "fondo de inversión colectiva",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para la mascota",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "abono a la meta del carro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "aorro",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "natiyero",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "alcansia",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahoro semanal",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "fondo de empleaods",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "aorro programado",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "cdt nuebo",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "guarde platica",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para el biaje a la costa",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "aorro para la moto",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para la cuota inicial",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "meta del viaje",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "plata para la meta",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "consignación al natillero",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para los regalos de navidad",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para la fiesta de quince",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro para las vacaciones de mitad de año",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "guardé lo del bono",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro de la quincena",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "ahorro 20 mil diarios",
+      "category": "Ahorro"
+    },
+    {
+      "concept": "cuota del crédito",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "tarjeta de crédito",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pago mínimo tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de la tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "crédito de vivienda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del apartamento",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del carro",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de la moto",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "préstamo del banco",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota préstamo libre inversión",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "crédito educativo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del ICETEX",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "le pagué lo que le debía al tío",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "abono a la deuda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "abono al préstamo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "gota a gota",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del gota a gota",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pagadiario",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de la nevera a crédito",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del celular a crédito",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del televisor",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "crédito de libranza",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "libranza",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "intereses de la tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de manejo de la tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pago del avance",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "le debo a la vecina",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pagarle al parcero",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "devolverle la plata a mi hermano",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pagué el fiado de la tienda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuenta en la tienda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "crédito del almacén",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "compras a cuotas",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota 3 de 12",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "refinanciación",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "crédito rotativo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "sobregiro",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "mora de la tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota préstamo fondo de empleados",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "préstamo del natillero",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "acuerdo de pago DIAN",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de la cooperativa",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pago crédito hipotecario",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "leasing del carro",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "le debo las polas al compañero",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "debo la vaca del asado",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "lo que le debo a la suegra",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del computador",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pagué la deuda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pago total tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota mensual del crédito",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "préstamo con el jefe",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "intereses del empeño",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "me prestaron 100 lucas",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "targeta de credito",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuta del préstamo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "prestamo de banco",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "le devo plata a mi primo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "avono a la deuda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de la libransa",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "interes de la tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "deuda del selular",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "credito vivenda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pago minimo de la targeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "me cobraron la cuota",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota 250 mil",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "abono de 50 lucas a la deuda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "debo el fiado",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pagar el préstamo del primo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "saldo de la tarjeta",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de la lavadora",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "plata que debo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "deuda con el compañero de trabajo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "crédito de la moto",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota del colchón",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "le debo a mi tío",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "cuota de la sala a crédito",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "pago tarjeta 300 mil",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "mora del préstamo",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "abono al fiado de la tienda",
+      "category": "Deudas y créditos"
+    },
+    {
+      "concept": "tinto",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "tinto en la oficina",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "tintico",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "mecato",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "mecato de la tarde",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "gaseosa",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "gaseosa en la tienda",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "dulces",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chicles",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "empanada de la tarde",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "empanada con gaseosa",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chance",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "lotería",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "raspa y gana",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "fotocopias",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "impresiones",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "cigarrillos",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "cigarrillo suelto",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "propina del domicilio",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "bolsa del supermercado",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "bolsa plástica",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "polas del viernes",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "una pola después del camello",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "cerveza en la tienda",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "agua en botella",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "jugo en la calle",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "helado",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "paquete de papas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chocolatina",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "galletas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "buñuelo y avena",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "pandebono",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "salpicón",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "mango biche",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "obleas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "crispetas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "café en la cafetería",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "aromática",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "capuchino",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "energizante",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "propina al cuidador de carros",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "apuesta del partido",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "boleta de la rifa del trabajo",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "dulce en el bus",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chance de 2 mil",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "tinto 2 mil",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "mecato 5 lucas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "antojo de la tarde",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "antojito",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "golosinas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chupetas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "cerveza suelta",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "maní",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "paquete de chicharrones",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "gomitas",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "gaseoza",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "sigarrillos",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "dulses",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "enpanada con tinto",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "elado",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chanse",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "mekato",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "propina del domisilio",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "agua en boteya",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chocolatna",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "jugito",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "papitas de paquete",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "fotocopia del documento",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "pandequeso de la tarde",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "pola con los del trabajo",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "aromática en la tienda",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "galleta y tinto",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "bolsa de hielo",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "chupeta y chicle",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "café con pandeyuca",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "cigarrillo y tinto",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "lotería del viernes",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "gaseosa 3 mil",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "un tinto con el parcero",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "salchipapa en la calle",
+      "category": "Gastos Hormiga"
+    },
+    {
+      "concept": "me debe las polas",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben 50 lucas",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "préstamo a mi primo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le presté a la vecina",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le presté plata al compañero de trabajo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe mi hermano",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "plata que me deben",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "cuenta de cobro enviada",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "factura pendiente de pago",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "factura sin pagar del cliente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "cliente no ha pagado",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "falta que me paguen el diseño",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "reembolso pendiente de la empresa",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben devolver la plata del pedido",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "devolución pendiente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "venta fiada",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "fiado a la vecina",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le fié a un cliente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me paga la otra semana",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben la vaca del asado",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe la mitad del arriendo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "el roomie me debe los servicios",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le pagué el almuerzo y me lo debe",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe el taxi",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe el mercado",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le presté para el SOAT",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "préstamo al cuñado",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "lo que me debe mi tía",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "saldo pendiente del cliente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "abono pendiente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "anticipo por cobrar",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "cuenta por cobrar",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "cobrar al cliente el lunes",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "honorarios pendientes",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben la quincena",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben horas extras",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "liquidación pendiente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "incapacidad por cobrar a la EPS",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "devolución de la DIAN pendiente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben la plata de la rifa",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le vendí a cuotas a una amiga",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "venta a plazos por cobrar",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me quedaron debiendo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "pendiente que me consignen",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben el arriendo del local",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "el inquilino no ha pagado",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "cobro pendiente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben del camello",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le presté 20 mil al parcero",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "plata prestada a mi papá",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe la entrada del cine",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe el regalo que le compré",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "falta que me paguen las empanadas",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "fiado de la tienda sin cobrar",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deve",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deven 30 mil",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le preste a mi tio",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "cuenta de cobro sin pagr",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "rembolso pendiente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "bentas fiadas",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deve mi primo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "prestamo al vesino",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "cobrarle al parsero",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me quedo deviendo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le presté 200 mil a un amigo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben dos cuentas de cobro",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "pendiente el pago del cliente",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "factura vencida sin pago",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "el cliente quedó de pagar el viernes",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me pagará el viernes",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "reintegro pendiente de gastos",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben la vaca",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben de la venta de postres",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "prestamo a la compañera",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me debe el pasaje",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "le presté para el arriendo",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "me deben la cuota del natillero",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "el cliente debe el saldo final",
+      "category": "Cuentas por cobrar"
+    },
+    {
+      "concept": "préstamo a la vecina por cobrar",
+      "category": "Cuentas por cobrar"
+    }
+  ]
+}

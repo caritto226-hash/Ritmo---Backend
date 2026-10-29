@@ -190,6 +190,21 @@
   font-weight: 800;
 }
 
+.finance-recurring-toggle {
+  min-height: 40px;
+  padding: 4px 2px;
+  border-top: 1px solid var(--surface-border);
+}
+
+.finance-recurring-settled-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: var(--type-supporting);
+  font-weight: 700;
+}
+
 .finance-recurring-hint {
   margin-top: 3px;
   color: var(--text-secondary);

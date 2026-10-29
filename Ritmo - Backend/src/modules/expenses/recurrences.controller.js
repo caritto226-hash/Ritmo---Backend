@@ -40,6 +40,31 @@ async function confirmOccurrence(req, res, next) {
 	}
 }
 
+async function updateRecurrence(req, res, next) {
+	try {
+		const recurrence = await recurrencesService.updateRecurrence(
+			Number(req.params.id),
+			req.user.id,
+			req.body,
+		);
+		return res.status(200).json({ data: recurrence });
+	} catch (error) {
+		return next(error);
+	}
+}
+
+async function undoConfirmation(req, res, next) {
+	try {
+		const result = await recurrencesService.undoConfirmation(
+			Number(req.params.occurrenceId),
+			req.user.id,
+		);
+		return res.status(200).json({ data: result });
+	} catch (error) {
+		return next(error);
+	}
+}
+
 async function cancelRecurrence(req, res, next) {
 	try {
 		const result = await recurrencesService.cancelRecurrence(
@@ -58,5 +83,7 @@ module.exports = {
 	getRecurrences,
 	getReminders,
 	confirmOccurrence,
+	updateRecurrence,
+	undoConfirmation,
 	cancelRecurrence,
 };
