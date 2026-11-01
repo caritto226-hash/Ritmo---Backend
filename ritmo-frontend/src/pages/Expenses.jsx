@@ -37,6 +37,10 @@ const MAX_AMOUNT = 99999999;
 const PASTED_AMOUNT_PATTERN = /^(\d+|\d{1,3}(\.\d{3})+)$/;
 const AMOUNT_FORMAT_ERROR = "El valor debe ser un número entero de pesos, sin comas ni decimales.";
 
+// La sugerencia de categoría se pide al crear, con 3 caracteres o más y 400 ms después de dejar de escribir.
+const SUGGESTION_MIN_LENGTH = 3;
+const SUGGESTION_DELAY_MS = 400;
+
 // "1.500.000" → 1500000. El signo no viene del campo: lo pone el selector Gasto / Ingreso.
 function parseCopAmount(value) {
   const digits = String(value).replace(/\D/g, "");
@@ -159,6 +163,12 @@ function Expenses() {
   const [recurrenceEnabled, setRecurrenceEnabled] = useState(false);
   const [recurrenceFrequency, setRecurrenceFrequency] = useState("monthly");
   const [balanceHidden, setBalanceHidden] = useState(readHideBalance);
+  // De dónde salió la categoría al crear: "" (ninguna), "suggested" o "manual". El ref se lee
+  // cuando llega la respuesta de la sugerencia, que puede llegar después de otros cambios.
+  const [categorySource, setCategorySource] = useState("");
+  const categorySourceRef = useRef("");
+  // Cada cambio del concepto invalida las sugerencias que aún no han llegado.
+  const suggestionRequestRef = useRef(0);
 
   function showToast(message, type = "success") {
     toastIdRef.current += 1;
@@ -213,22 +223,75 @@ function Expenses() {
     setError("");
   }
 
-  // type: "expense" | "income". recurring marca la casilla "repetir"; como solo se muestra
-  // con categorías recurrentes, en ese caso se preselecciona la primera que lo permita.
+  useEffect(() => {
+    categorySourceRef.current = categorySource;
+  }, [categorySource]);
+
+  function applySuggestedCategory(categoryId) {
+    setCategorySource("suggested");
+    setForm((previous) => ({ ...previous, categoryId }));
+  }
+
+  // Solo quita la categoría si la puso la sugerencia; una elegida a mano no se toca.
+  function clearSuggestedCategory() {
+    if (categorySourceRef.current !== "suggested") return;
+    setCategorySource("");
+    setForm((previous) => ({ ...previous, categoryId: "" }));
+  }
+
+  // Sugerencia de categoría mientras se escribe el concepto, solo al crear. Nunca cambia
+  // el tipo de movimiento, y si falla o no hay sugerencia el formulario sigue como siempre.
+  useEffect(() => {
+    if (!modalOpen || editingId || editingRecurrence) return undefined;
+
+    const requestId = suggestionRequestRef.current + 1;
+    suggestionRequestRef.current = requestId;
+    const concept = form.concept.trim();
+
+    if (concept.length < SUGGESTION_MIN_LENGTH) {
+      clearSuggestedCategory();
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      let suggestion = null;
+      try {
+        suggestion = await expensesService.suggestCategory(concept, controller.signal);
+      } catch {
+        // Sin sugerencia: no se muestra ningún error.
+      }
+
+      // Se ignora si la persona siguió escribiendo o ya eligió una categoría a mano.
+      if (requestId !== suggestionRequestRef.current || categorySourceRef.current === "manual") return;
+
+      // Con "Programar como pago fijo" marcado, solo sirven categorías que permiten recurrencia.
+      const category = suggestion && categories.find((item) => (
+        item.id === suggestion.categoryId
+        && item.isActive !== false
+        && (!recurrenceEnabled || item.isRecurring)
+      ));
+      if (category) applySuggestedCategory(String(category.id));
+      else clearSuggestedCategory();
+    }, SUGGESTION_DELAY_MS);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [form.concept, modalOpen, editingId, editingRecurrence, categories, recurrenceEnabled]);
+
+  // type: "expense" | "income". Empieza sin categoría: la elige la persona o llega por sugerencia.
+  // recurring deja marcada la casilla "repetir", que aparece al elegir una categoría recurrente.
   function openCreateModal({ type = "expense", recurring = false } = {}) {
-    const defaultCategory = recurring
-      ? categories.find((category) => category.isRecurring && category.isActive !== false)
-      : categories[0];
     setEditingId(null);
     setEditingRecurrence(null);
     setEditingExpenseCategory(null);
     setError("");
-    setRecurrenceEnabled(recurring && Boolean(defaultCategory));
+    setCategorySource("");
+    setRecurrenceEnabled(recurring && categories.some((category) => category.isRecurring && category.isActive !== false));
     setRecurrenceFrequency("monthly");
-    setForm({
-      ...emptyForm,
-      categoryId: defaultCategory ? String(defaultCategory.id) : "",
-    });
+    setForm(emptyForm);
     setAmountTouched(false);
     setOriginalEditingAmount(null);
     setMovementType(type);
@@ -241,6 +304,7 @@ function Expenses() {
     setEditingRecurrence(recurrence);
     setEditingExpenseCategory(recurrence.category);
     setError("");
+    setCategorySource("");
     setRecurrenceEnabled(false);
     setForm({
       concept: recurrence.concept,
@@ -260,6 +324,7 @@ function Expenses() {
     setEditingRecurrence(null);
     setEditingExpenseCategory(item.category);
     setError("");
+    setCategorySource("");
     setRecurrenceEnabled(false);
     setForm({
       concept: item.concept,
@@ -799,12 +864,21 @@ function Expenses() {
             <input name="concept" value={form.concept} onChange={handleChange} maxLength={100} required />
           </div>
           <div className="field-group">
-            <label>Categoría</label>
+            <div className="category-label-row">
+              <label>Categoría</label>
+              <span aria-live="polite">
+                {categorySource === "suggested" && form.categoryId && (
+                  <span className="category-suggested-tag">Sugerida</span>
+                )}
+              </span>
+            </div>
             <CategorySelect
               categories={editingRecurrence ? categories.filter((category) => category.isRecurring) : categories}
               value={form.categoryId}
               onChange={(categoryId) => {
                 const selectedCategory = categories.find((category) => String(category.id) === categoryId);
+                // Elegida a mano: ninguna sugerencia posterior la cambia.
+                setCategorySource("manual");
                 setForm((previous) => ({ ...previous, categoryId }));
                 if (!selectedCategory?.isRecurring) {
                   setRecurrenceEnabled(false);

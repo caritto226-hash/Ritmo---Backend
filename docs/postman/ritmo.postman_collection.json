@@ -2460,7 +2460,7 @@
                   "  pm.expect(suggestion).to.be.an('object');",
                   "  pm.expect(suggestion.name).to.eql('Transporte');",
                   "  pm.expect(suggestion.categoryId).to.eql(Number(pm.collectionVariables.get('suggestCatId')));",
-                  "  pm.expect(suggestion.confidence).to.be.at.least(0.6);",
+                  "  pm.expect(suggestion.confidence).to.be.at.least(0.5);",
                   "});"
                 ]
               }

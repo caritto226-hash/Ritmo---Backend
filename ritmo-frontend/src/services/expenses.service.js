@@ -27,6 +27,12 @@ async function remove(id) {
   return response.data;
 }
 
+// Devuelve { categoryId, name, confidence } o null si no hay una sugerencia confiable.
+async function suggestCategory(concept, signal) {
+  const response = await api.post("/expenses/suggest-category", { concept }, { signal });
+  return response.data.data.suggestion;
+}
+
 async function getRecurrences() {
   const response = await api.get("/expenses/recurrences");
   return response.data.data;
@@ -68,6 +74,7 @@ export default {
   create,
   update,
   remove,
+  suggestCategory,
   getRecurrences,
   getRecurrenceReminders,
   createRecurrence,

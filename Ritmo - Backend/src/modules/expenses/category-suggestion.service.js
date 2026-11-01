@@ -7,7 +7,8 @@ const { normalizeText } = require('../../utils/text-normalizer');
 
 // El modelo lo genera "npm run ml:train". Es un archivo de datos: no se importa código de ml/.
 const MODEL_PATH = path.join(__dirname, '..', '..', '..', 'ml', 'models', 'finance-category-model.json');
-const MIN_CONFIDENCE = 0.6;
+// Va de la mano con el suavizado 0.1 del entrenamiento: todavía deja sin sugerencia los casos dudosos.
+const MIN_CONFIDENCE = 0.5;
 
 // Se carga una sola vez, al iniciar. Si falta o está dañado, el servidor arranca igual
 // y el endpoint responde 503.

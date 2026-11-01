@@ -677,6 +677,18 @@
 }
 /* Selector Gasto / Ingreso del formulario de movimientos */
 .movement-type-label { font-size: var(--type-label); font-weight: 700; color: var(--text-secondary); }
+.category-label-row { display: flex; align-items: center; gap: 8px; }
+/* Texto principal sobre fondo suave: mantiene el contraste en modo claro y oscuro. */
+.category-suggested-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  color: var(--text-primary);
+  font-size: var(--type-caption);
+  font-weight: 700;
+}
 .movement-type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .movement-type-option {
   min-height: 44px;
