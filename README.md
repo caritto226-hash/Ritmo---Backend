@@ -20,6 +20,7 @@ Ritmo es un organizador personal para manejar tareas, hábitos, eventos y finanz
 - [Dashboard y hábitos](#dashboard-y-hábitos)
 - [Categorías](#categorías)
 - [Finanzas](#finanzas)
+- [Sugerencia de categoría con Machine Learning](#sugerencia-de-categoría-con-machine-learning)
 - [Pruebas con Postman](#pruebas-con-postman)
 - [Requerimientos](#requerimientos)
   - [Cómo evolucionó el módulo de finanzas](#cómo-evolucionó-el-módulo-de-finanzas)
@@ -423,6 +424,60 @@ Se crean con `POST /api/expenses/recurrences`, usando una categoría con `isRecu
 
 Si la categoría tiene `isRecurring`, una tarea o un evento puede tener `recurrenceFrequency` (`daily`, `weekly`, `monthly` o `yearly`). La siguiente tarea se crea cuando la actual se marca como `completada`, y el siguiente evento cuando el actual se marca como `completado`. Un evento puede estar `programado`, `completado` o `cancelado`, y se puede devolver a `programado`; cancelar no genera la siguiente repetición. Si no se completa, queda vencida; no se crean copias solas.
 
+## Sugerencia de categoría con Machine Learning
+
+Al crear un movimiento en Finanzas, Ritmo sugiere la categoría a partir del concepto que se escribe. Por ejemplo, "tinto" → Gastos Hormiga y "gasolina para la moto" → Transporte. La categoría aparece preseleccionada como **"Sugerida"** y la persona puede cambiarla antes de guardar. Es una prueba de concepto.
+
+**Cómo funciona:** un clasificador de texto Naive Bayes (librería [`natural`](https://naturalnode.github.io/natural/bayesian_classifier.html)) entrenado con 1.540 conceptos sintéticos en español colombiano, generados con apoyo de IA y revisados manualmente. El modelo corre dentro del backend; no se usan servicios externos.
+
+| Archivo | Para qué sirve |
+|---|---|
+| `ml/data/finance-concepts.json` | Datos de entrenamiento (140 ejemplos por cada una de las 11 categorías) |
+| `ml/train-category-model.js` | Entrena, evalúa y guarda el modelo |
+| `ml/models/finance-category-model.json` | Modelo entrenado que usa la API |
+| `src/utils/category-features.js` | Limpieza del texto, compartida por el entrenamiento y la API |
+
+### Volver a entrenar el modelo
+
+Hay que hacerlo cada vez que cambien los datos o `category-features.js`:
+
+```bash
+cd "Ritmo - Backend"
+npm run ml:train
+```
+
+El script separa 80 % para entrenar y 20 % para evaluar, muestra los aciertos por categoría y guarda el modelo entrenado con todos los datos. Después hay que reiniciar el backend para que cargue el modelo nuevo.
+
+### Endpoint
+
+```http
+POST /api/expenses/suggest-category
+Authorization: Bearer <token>
+```
+
+```json
+{ "concept": "tinto" }
+```
+
+Respuesta:
+
+```json
+{ "data": { "suggestion": { "categoryId": 10, "name": "Gastos Hormiga", "confidence": 0.79 } } }
+```
+
+- Si el modelo no está seguro (confianza menor que 0.5) o el concepto no tiene palabras conocidas, responde `{ "data": { "suggestion": null } }`.
+- Solo sugiere categorías activas del usuario. Si la categoría fue desactivada o renombrada, responde `null`.
+- `confidence` es la confianza del modelo, no una probabilidad real.
+- No guarda nada en la base de datos ni escribe el concepto en los registros.
+- Si falta el archivo del modelo, el servidor arranca igual y este endpoint responde `503`.
+
+### Limitaciones
+
+- En la prueba interna acierta el 90,9 %, pero con conceptos nuevos escritos a mano sugirió en el 60 % de los casos y acertó el 75 %: el vocabulario de los datos sintéticos es limitado.
+- Solo sugiere las 11 categorías predeterminadas de finanzas, no las categorías propias.
+- La limpieza del texto quita los números, así que conceptos como "4x1000" no se reconocen.
+- Mejoras posibles: aprender de las correcciones de los usuarios (con su autorización) y ampliar el vocabulario con la canasta del IPC del DANE.
+
 ## Pruebas con Postman
 
 La colección está en [`docs/postman/ritmo.postman_collection.json`](docs/postman/ritmo.postman_collection.json).
@@ -433,7 +488,8 @@ La colección está en [`docs/postman/ritmo.postman_collection.json`](docs/postm
 
 **Cómo está armada:**
 
-- Cuatro carpetas: Usuarios y autenticación, Tareas, Finanzas y Seguridad.
+- Siete carpetas: Usuarios y autenticación, Tareas, Finanzas, Seguridad, Recurrencias, Editar y deshacer recurrencias, y Sugerencia de categoría.
+- En total, 89 peticiones y 155 verificaciones. Se puede ejecutar desde la terminal con Newman: `npx newman run docs/postman/ritmo.postman_collection.json`.
 - Cubre el registro, el correo duplicado (`409`), el inicio de sesión, crear, actualizar y eliminar una tarea, un error de validación (`400`), un gasto con categoría, la ruta sin token (`401`) y el acceso sin permiso (`403`).
 - Al iniciar sesión, el token se guarda solo en la variable `{{token}}`, y todas las peticiones privadas lo usan.
 - Cada ejecución crea un usuario nuevo con un correo distinto, para no chocar con datos anteriores.
@@ -529,6 +585,7 @@ El mismo sistema de categorías se reutiliza en **tareas, hábitos y eventos**, 
 | ✅ | Colección de Postman en `docs/postman/` |
 | ✅ | App móvil para Android (inicio de sesión, lista, creación y cambio de estado de tareas) y APK compilado con EAS |
 | ✅ | Script del esquema de la base de datos en el repositorio (`database/schema.sql`) |
+| ✅ | Sugerencia de categoría con Machine Learning en el formulario de movimientos (prueba de concepto) |
 | ❌ | Calendario con detalle del día al hacer clic (en desarrollo) |
 | ❌ | Mensaje motivacional personalizable en el dashboard (en desarrollo) |
 | ❌ | Hábitos con recordatorios repetidos durante el día (por ejemplo, cada 2 o 3 horas) |
