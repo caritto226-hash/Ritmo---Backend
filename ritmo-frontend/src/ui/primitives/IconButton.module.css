@@ -1,0 +1,78 @@
+.button {
+  position: relative;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--motion-fast), color var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+/* Tamaños: web 46 · móvil 44 · en tarjeta 40 · flechas 36 */
+.s46 { width: 46px; height: 46px; }
+.s44 { width: 44px; height: 44px; }
+.s40 { width: 40px; height: 40px; }
+.s36 { width: 36px; height: 36px; }
+
+/* Variantes */
+.muted { background: var(--surface-muted); }
+.muted:hover:not(:disabled) { background: var(--hover-muted); }
+
+.soft { background: var(--surface-soft); }
+.soft:hover:not(:disabled) { background: var(--hover-soft); }
+
+.surface { background: var(--surface); }
+.surface:hover:not(:disabled) { background: var(--hover-surface); }
+
+.outline { background: var(--surface); box-shadow: 0 0 0 1px var(--line-edit); }
+
+.float { background: var(--btn-float); box-shadow: var(--shadow-float-btn); }
+
+.glass { background: var(--btn-glass); }
+
+.menu { background: var(--surface-muted); box-shadow: var(--shadow-menu-btn); }
+
+.ghost { background: transparent; color: var(--text-3); }
+.ghost:hover:not(:disabled) { background: var(--surface-soft); }
+
+.onDark { background: transparent; color: var(--on-dark); border: 1px solid var(--dark-outline); }
+
+.primary,
+.button[aria-current="page"],
+.button[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: none;
+}
+.primary:hover:not(:disabled),
+.button[aria-current="page"]:hover,
+.button[aria-pressed="true"]:hover:not(:disabled) { background: var(--hover-primary); }
+
+/* Punto de notificación */
+.badge {
+  position: absolute;
+  border-radius: 4px;
+  background: var(--notify);
+}
+.s46 .badge { top: 11px; right: 13px; width: 7px; height: 7px; }
+.s44 .badge { top: 10px; right: 12px; width: 8px; height: 8px; }
+.s40 .badge,
+.s36 .badge { top: 8px; right: 9px; width: 7px; height: 7px; }

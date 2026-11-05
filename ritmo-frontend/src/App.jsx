@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/login";
 import Register from "./pages/Register";
@@ -12,6 +13,9 @@ import Tasks from "./pages/Tasks";
 import Habits from "./pages/Habits";
 import Events from "./pages/Events";
 import Expenses from "./pages/Expenses";
+
+// Catálogo del sistema de diseño: solo existe en desarrollo (no entra al build de producción).
+const UiPlayground = import.meta.env.DEV ? lazy(() => import("./pages/dev/UiPlayground")) : null;
 
 function App() {
   return (
@@ -34,6 +38,10 @@ function App() {
         <Route path="/events" element={<Events />} />
         <Route path="/expenses" element={<Expenses />} />
       </Route>
+
+      {UiPlayground && (
+        <Route path="/dev/ui" element={<Suspense fallback={null}><UiPlayground /></Suspense>} />
+      )}
 
       <Route path="/" element={<Navigate to="/login" />} />
       <Route path="*" element={<NotFound />} />

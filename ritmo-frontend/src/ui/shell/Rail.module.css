@@ -1,0 +1,13 @@
+.rail {
+  flex: 0 0 46px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.spacer { flex: 1 1 auto; }
+
+@media (max-width: 760px) {
+  .rail { flex-direction: row; flex-wrap: wrap; }
+  .spacer { display: none; }
+}

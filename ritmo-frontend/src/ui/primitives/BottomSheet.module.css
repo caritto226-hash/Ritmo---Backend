@@ -1,0 +1,84 @@
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  font-family: var(--font-sans);
+  color: var(--text);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  background: var(--scrim);
+  cursor: pointer;
+}
+
+.sheet {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 10px 20px calc(28px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  box-shadow: var(--shadow-sheet);
+  animation: sheet-up 220ms ease-out;
+}
+
+.handle {
+  align-self: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-muted);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+/* Web: diálogo centrado con las cuatro esquinas redondeadas */
+@media (min-width: 760px) {
+  .layer { align-items: center; padding: 24px; }
+  .sheet {
+    max-width: 480px;
+    border-radius: var(--radius-card);
+    padding-bottom: 28px;
+    box-shadow: var(--shadow-popover);
+    animation-name: sheet-in;
+  }
+  .handle { display: none; }
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(24px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes sheet-in {
+  from { transform: scale(0.98); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet { animation: none; }
+}

@@ -1,0 +1,50 @@
+.hit {
+  width: var(--touch-min);
+  height: var(--touch-min);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.hit:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 0;
+}
+
+.hit:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+.circle {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--line-check);
+  background: transparent;
+  transition: background var(--motion-fast), border-color var(--motion-fast);
+}
+
+.s26 { width: 26px; height: 26px; }
+.s28 { width: 28px; height: 28px; }
+.s32 { width: 32px; height: 32px; border-width: 1px; }
+
+/* Sobre bloques pastel el aro usa la línea translúcida del bloque */
+.pastel { border-color: var(--pastel-line); }
+
+.hit:hover:not(:disabled) .circle:not(.checked) { border-color: var(--text-num-muted); }
+
+.checked {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}

@@ -1,0 +1,302 @@
+/* ============================================================
+   tokens.css — Sistema de diseño Ritmo (rediseño 2026)
+   Fuente de verdad: design-handoff/DESIGN_SPEC.md §1 y los .dc.html.
+   Es el ÚNICO archivo donde se escriben colores literales.
+   El modo oscuro es provisional (no está diseñado todavía).
+   ============================================================ */
+
+:root {
+  /* ── Fondos y superficies ── */
+  --bg-app: #E6E8EB;
+  --bg: #F7F7F8;
+  --surface: #FFFFFF;
+  --surface-muted: #ECEDEF;
+  --surface-soft: #F1F2F4;
+  --surface-subtle: #F4F5F6;
+  --surface-row: #F7F8F9;
+
+  /* ── Líneas ── */
+  --line: #F1F2F4;
+  --line-ring: #ECEDEF;
+  --line-strong: #D6D8DC;
+  --line-check: #C9CBD0;
+  --line-edit: #E3E4E8;
+  --line-on-accent: rgba(18, 18, 18, 0.25);
+
+  /* ── Texto ── */
+  --text: #121212;
+  --text-2: #4F525A;
+  --text-3: #5F6268;
+  --text-strong-2: #3E4148;
+  --text-orb: #2C2F35;
+  --text-done: #6C6F75;
+  --text-num-muted: #8A8D93;
+
+  /* ── Acción principal ── */
+  --primary: #121212;
+  --on-primary: #FFFFFF;
+
+  /* ── Hover (no definido en el spec; derivado y discreto) ── */
+  --hover-muted: #E3E5E8;
+  --hover-soft: #E8E9EC;
+  --hover-surface: #F7F7F8;
+  --hover-primary: #2B2B2D;
+  --disabled-opacity: 0.45;
+
+  /* ── Acentos y pasteles ── */
+  --accent: #EAF98F;
+  --on-accent: #121212;
+  --accent-strong: #C8F04A;
+  --glow-accent: 0 0 16px rgba(200, 240, 74, 0.85);
+  --mint: #B9DECD;
+  --mint-soft: #DDEFE6;
+  --teal: #8ED0CD;
+  --teal-soft: #D6EEEC;
+  --teal-text: #1E5755;
+  --teal-ink: #153B3A;
+  --teal-deep: #4FA9A5;
+  --lav-grey: #DCE0EB;
+  --lav-grey-2: #E3E6EE;
+  --lime-soft: #F1F9C4;
+  --lilac: #E4DEFB;
+  --bubble-gradient: radial-gradient(circle at 35% 30%, #A9DEDB 0%, #8ED0CD 60%, #7CC4C1 100%);
+
+  /* Pasteles con transparencia (bloques de línea de tiempo y filas de hábito) */
+  --pastel-mint: rgba(185, 222, 205, 0.9);
+  --pastel-teal: rgba(142, 208, 205, 0.82);
+  --pastel-lime: rgba(234, 249, 143, 0.9);
+  --pastel-grey: rgba(220, 224, 235, 0.92);
+  --pastel-done: rgba(241, 242, 244, 0.85);
+  --pastel-line: rgba(18, 18, 18, 0.2);
+  --pastel-line-done: rgba(18, 18, 18, 0.14);
+
+  /* ── Dinero y estados ── */
+  --income: #2E7D4F;
+  --income-on-dark: #9EE6B8;
+  --expense-on-dark: #F5B5A3;
+  --danger: #B42F36;
+  --danger-strong: #C2353C;
+  --danger-border: rgba(194, 53, 60, 0.35);
+  --danger-bg: #FFF7F6;
+  --danger-chip: #FBE3E4;
+  --warning: #D9A21B;
+  --notify: #E5484D;
+
+  /* ── Degradados y tarjeta oscura ── */
+  --ritmo-gradient: linear-gradient(165deg, #ECEDF3 0%, #DFE3EC 55%, #D2D9E7 100%);
+  --dark-card: #121212;
+  --on-dark: #FFFFFF;
+  --on-dark-2: rgba(255, 255, 255, 0.7);
+  --on-dark-3: rgba(255, 255, 255, 0.8);
+  --dark-card-sheen: linear-gradient(150deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 55%);
+  --dark-card-sheen-mobile: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 55%);
+  --dark-card-border: rgba(255, 255, 255, 0.14);
+  --dark-tile: rgba(255, 255, 255, 0.08);
+  --dark-tile-border: rgba(255, 255, 255, 0.12);
+  --dark-outline: rgba(255, 255, 255, 0.3);
+  --btn-glass: rgba(255, 255, 255, 0.7);
+  --btn-float: rgba(255, 255, 255, 0.92);
+
+  /* ── Gráficas y pistas ── */
+  --chart-area: #F3F4F6;
+  --chart-line: #4F525A;
+  --chart-dash: #B6B9BF;
+  --bar-past: #E3E5E9;
+  --track-stripes: repeating-linear-gradient(135deg, #F6F7F8 0 10px, #FFFFFF 10px 20px);
+  --future-stripes: repeating-linear-gradient(135deg, #ECEDEF 0 2px, transparent 2px 5px);
+  --col-today: #FBFCF1;
+  --col-day: #FAFAFB;
+  --heat-0: #F1F2F4;
+  --heat-1: #DDEFE6;
+  --heat-2: #B9DECD;
+  --heat-3: #8ED0CD;
+  --heat-4: #4FA9A5;
+
+  /* ── Vidrio (solo donde lo indica el diseño) ── */
+  --glass-bg: rgba(255, 255, 255, 0.55);
+  --glass-bg-strong: rgba(255, 255, 255, 0.9);
+  --glass-bubble: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-blur-sm: blur(8px) saturate(140%);
+  --glass-blur: blur(14px);
+  --glass-blur-lg: blur(20px) saturate(140%);
+  --quote-bg: rgba(240, 241, 247, 0.6);
+  --pastel-edge: rgba(255, 255, 255, 0.7);
+  --stripes: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0 2px, transparent 2px 9px);
+  --scrim: rgba(18, 18, 18, 0.45);
+
+  /* ── Sombras y anillos ── */
+  --shadow-pill: 0 6px 16px rgba(20, 22, 30, 0.06);
+  --shadow-block: 0 6px 18px rgba(18, 18, 18, 0.07);
+  --shadow-soft-btn: 0 6px 16px rgba(28, 30, 40, 0.07);
+  --shadow-menu-btn: 0 4px 14px rgba(18, 18, 18, 0.06);
+  --shadow-float-btn: 0 4px 14px rgba(18, 18, 18, 0.14);
+  --shadow-tabbar: 0 10px 30px rgba(18, 18, 18, 0.10);
+  --shadow-popover: 0 18px 40px rgba(20, 22, 30, 0.14);
+  --shadow-sheet: 0 -10px 30px rgba(17, 17, 20, 0.12);
+  --shadow-dark-card: 0 14px 32px rgba(17, 17, 20, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --shadow-glass: 0 6px 18px rgba(80, 170, 165, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --shadow-selected: 0 0 0 2px #121212, 0 8px 18px rgba(18, 18, 18, 0.12);
+  --ring-edit: 0 0 0 2px #121212, 0 12px 30px rgba(20, 22, 30, 0.08);
+  --ring-avatar: 0 0 0 1px #E2E4E7;
+  --ring-avatar-border: #FFFFFF;
+  --focus-ring: 0 0 0 3px rgba(18, 18, 18, 0.28);
+
+  /* ── Tipografía ── */
+  --font-sans: 'Urbanist', system-ui, sans-serif;
+  --fs-h1: 52px;
+  --ls-h1: -1.2px;
+  --fs-h2: 22px;
+  --fs-stat: 40px;
+  --fs-body: 15px;
+  --fs-nav: 14px;
+  --fs-meta: 13px;
+  --fs-small: 12px;
+  --fs-tab: 11px;
+
+  /* ── Forma ── */
+  --radius-frame: 36px;
+  --radius-card: 28px;
+  --radius-card-bento: 26px;
+  --radius-box-xs: 12px;
+  --radius-box-sm: 14px;
+  --radius-box-md: 18px;
+  --radius-box-lg: 22px;
+  --radius-pill: 999px;
+
+  /* ── Medidas de control ── */
+  --h-pill: 46px;
+  --h-pill-mobile: 44px;
+  --h-icon: 46px;
+  --h-icon-mobile: 44px;
+  --h-chip: 40px;
+  --h-chip-sm: 36px;
+  --touch-min: 44px;
+
+  /* ── Espaciado ── */
+  --frame-max: 1480px;
+  --frame-pad: 28px 36px 36px;
+  --gap-frame: 28px;
+  --gap-cards: 12px;
+  --gap-bento: 10px;
+  --pad-card: 24px;
+  --pad-widget: 22px;
+  --pad-card-mobile: 16px;
+  --gutter-mobile: 20px;
+  --gutter-home: 16px;
+  --tabbar-h: 64px;
+  --tabbar-inset: 12px;
+  --tabbar-bottom: 10px;
+
+  /* ── Movimiento ── */
+  --motion-fast: 150ms ease;
+  --motion-level: 0.8s ease;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+   Modo oscuro PROVISIONAL — pendiente de diseño (DESIGN_SPEC §7)
+   ============================================================ */
+[data-theme="dark"] {
+  --bg-app: #0A0B0C;
+  --bg: #0F1012;
+  --surface: #1A1B1E;
+  --surface-muted: #26272B;
+  --surface-soft: #222327;
+  --surface-subtle: #1F2023;
+  --surface-row: #1F2023;
+
+  --line: #2A2B30;
+  --line-ring: #2E2F34;
+  --line-strong: #3A3C42;
+  --line-check: #4A4C52;
+  --line-edit: #3A3C42;
+
+  --text: #F2F2F3;
+  --text-2: #B4B7BE;
+  --text-3: #9A9DA4;
+  --text-strong-2: #C8CACF;
+  --text-orb: #D4D6DA;
+  --text-done: #8A8D93;
+  --text-num-muted: #6C6F75;
+
+  --primary: #F2F2F3;
+  --on-primary: #121212;
+  --hover-muted: #303136;
+  --hover-soft: #2C2D31;
+  --hover-surface: #222327;
+  --hover-primary: #DADADC;
+
+  --mint-soft: #1E2A25;
+  --teal-soft: #1B2A29;
+
+  --pastel-done: rgba(42, 43, 48, 0.85);
+  --pastel-line: rgba(242, 242, 243, 0.2);
+  --pastel-line-done: rgba(242, 242, 243, 0.14);
+
+  --income: #4CAF83;
+  --danger: #E0697E;
+  --danger-strong: #E0697E;
+  --danger-border: rgba(224, 105, 126, 0.4);
+  --danger-bg: #2A1A1C;
+  --danger-chip: #3A1F22;
+
+  --ritmo-gradient: linear-gradient(165deg, #1C1E24 0%, #191B21 55%, #161920 100%);
+  --dark-card: #1F2024;
+
+  --chart-area: #222327;
+  --chart-line: #9A9DA4;
+  --bar-past: #2E2F34;
+  --track-stripes: repeating-linear-gradient(135deg, #1D1E21 0 10px, #1A1B1E 10px 20px);
+  --future-stripes: repeating-linear-gradient(135deg, #2E2F34 0 2px, transparent 2px 5px);
+  --col-today: #1E2018;
+  --col-day: #17181B;
+  --heat-0: #222327;
+
+  --glass-bg: rgba(40, 41, 46, 0.55);
+  --glass-bg-strong: rgba(30, 31, 35, 0.9);
+  --glass-bubble: rgba(40, 41, 46, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --quote-bg: rgba(30, 31, 36, 0.6);
+  --scrim: rgba(0, 0, 0, 0.6);
+
+  --shadow-selected: 0 0 0 2px #F2F2F3, 0 8px 18px rgba(0, 0, 0, 0.4);
+  --ring-edit: 0 0 0 2px #F2F2F3, 0 12px 30px rgba(0, 0, 0, 0.4);
+  --ring-avatar: 0 0 0 1px #2E2F34;
+  --ring-avatar-border: #1A1B1E;
+  --focus-ring: 0 0 0 3px rgba(242, 242, 243, 0.35);
+
+  color-scheme: dark;
+}
+
+/* ── Respaldo opaco del efecto vidrio ── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root:not([data-theme="dark"]) {
+    --glass-bg: #F4F5F7;
+    --glass-bg-strong: #FFFFFF;
+    --glass-bubble: #F1F4F6;
+    --quote-bg: #EEF0F5;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  :root:not([data-theme="dark"]) {
+    --glass-bg: #F4F5F7;
+    --glass-bg-strong: #FFFFFF;
+    --glass-bubble: #F1F4F6;
+    --quote-bg: #EEF0F5;
+    --glass-blur-sm: none;
+    --glass-blur: none;
+    --glass-blur-lg: none;
+  }
+}
+
+/* ── Móvil: tipografía de títulos (DESIGN_SPEC §1, columna Móvil) ── */
+@media (max-width: 759.98px) {
+  :root {
+    --fs-h1: 30px;
+    --ls-h1: -0.6px;
+    --fs-h2: 18px;
+  }
+}

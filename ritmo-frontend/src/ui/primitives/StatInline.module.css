@@ -1,0 +1,27 @@
+.stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.value {
+  font-size: var(--fs-stat);
+  font-weight: 300;
+  line-height: 1;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--fs-meta);
+  line-height: 1.3;
+}
+
+.delta { font-weight: 600; }
+.positive { color: var(--income); }
+.negative { color: var(--danger-strong); }
+.strong { color: var(--text); }
+.neutral { color: var(--text-2); }
+.empty { color: var(--text-3); font-weight: 500; }
+
+.label { color: var(--text-3); }

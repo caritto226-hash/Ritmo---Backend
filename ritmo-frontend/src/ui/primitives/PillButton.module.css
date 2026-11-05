@@ -1,0 +1,74 @@
+.pill {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-family: inherit;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.pill:disabled,
+.pill[aria-disabled="true"] {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+/* Tamaños: lg 46 (web) · md 44 (móvil) · sm 40 (en tarjeta) */
+.lg { height: var(--h-pill); padding: 0 18px; font-size: var(--fs-nav); }
+.nav { height: var(--h-pill); padding: 0 20px; font-size: var(--fs-nav); }
+.md { height: var(--h-pill-mobile); padding: 0 16px; font-size: var(--fs-nav); }
+.sm { height: var(--h-chip); padding: 0 16px; font-size: var(--fs-meta); gap: 8px; }
+.cta { height: 54px; padding: 0 24px; font-size: 16px; font-weight: 600; }
+.block { width: 100%; }
+
+/* Variantes */
+.secondary { background: var(--surface-muted); }
+.secondary:hover:not(:disabled) { background: var(--hover-muted); }
+
+.soft { background: var(--surface-soft); }
+.soft:hover:not(:disabled) { background: var(--hover-soft); }
+
+.surface { background: var(--surface); }
+.surface:hover:not(:disabled) { background: var(--hover-surface); }
+
+.outline { background: transparent; border: 1px solid var(--line-on-accent); }
+
+.bordered { background: var(--surface); border: 1px solid var(--line-ring); }
+.bordered:hover:not(:disabled) { background: var(--hover-surface); }
+
+.accent { background: var(--accent); color: var(--on-accent); }
+
+.onDark { background: transparent; color: var(--on-dark); border: 1px solid var(--dark-outline); }
+
+.primary,
+.pill[aria-current="page"],
+.pill[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: transparent;
+}
+.primary:hover:not(:disabled),
+.pill[aria-current="page"]:hover,
+.pill[aria-pressed="true"]:hover:not(:disabled) { background: var(--hover-primary); }
+
+.lg.primary { padding: 0 20px; }
+
+.danger { background: transparent; color: var(--danger); }
+
+/* Ícono a color propio (por ejemplo "+" verde de Ingreso) */
+.iconWrap { display: inline-flex; }
+.iconIncome { color: var(--income); }

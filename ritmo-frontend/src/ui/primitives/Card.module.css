@@ -1,0 +1,76 @@
+.card {
+  position: relative;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--text);
+}
+
+/* Variantes de fondo */
+.white { background: var(--surface); }
+.ritmo { background: var(--ritmo-gradient); overflow: hidden; }
+.dark {
+  background-color: var(--dark-card);
+  background-image: var(--dark-card-sheen);
+  color: var(--on-dark);
+  overflow: hidden;
+}
+.darkMobile {
+  background-color: var(--dark-card);
+  background-image: var(--dark-card-sheen-mobile);
+  border: 1px solid var(--dark-card-border);
+  box-shadow: var(--shadow-dark-card);
+  color: var(--on-dark);
+  overflow: hidden;
+}
+.pastel {
+  background-color: var(--card-tint, var(--pastel-grey));
+  background-image: var(--stripes);
+  border: 1px solid var(--pastel-edge);
+}
+.pastel.done {
+  background-color: var(--surface-soft);
+  background-image: none;
+}
+
+/* Forma: web 28 · bento móvil 26 · lista móvil 18 */
+.radiusCard { border-radius: var(--radius-card); }
+.radiusBento { border-radius: var(--radius-card-bento); }
+.radiusList { border-radius: var(--radius-box-md); }
+
+.padLg { padding: var(--pad-card); }
+.padMd { padding: var(--pad-widget); }
+.padSm { padding: var(--pad-card-mobile); }
+.padNone { padding: 0; }
+
+.title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta {
+  font-size: var(--fs-meta);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.dark .meta,
+.darkMobile .meta { color: var(--on-dark-2); }

@@ -1,0 +1,32 @@
+.group {
+  box-sizing: border-box;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface-muted);
+}
+
+.tab {
+  border: none;
+  font-family: inherit;
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+/* Web (Día / Semana): 46 de alto, pestaña activa negra */
+.web { height: var(--h-pill); border-radius: 23px; }
+.web .tab { height: 38px; padding: 0 18px; border-radius: 19px; font-size: var(--fs-nav); font-weight: 500; }
+.web .tab[aria-selected="true"] { background: var(--primary); color: var(--on-primary); }
+
+/* Móvil (Por confirmar / Al día): ancho completo, pestaña activa blanca */
+.mobile { display: grid; grid-auto-columns: minmax(0, 1fr); grid-auto-flow: column; border-radius: 16px; }
+.mobile .tab { height: 40px; border-radius: 12px; font-size: var(--fs-nav); font-weight: 600; }
+.mobile .tab[aria-selected="true"] { background: var(--surface); }

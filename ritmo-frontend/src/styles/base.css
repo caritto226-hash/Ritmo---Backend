@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
 
 /* ============================================================
-   base.css — Tokens, reset y sistema de tema (claro/oscuro)
+   base.css — Reset, tema heredado y alias de variables antiguas.
+   Los tokens nuevos viven en tokens.css; estos alias se eliminan en la fase 7.
    ============================================================ */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -91,7 +92,6 @@
   --navy: var(--text-primary);
   --navy-soft: #2d3a5c;
   --card-bg: var(--surface-primary);
-  --bg: var(--app-bg-gradient);
   --text-muted: var(--text-secondary);
   --azul-oscuro: var(--text-primary);
   --beige-fondo: #f9f6f1;
@@ -100,9 +100,7 @@
   --naranja-ritmo: #f9a03f;
   --rojo-error: #c0392b;
 
-  /* Dinero y acción principal. Derivados de la paleta; contraste ≥ 4.5:1 sobre --surface-primary. */
-  --income: color-mix(in srgb, #25875e 88%, #1d2b44);
-  --danger: var(--rojo-error);
+  /* --bg, --income y --danger viven ahora en tokens.css (rediseño 2026). */
   --primary-solid: #1d2b44;
   --primary-border: transparent;
   --on-primary: #ffffff;
@@ -126,8 +124,6 @@
   --beige-fondo: #11162a;
   --blanco: rgba(29, 35, 56, 0.78);
 
-  --income: #4caf83;
-  --danger: #e0697e;
   /* El navy se perdería sobre el fondo oscuro: se usa la superficie elevada con borde. */
   --primary-solid: rgba(45, 58, 92, 0.65);
   --primary-border: var(--surface-border);

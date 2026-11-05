@@ -1,0 +1,6 @@
+.label {
+  font-size: var(--fs-small);
+  font-weight: 400;
+  color: var(--text-3);
+  white-space: nowrap;
+}
