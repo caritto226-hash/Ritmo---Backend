@@ -1,0 +1,65 @@
+/* Semana con anillos: valores de design-handoff/screens/mobile/Habitos.dc.html */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.week {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  text-align: center;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.letter {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.ring {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: transparent;
+  stroke: var(--surface-muted);
+}
+
+.trackToday { fill: var(--primary); }
+
+.value { stroke: var(--text); }
+
+.number {
+  position: relative;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.numberToday { color: var(--on-primary); }
+
+.noData { align-self: center; }

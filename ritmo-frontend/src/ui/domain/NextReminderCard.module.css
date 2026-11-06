@@ -1,0 +1,108 @@
+/* Próximo recordatorio: valores de HabitosWeb.dc.html (web) y Habitos.dc.html (móvil) */
+
+.card {
+  display: flex;
+  align-items: center;
+  background-color: var(--dark-card);
+  color: var(--on-dark);
+}
+
+.web {
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius-card);
+  background-image: var(--dark-card-sheen);
+}
+
+.mobile {
+  gap: 12px;
+  padding: 12px 12px 12px 14px;
+  border-radius: 24px;
+  border: 1px solid var(--dark-card-border);
+  background-image: var(--dark-card-sheen-mobile);
+  box-shadow: var(--shadow-dark-card);
+}
+
+.icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-on-light);
+}
+
+.web .icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--accent);
+}
+
+.mobile .icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: var(--lilac);
+}
+
+.copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.kicker {
+  font-size: 12px;
+  color: var(--on-dark-2);
+}
+
+.mobile .kicker {
+  font-weight: 500;
+  color: var(--on-dark-3);
+}
+
+.title {
+  margin: 0;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.web .title { font-size: 18px; }
+.mobile .title { font-size: 15px; }
+
+.edit {
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 22px;
+  background: transparent;
+  color: var(--on-dark);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.web .edit {
+  padding: 0 16px;
+  border: 1px solid var(--dark-outline-web);
+}
+
+.mobile .edit {
+  padding: 0 14px;
+  border: 1px solid var(--dark-outline-mobile);
+}
+
+.edit:hover:not(:disabled) { background: var(--dark-tile); }
+
+.edit:focus-visible {
+  outline: 2px solid var(--on-dark);
+  outline-offset: 2px;
+}
+
+.edit:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}

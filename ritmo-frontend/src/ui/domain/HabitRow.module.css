@@ -1,0 +1,188 @@
+/* Burbuja de hábito móvil: valores de design-handoff/screens/mobile/Habitos.dc.html.
+   El texto va en las tintas fijas (--ink-on-light*) porque el fondo es el color de la categoría. */
+
+.row {
+  position: relative;
+  overflow: hidden;
+  height: 76px;
+  box-sizing: border-box;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--block-edge);
+  background-color: var(--habit-tint, var(--pastel-grey));
+  background-image: var(--stripes);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-block);
+  color: var(--ink-on-light);
+}
+
+/* La burbuja de conteo lleva las rayas solo en la parte llena. */
+.counter { background-image: none; }
+
+.done {
+  background-color: var(--pastel-done);
+  background-image: none;
+  color: var(--text-3);
+}
+
+.fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background-color: var(--habit-fill);
+  background-image: var(--stripes);
+  transition: width var(--motion-level);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill { transition: none; }
+}
+
+.inner {
+  position: relative;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0 8px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 22px;
+  background: var(--habit-glass-icon);
+  color: var(--ink-on-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nombre y meta: toda el área abre el detalle. */
+.copy {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.copy:focus-visible {
+  outline: 2px solid var(--ink-on-light);
+  outline-offset: -4px;
+  border-radius: 14px;
+}
+
+.done .copy:focus-visible { outline-color: var(--text); }
+
+.name {
+  font-size: 15px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.countBlock {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.count {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.noData {
+  color: var(--ink-on-light-2);
+  font-size: 11px;
+}
+
+.plus {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 22px;
+  background: var(--primary);
+  color: var(--on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.plus:hover:not(:disabled) { background: var(--hover-primary); }
+
+.check {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.checkCircle {
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  border: 1.5px solid var(--pastel-line);
+  background: transparent;
+  color: var(--on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--motion-fast), border-color var(--motion-fast);
+}
+
+.done .checkCircle,
+.check[aria-pressed="true"] .checkCircle {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.check:hover:not(:disabled):not([aria-pressed="true"]) .checkCircle { border-color: var(--ink-on-light-2); }
+
+.plus:focus-visible,
+.check:focus-visible {
+  outline: 2px solid var(--ink-on-light);
+  outline-offset: 0;
+  border-radius: 22px;
+}
+
+.done .plus:focus-visible,
+.done .check:focus-visible { outline-color: var(--text); }
+
+.plus:disabled,
+.check:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}

@@ -1,0 +1,49 @@
+/* Constancia: valores de design-handoff/screens/web/HabitosWeb.dc.html */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.letter {
+  font-size: 11px;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.cell {
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
+.l0 { background: var(--heat-0); }
+.l1 { background: var(--heat-1); }
+.l2 { background: var(--heat-2); }
+.l3 { background: var(--heat-3); }
+.l4 { background: var(--heat-4); }
+
+/* Días que aún no llegan en la semana de hoy (caso no dibujado). */
+.future {
+  background: transparent;
+  border: 1.5px dashed var(--line-strong);
+}
+
+.today { box-shadow: 0 0 0 2px var(--text); }
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.noData { margin-left: auto; }

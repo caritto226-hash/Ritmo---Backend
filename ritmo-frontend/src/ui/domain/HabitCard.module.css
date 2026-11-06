@@ -1,0 +1,254 @@
+/* Tarjeta de hábito web: valores de design-handoff/screens/web/HabitosWeb.dc.html.
+   El texto va en las tintas fijas (--ink-on-light*) porque el fondo es el color de la categoría. */
+
+.card {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  min-height: 300px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--pastel-edge);
+  background-color: var(--habit-tint, var(--pastel-grey));
+  background-image: var(--stripes);
+  color: var(--ink-on-light);
+}
+
+/* Completado: gris, sin rayas, check negro en el botón. Nunca tachado. */
+.done {
+  background-color: var(--surface-soft);
+  background-image: none;
+  color: var(--text-done);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  background: var(--habit-glass);
+  color: var(--ink-on-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* El nombre abre el detalle; el área táctil crece a 44 px sin cambiar el texto. */
+.nameButton {
+  position: relative;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.nameButton::after {
+  content: "";
+  position: absolute;
+  inset: -9px -4px;
+}
+
+.nameButton:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.nameButton:focus-visible {
+  outline: 2px solid var(--ink-on-light);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.done .nameButton:focus-visible { outline-color: var(--text); }
+
+.freq {
+  font-size: 13px;
+  color: var(--ink-on-light-2);
+}
+
+.done .freq { color: var(--text-strong-2); }
+
+.streak {
+  height: 30px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border-radius: 15px;
+  background: var(--habit-glass);
+  color: var(--ink-on-light);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.big {
+  font-size: 44px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.unit {
+  font-size: 18px;
+  letter-spacing: 0;
+  color: var(--ink-on-light-2);
+}
+
+.done .unit { color: var(--text-strong-2); }
+
+.segments {
+  display: grid;
+  gap: 4px;
+}
+
+.segment {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--habit-glass);
+}
+
+.segmentOn { background: var(--ink-on-light); }
+
+/* "Próximamente" sobre el pastel: --text-3 no llega a 4,5:1 en el teal claro. */
+.noData { color: var(--ink-on-light-2); }
+
+.done .noData { color: var(--text-3); }
+
+/* En tarjetas angostas (< ~330 px) el botón baja debajo de la semana en lugar de montarse. */
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.weekBlock {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.week {
+  display: flex;
+  gap: 5px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.dayCircle {
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: var(--habit-day-empty);
+}
+
+.dayDone { background: var(--ink-on-light); }
+.dayPartial { background: var(--habit-day-partial); }
+
+.dayNone {
+  background: transparent;
+  border: 1.5px dashed var(--line-on-accent);
+}
+
+.dayToday { border: 2px solid var(--ink-on-light); }
+
+.dayLabel {
+  font-size: 10px;
+  color: var(--ink-on-light-2);
+}
+
+.done .dayLabel { color: var(--text-strong-2); }
+
+.action {
+  height: 48px;
+  flex-shrink: 0;
+  padding: 0 18px;
+  border: none;
+  border-radius: 24px;
+  background: var(--habit-btn);
+  color: var(--ink-on-light);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity var(--motion-fast);
+}
+
+.actionDark {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.action:hover:not(:disabled) { opacity: 0.88; }
+
+.action:focus-visible {
+  outline: 2px solid var(--ink-on-light);
+  outline-offset: 2px;
+}
+
+.done .action:focus-visible { outline-color: var(--text); }
+
+.action:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

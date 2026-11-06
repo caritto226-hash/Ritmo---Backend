@@ -10,7 +10,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import MainLayout from "./layouts/MainLayout";
 import TasksPage from "./pages/tasks/TasksPage";
-import Habits from "./pages/Habits";
+import HabitsPage from "./pages/habits/HabitsPage";
 import EventsPage from "./pages/events/EventsPage";
 import Expenses from "./pages/Expenses";
 
@@ -34,7 +34,7 @@ function App() {
       >
         <Route path="/dashboard" element={<HomePage />} />
         <Route path="/tasks" element={<TasksPage />} />
-        <Route path="/habits" element={<Habits />} />
+        <Route path="/habits" element={<HabitsPage />} />
         <Route path="/events" element={<EventsPage />} />
         <Route path="/expenses" element={<Expenses />} />
       </Route>

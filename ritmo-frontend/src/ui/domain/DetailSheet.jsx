@@ -9,7 +9,8 @@ import styles from "./DetailSheet.module.css";
  * dentro de la misma hoja (deleteQuestion), sin window.confirm. onDuplicate y onDelete devuelven
  * true si salió bien; la hoja se cierra en ese caso.
  * extraAction ({ label, onRun }) agrega una acción de texto más (Eventos: "Cancelar evento" o
- * "Restaurar evento"), con el mismo estilo que "Detener futuras" en la hoja de confirmar pago.
+ * "Restaurar evento"; Hábitos: "Marcar cumplido hoy" o "Desmarcar hoy"), con el mismo estilo que
+ * "Detener futuras" en la hoja de confirmar pago.
  */
 function DetailSheet({ title, details, deleteQuestion, onClose, onEdit, onDuplicate, onDelete, extraAction }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);

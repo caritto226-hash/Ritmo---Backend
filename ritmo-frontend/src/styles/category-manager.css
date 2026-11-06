@@ -1,3 +1,12 @@
+/* Lista vacía del administrador (antes en tareas.css, que se borró en la fase 5). */
+.task-empty {
+  padding: 28px 18px;
+  color: var(--text-secondary);
+  font-size: var(--type-body);
+  line-height: 1.5;
+  text-align: center;
+}
+
 .category-recurring-toggle {
   display: flex;
   width: 100%;

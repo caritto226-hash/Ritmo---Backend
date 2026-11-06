@@ -76,6 +76,15 @@
   --ink-on-light: #121212;
   --ink-on-dark: #FFFFFF;
 
+  /* Tarjetas y burbujas de hábito (HabitosWeb.dc.html / Habitos.dc.html). Van sobre el color
+     de la categoría, así que tampoco cambian con el tema. */
+  --ink-on-light-2: #3E4148;
+  --habit-glass: rgba(255, 255, 255, 0.75);
+  --habit-glass-icon: rgba(255, 255, 255, 0.6);
+  --habit-day-empty: rgba(255, 255, 255, 0.7);
+  --habit-day-partial: rgba(18, 18, 18, 0.35);
+  --habit-btn: #FFFFFF;
+
   /* Esfera "Tu ritmo de hoy" */
   --orb-rim: rgba(255, 255, 255, 0.95);
   --orb-shine: rgba(255, 255, 255, 0.6);
@@ -107,6 +116,8 @@
   --dark-tile: rgba(255, 255, 255, 0.08);
   --dark-tile-border: rgba(255, 255, 255, 0.12);
   --dark-outline: rgba(255, 255, 255, 0.3);
+  --dark-outline-web: rgba(255, 255, 255, 0.35);
+  --dark-outline-mobile: rgba(255, 255, 255, 0.4);
   --btn-glass: rgba(255, 255, 255, 0.7);
   --btn-float: rgba(255, 255, 255, 0.92);
 
@@ -116,6 +127,8 @@
   --chart-dash: #B6B9BF;
   --bar-past: #E3E5E9;
   --track-stripes: repeating-linear-gradient(135deg, #F6F7F8 0 10px, #FFFFFF 10px 20px);
+  --line-track: #DCDEE2;
+  --ring-fill: rgba(255, 255, 255, 0.5);
   --future-stripes: repeating-linear-gradient(135deg, #ECEDEF 0 2px, transparent 2px 5px);
   --col-today: #FBFCF1;
   --col-day: #FAFAFB;
@@ -268,6 +281,8 @@
   --chart-line: #9A9DA4;
   --bar-past: #2E2F34;
   --track-stripes: repeating-linear-gradient(135deg, #1D1E21 0 10px, #1A1B1E 10px 20px);
+  --line-track: #3A3C42;
+  --ring-fill: rgba(255, 255, 255, 0.08);
   --future-stripes: repeating-linear-gradient(135deg, #2E2F34 0 2px, transparent 2px 5px);
   --col-today: #1E2018;
   --col-day: #17181B;

@@ -1,0 +1,55 @@
+/* Anillo "Hoy": valores de design-handoff/screens/web/HabitosWeb.dc.html */
+
+.ring {
+  position: relative;
+  width: 170px;
+  height: 170px;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: var(--ring-fill);
+  stroke: var(--glass-bg-strong);
+}
+
+.value {
+  stroke: var(--text);
+  transition: stroke-dasharray var(--motion-level);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .value { transition: none; }
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.number {
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.total {
+  font-size: 22px;
+  letter-spacing: 0;
+  color: var(--text-strong-2);
+}
+
+.caption {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-orb);
+}

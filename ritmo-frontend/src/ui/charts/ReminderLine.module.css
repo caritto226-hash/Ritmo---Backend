@@ -1,0 +1,69 @@
+/* Recordatorios de hoy: valores de design-handoff/screens/web/HabitosWeb.dc.html */
+
+.track {
+  position: relative;
+  height: 96px;
+  border-radius: 20px;
+  background: var(--track-stripes);
+}
+
+.line {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 46px;
+  border-top: 1px solid var(--line-track);
+}
+
+.progress {
+  position: absolute;
+  left: 4%;
+  top: 45px;
+  border-top: 3px solid var(--text);
+}
+
+.point {
+  position: absolute;
+  top: 32px;
+  width: 30px;
+  height: 30px;
+  margin-left: -15px;
+  box-sizing: border-box;
+  border-radius: 15px;
+  border: 2px solid var(--line-track);
+  background: var(--surface);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.missed { border-color: var(--text); }
+
+.done {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--surface);
+}
+
+.label {
+  position: absolute;
+  top: 70px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+/* Recordatorios muy juntos: la etiqueta pasa arriba del punto (caso no dibujado). */
+.above { top: 12px; }
+
+.empty {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 58px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-2);
+}

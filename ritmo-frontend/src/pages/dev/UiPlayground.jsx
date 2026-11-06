@@ -16,6 +16,7 @@ import MobileShell, { CirclePill, MobilePageTitle, MobileTopBar } from "../../ui
 import HomeComponentsDemo from "./HomeComponentsDemo";
 import TasksComponentsDemo from "./TasksComponentsDemo";
 import EventsComponentsDemo from "./EventsComponentsDemo";
+import HabitsComponentsDemo from "./HabitsComponentsDemo";
 import styles from "./UiPlayground.module.css";
 
 // Catálogo visual del sistema de diseño (solo desarrollo: la ruta no existe en producción).
@@ -297,6 +298,7 @@ function UiPlayground() {
         <HomeComponentsDemo theme={theme} onToggleTheme={toggleTheme} />
         <TasksComponentsDemo />
         <EventsComponentsDemo />
+        <HabitsComponentsDemo />
       </div>
 
       <Toast toast={toast} onDone={() => setToast(null)} />
