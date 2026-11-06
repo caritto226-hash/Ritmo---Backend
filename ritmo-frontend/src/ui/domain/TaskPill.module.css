@@ -1,0 +1,117 @@
+/* Píldoras "Sin hora": TareasWeb.dc.html (web) y Tareas.dc.html (móvil) */
+.pill {
+  max-width: 100%;
+  height: 44px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 0 8px;
+  border: none;
+  border-radius: 22px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  --pill-line: var(--line-check);
+}
+
+button.pill { cursor: pointer; }
+
+button.pill:focus-visible,
+.toggle:focus-visible,
+.open:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+button.pill:disabled,
+.toggle:disabled { cursor: progress; }
+
+.web {
+  background: var(--surface-row);
+  color: var(--text);
+}
+
+.web.done {
+  background: var(--surface-soft);
+  color: var(--text-done);
+}
+
+.mobile {
+  border: 1px solid var(--pastel-line);
+  background-color: color-mix(in srgb, var(--pill-tint, var(--lav-grey)) 90%, transparent);
+  color: var(--pill-ink, var(--text));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  --pill-line: var(--pastel-line);
+}
+
+.mobile.done {
+  border-color: var(--pastel-line-done);
+  background-color: var(--pastel-done);
+  color: var(--text-3);
+}
+
+.overdue {
+  border: 1px solid var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-weight: 600;
+  --pill-line: var(--danger-border);
+}
+
+.check {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border-radius: 14px;
+  border: 1.5px solid var(--pill-line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.done .check {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+
+/* Variante con dos botones: el círculo (área de 44 × 44) y el título */
+.toggle {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.toggle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--touch-min);
+  height: var(--touch-min);
+  transform: translate(-50%, -50%);
+}
+
+.open {
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}

@@ -45,10 +45,11 @@
   border-radius: 8px;
 }
 
-.logoText {
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.5px;
+/* Logo de marca (public/Ritmo-logo.*): 46 px de alto, igual que las píldoras de la cabecera. */
+.logoImage {
+  display: block;
+  height: 46px;
+  width: auto;
 }
 
 .nav {

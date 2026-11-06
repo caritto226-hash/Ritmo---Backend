@@ -1,0 +1,77 @@
+/* Detalle de tarea: sin mockup propio; mismos estilos que la hoja de Confirmar. */
+.details {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.term {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.value {
+  margin: 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.secondary {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.textButton {
+  height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.textButton:hover:not(:disabled) { background: var(--surface-soft); }
+
+.textButton:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.textButton:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+.danger { color: var(--danger); }
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.confirmText {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}

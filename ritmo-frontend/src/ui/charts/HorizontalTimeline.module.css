@@ -134,3 +134,35 @@
   font-size: 15px;
   color: var(--text-2);
 }
+
+/* ── Variante Tareas (TareasWeb.dc.html) ── */
+.trackTasks { min-width: 860px; height: 230px; }
+
+.taskVariant { min-width: 170px; }
+
+.taskVariant .icon {
+  background: var(--item-tint, var(--surface-soft));
+  color: var(--item-ink, var(--text));
+}
+
+/* Completada: gris al 55 % con el círculo negro y check blanco (nunca tachada) */
+.taskVariant.done {
+  opacity: 0.55;
+  background: var(--surface-soft);
+}
+
+.taskVariant.done .icon {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+/* En curso o a punto de empezar: negra con el círculo lima */
+.taskVariant.hot {
+  background: var(--dark-card);
+  color: var(--on-dark);
+}
+
+.taskVariant.hot .icon {
+  background: var(--accent);
+  color: var(--on-accent);
+}

@@ -1,11 +1,11 @@
 import { Link, NavLink } from "react-router-dom";
 import { DESIGN_PREVIEW } from "../designPreview";
-import Icon from "../icons/Icon";
 import IconButton from "../primitives/IconButton";
 import PillButton from "../primitives/PillButton";
 import cx from "../cx";
 import Rail from "./Rail";
 import { MAIN_NAV } from "./navigation";
+import { LOGO_DARK, LOGO_LIGHT } from "./logo";
 import styles from "./AppShellWeb.module.css";
 
 /**
@@ -35,8 +35,7 @@ function AppShellWeb({
       <div className={styles.frame}>
         <header className={styles.header}>
           <Link to="/dashboard" className={styles.logo} aria-label="Ritmo, inicio">
-            <Icon name="logo" size={30} strokeWidth={1.8} />
-            <span className={styles.logoText}>Ritmo</span>
+            <img src={isDark ? LOGO_DARK : LOGO_LIGHT} alt="" className={styles.logoImage} />
           </Link>
 
           <nav aria-label="Principal" className={styles.nav}>

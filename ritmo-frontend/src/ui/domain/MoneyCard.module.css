@@ -105,6 +105,7 @@
 .income { color: var(--income); }
 
 .settle {
+  position: relative;
   flex-shrink: 0;
   border: none;
   border-radius: var(--radius-pill);
@@ -120,6 +121,17 @@
 
 .settle:hover { background: var(--hover-primary); }
 
+/* Área táctil mínima de 44×44 (el botón mide 40 o 36 en web), sin cambiar cómo se ve. */
+.settle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--touch-min));
+  height: max(100%, var(--touch-min));
+  transform: translate(-50%, -50%);
+}
+
 .settle:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 2px;
@@ -127,3 +139,19 @@
 
 .card .settle { width: 40px; height: 40px; }
 .row .settle { width: 44px; height: 44px; }
+
+/* Compacta (carrusel del Inicio web): misma estructura, ~20 % más pequeña */
+.compact {
+  flex-basis: 164px;
+  width: 164px;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 18px;
+}
+
+.compact .lead { gap: 8px; }
+.compact .tile { width: 30px; height: 30px; border-radius: 10px; font-size: 13px; }
+.compact .name { font-size: 14px; }
+.compact .due { font-size: 11px; }
+.compact .amount { font-size: 15px; }
+.card.compact .settle { width: 36px; height: 36px; }

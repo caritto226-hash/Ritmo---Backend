@@ -264,6 +264,7 @@
 }
 
 .monthCell {
+  position: relative;
   height: 38px;
   padding: 0;
   border: none;
@@ -275,6 +276,17 @@
   font-family: inherit;
   color: var(--text);
   cursor: pointer;
+}
+
+/* El círculo visible mide 32 px (mockup); el área táctil se amplía a 44×44 sin cambiar el aspecto. */
+.monthCell::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--touch-min));
+  height: max(100%, var(--touch-min));
+  transform: translate(-50%, -50%);
 }
 
 .monthCell:focus-visible { outline: none; }

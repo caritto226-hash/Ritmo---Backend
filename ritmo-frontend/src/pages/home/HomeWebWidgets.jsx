@@ -9,7 +9,7 @@ import HorizontalTimeline from "../../ui/charts/HorizontalTimeline";
 import MonthMini from "../../ui/charts/MonthMini";
 import BubbleStats from "../../ui/charts/BubbleStats";
 import CurveChart from "../../ui/charts/CurveChart";
-import MoneyCard from "../../ui/domain/MoneyCard";
+import MoneyCarousel from "../../ui/domain/MoneyCarousel";
 import { NO_DATA } from "../../ui/designPreview";
 import cx from "../../ui/cx";
 import { formatCurrency } from "../../utils/financeFormat";
@@ -97,18 +97,14 @@ export function PagosWidget({ groups, today, onSettle }) {
   ];
 
   return sections.map((section) => (
-    <div key={section.key} className={styles.moneyGroup}>
-      <div className={styles.moneyHead}>
-        <span className={styles.moneyTitle}>{section.title}</span>
-        <span className={styles.moneyTotal}>{section.total}</span>
-      </div>
-      <div className={styles.moneyScroller}>
-        {section.list.map((reminder) => (
-          <MoneyCard key={reminder.occurrenceId} reminder={reminder} today={today} onSettle={onSettle} />
-        ))}
-        {section.list.length === 0 && <div className={styles.moneyEmpty}>Todo al día</div>}
-      </div>
-    </div>
+    <MoneyCarousel
+      key={section.key}
+      title={section.title}
+      total={section.total}
+      reminders={section.list}
+      today={today}
+      onSettle={onSettle}
+    />
   ));
 }
 

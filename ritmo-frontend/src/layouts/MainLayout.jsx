@@ -14,6 +14,11 @@ import styles from "./MainLayout.module.css";
 
 const THEME_KEY = "ritmo-theme";
 
+// En móvil, el + de la pantalla de un módulo abre directo su formulario (Tareas.dc.html: "Nueva tarea").
+const CREATE_SHORTCUTS = {
+  "/tasks": "Nueva tarea",
+};
+
 function readTheme() {
   try {
     return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
@@ -37,6 +42,7 @@ function MainLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sheet, setSheet] = useState(null);
   const [toast, setToast] = useState(null);
+  const [pageRail, setPageRail] = useState(null);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -85,14 +91,17 @@ function MainLayout() {
     notify,
     comingSoon,
     titleSlot,
+    setRailItems: setPageRail,
     openSettings: () => setSheet("settings"),
   }), [profile, isWeb, theme, toggleTheme, notify, comingSoon, titleSlot]);
 
   const userName = profile?.name?.trim() || "";
   const email = user?.correo || "";
   const isHome = location.pathname === "/dashboard";
+  const createLabel = CREATE_SHORTCUTS[location.pathname];
 
-  const railItems = [
+  // Rail del Inicio; cada pantalla puede poner el suyo con useShellRail.
+  const homeRail = [
     { label: "Inicio", icon: "home", to: "/dashboard", end: true },
     { label: "Calendario", icon: "calendarDays", to: "/events" },
     { label: "Mi journal", icon: "journal", onClick: () => comingSoon("Mi journal") },
@@ -140,7 +149,7 @@ function MainLayout() {
             <PillButton icon="plus" size="nav" onClick={() => setSheet("new")}>Nueva actividad</PillButton>
           }
           title={<div ref={setTitleSlot} className={styles.titleSlot} />}
-          railItems={railItems}
+          railItems={pageRail || homeRail}
           onLogout={logout}
         >
           <Outlet />
@@ -154,8 +163,10 @@ function MainLayout() {
     <ShellContext.Provider value={shell}>
       <MobileShell layout={isHome ? "home" : "default"}>
         <MobileTopBar
+          elevated={Boolean(createLabel)}
+          addLabel={createLabel}
           onMenu={() => setDrawerOpen(true)}
-          onAdd={() => setSheet("new")}
+          onAdd={() => (createLabel ? startActivity(location.pathname) : setSheet("new"))}
           onNotifications={() => comingSoon("Notificaciones")}
         />
         <Outlet />

@@ -7,6 +7,7 @@
 }
 
 .tab {
+  position: relative;
   border: none;
   font-family: inherit;
   color: var(--text);
@@ -19,6 +20,17 @@
 .tab:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 1px;
+}
+
+/* Área táctil mínima de 44 px de alto (las pestañas miden 38 o 40), sin cambiar cómo se ven. */
+.tab::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--touch-min));
+  height: max(100%, var(--touch-min));
+  transform: translate(-50%, -50%);
 }
 
 /* Web (Día / Semana): 46 de alto, pestaña activa negra */

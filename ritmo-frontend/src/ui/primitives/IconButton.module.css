@@ -20,6 +20,17 @@
   outline-offset: 2px;
 }
 
+/* Área táctil mínima de 44×44 en los tamaños 40 y 36, sin cambiar cómo se ve el botón. */
+.button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--touch-min));
+  height: max(100%, var(--touch-min));
+  transform: translate(-50%, -50%);
+}
+
 .button:disabled,
 .button[aria-disabled="true"] {
   opacity: var(--disabled-opacity);

@@ -14,6 +14,7 @@ import AppShellWeb from "../../ui/shell/AppShellWeb";
 import PageTitle from "../../ui/shell/PageTitle";
 import MobileShell, { CirclePill, MobilePageTitle, MobileTopBar } from "../../ui/shell/MobileShell";
 import HomeComponentsDemo from "./HomeComponentsDemo";
+import TasksComponentsDemo from "./TasksComponentsDemo";
 import styles from "./UiPlayground.module.css";
 
 // Catálogo visual del sistema de diseño (solo desarrollo: la ruta no existe en producción).
@@ -293,6 +294,7 @@ function UiPlayground() {
         </section>
 
         <HomeComponentsDemo theme={theme} onToggleTheme={toggleTheme} />
+        <TasksComponentsDemo />
       </div>
 
       <Toast toast={toast} onDone={() => setToast(null)} />

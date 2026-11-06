@@ -64,6 +64,19 @@ export function daysInMonth(year, month) {
   return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 }
 
+// Días de calendario de fromKey a toKey (negativo si toKey es anterior).
+export function daysBetween(fromKey, toKey) {
+  const from = parseDateKey(fromKey);
+  const to = parseDateKey(toKey);
+  return Math.round((Date.UTC(to.year, to.month, to.day) - Date.UTC(from.year, from.month, from.day)) / 86400000);
+}
+
+// "Jue 5 nov" (columna "Cuándo" de Tareas)
+export function formatShortDay(dateKey) {
+  const { month, day, weekday } = parseDateKey(dateKey);
+  return `${WEEKDAYS_SHORT[weekday]} ${day} ${MONTHS_SHORT[month]}`;
+}
+
 // "Jue 29 oct, 2026" (píldora de fecha del Inicio web)
 export function formatDayPill(dateKey) {
   const { year, month, day, weekday } = parseDateKey(dateKey);

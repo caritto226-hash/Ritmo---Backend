@@ -1,0 +1,95 @@
+/* Tabla "Todas las tareas": TareasWeb.dc.html */
+.grid {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 140px 90px 120px;
+  gap: 10px;
+}
+
+.header {
+  padding: 0 8px 8px;
+  font-size: 12px;
+  color: var(--text-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.row {
+  align-items: center;
+  min-height: 56px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.title {
+  min-width: 0;
+  min-height: var(--touch-min);
+  padding: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.title:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.title:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.done .title { color: var(--text-done); }
+
+.category {
+  justify-self: start;
+  max-width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  background: var(--row-tint);
+  color: var(--row-ink);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.noCategory {
+  background: var(--surface-soft);
+  color: var(--text-2);
+}
+
+.priority {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: var(--row-dot);
+}
+
+.when {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.overdue {
+  color: var(--danger);
+  font-weight: 600;
+}

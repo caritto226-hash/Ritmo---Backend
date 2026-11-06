@@ -69,6 +69,7 @@
   --pastel-done: rgba(241, 242, 244, 0.85);
   --pastel-line: rgba(18, 18, 18, 0.2);
   --pastel-line-done: rgba(18, 18, 18, 0.14);
+  --block-edge: rgba(255, 255, 255, 0.55);
 
   /* Tinta sobre colores de categoría guardados: no cambia con el tema porque
      el fondo (el color de la categoría) tampoco cambia. Ver utils/color.js. */
@@ -245,6 +246,7 @@
   --pastel-done: rgba(42, 43, 48, 0.85);
   --pastel-line: rgba(242, 242, 243, 0.2);
   --pastel-line-done: rgba(242, 242, 243, 0.14);
+  --block-edge: rgba(255, 255, 255, 0.12);
 
   --orb-rim: rgba(255, 255, 255, 0.35);
   --orb-shine: rgba(255, 255, 255, 0.18);

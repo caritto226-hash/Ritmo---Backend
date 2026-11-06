@@ -9,7 +9,7 @@ import HomePage from "./pages/home/HomePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import MainLayout from "./layouts/MainLayout";
-import Tasks from "./pages/Tasks";
+import TasksPage from "./pages/tasks/TasksPage";
 import Habits from "./pages/Habits";
 import Events from "./pages/Events";
 import Expenses from "./pages/Expenses";
@@ -33,7 +33,7 @@ function App() {
         }
       >
         <Route path="/dashboard" element={<HomePage />} />
-        <Route path="/tasks" element={<Tasks />} />
+        <Route path="/tasks" element={<TasksPage />} />
         <Route path="/habits" element={<Habits />} />
         <Route path="/events" element={<Events />} />
         <Route path="/expenses" element={<Expenses />} />

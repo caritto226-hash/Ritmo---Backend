@@ -68,21 +68,33 @@ export function selectAgendaItems({ tasks, events }, dateKey) {
     ...selectDayEvents(events, dateKey)
       .map((event) => ({ kind: "event", item: event, range: getEventTimeRange(event) }))
       .filter(({ range }) => range),
-  ].sort((a, b) => a.range.start - b.range.start);
+  ];
 
+  return assignLanes(items).map((entry) => ({
+    ...entry,
+    key: `${entry.kind}-${entry.item.id}`,
+    done: entry.kind === "task" ? isTaskDone(entry.item) : isEventDone(entry.item),
+  }));
+}
+
+// Las píldoras de la línea de tiempo horizontal tienen un ancho mínimo (150 px en la Agenda,
+// 170 en Tareas): sobre una pista de ~820–900 px por 12 horas eso equivale a unas 2,4 horas.
+// Una tarea corta ocupa ese largo en pantalla aunque dure 30 min, así que los carriles se
+// reparten con ese largo mínimo para que las píldoras no se tapen.
+const MIN_VISUAL_HOURS = 2.4;
+
+// Reparte bloques con { range: { start, end } } en hasta 3 carriles sin solaparse (ordenados por inicio).
+export function assignLanes(entries, minVisualHours = MIN_VISUAL_HOURS) {
   const laneEnds = [];
-  return items.map((entry) => {
-    let lane = laneEnds.findIndex((end) => end <= entry.range.start);
-    if (lane < 0 && laneEnds.length < MAX_LANES) lane = laneEnds.length;
-    if (lane < 0) lane = laneEnds.indexOf(Math.min(...laneEnds));
-    laneEnds[lane] = entry.range.end;
-    return {
-      ...entry,
-      key: `${entry.kind}-${entry.item.id}`,
-      lane,
-      done: entry.kind === "task" ? isTaskDone(entry.item) : isEventDone(entry.item),
-    };
-  });
+  return [...entries]
+    .sort((a, b) => a.range.start - b.range.start)
+    .map((entry) => {
+      let lane = laneEnds.findIndex((end) => end <= entry.range.start);
+      if (lane < 0 && laneEnds.length < MAX_LANES) lane = laneEnds.length;
+      if (lane < 0) lane = laneEnds.indexOf(Math.min(...laneEnds));
+      laneEnds[lane] = Math.max(entry.range.end, entry.range.start + minVisualHours);
+      return { ...entry, lane };
+    });
 }
 
 // Días con actividad para los puntos del calendario: tareas, eventos y próxima fecha de cada

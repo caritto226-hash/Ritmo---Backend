@@ -1,0 +1,141 @@
+/* Línea de tiempo vertical: Tareas.dc.html */
+.timeline {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.hour {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hourLabel {
+  width: 52px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+}
+
+.hourLine {
+  flex: 1;
+  border-top: 1px dashed var(--line-ring);
+}
+
+.now {
+  position: absolute;
+  left: 52px;
+  right: 0;
+  height: 0;
+  border-top: 1.5px solid var(--text);
+  z-index: 2;
+}
+
+.nowDot {
+  position: absolute;
+  left: -5px;
+  top: -6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--text);
+}
+
+/* Bloque: left 60 / right 0; con solapes, (ancho − 60) se reparte entre las columnas. */
+.block {
+  --block-lane: calc((100% - 60px) / var(--block-columns));
+  position: absolute;
+  left: calc(60px + var(--block-lane) * var(--block-column));
+  width: calc(var(--block-lane) - (var(--block-columns) - 1) * 6px / var(--block-columns));
+  z-index: 3;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 6px 0 16px;
+  border-radius: 24px;
+  border: 1px solid var(--block-edge);
+  background-color: color-mix(in srgb, var(--block-tint) 90%, transparent);
+  background-image: var(--stripes);
+  color: var(--block-ink, var(--text));
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-block);
+  --block-line: var(--pastel-line);
+}
+
+.done {
+  background-color: var(--pastel-done);
+  background-image: none;
+  color: var(--text-3);
+  --block-line: var(--pastel-line-done);
+}
+
+.open {
+  flex: 1;
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.open:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+.title,
+.meta {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.meta {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.time {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 10px;
+  box-sizing: border-box;
+  border: 1px solid var(--block-line);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.empty {
+  position: absolute;
+  left: 60px;
+  right: 0;
+  top: 40%;
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-2);
+}

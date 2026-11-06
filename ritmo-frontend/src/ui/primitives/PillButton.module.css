@@ -1,4 +1,5 @@
 .pill {
+  position: relative;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -19,6 +20,17 @@
 .pill:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 2px;
+}
+
+/* Área táctil mínima de 44 px de alto en el tamaño sm (40), sin cambiar cómo se ve. */
+.pill::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100%, var(--touch-min));
+  height: max(100%, var(--touch-min));
+  transform: translate(-50%, -50%);
 }
 
 .pill:disabled,

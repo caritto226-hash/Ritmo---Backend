@@ -1,0 +1,56 @@
+/* Tira de días: Tareas.dc.html */
+.strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  text-align: center;
+}
+
+.day {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.day:focus-visible { outline: none; }
+.day:focus-visible .number { box-shadow: var(--focus-ring); }
+
+.letter {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.number {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.day:hover .number:not(.selected):not(.today) { background: var(--surface-soft); }
+
+.today { background: var(--accent); color: var(--on-accent); }
+.selected { background: var(--primary); color: var(--on-primary); }
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 3px;
+  background: transparent;
+}
+
+.dotOn { background: var(--text); }
