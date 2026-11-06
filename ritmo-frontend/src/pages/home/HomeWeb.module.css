@@ -1,0 +1,428 @@
+/* Inicio web: valores de design-handoff/screens/web/Inicio.dc.html */
+
+.customize { gap: 8px; }
+
+.alert {
+  margin: 0;
+  padding: 12px 18px;
+  border-radius: 20px;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.loading {
+  margin: 0;
+  padding: 24px;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.flex { flex: 1; }
+
+.empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+/* ── Tu ritmo de hoy ── */
+.blobLime,
+.blobTeal {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.blobLime {
+  left: -60px;
+  top: 90px;
+  width: 260px;
+  height: 260px;
+  background: var(--accent);
+  opacity: var(--orb-blob-opacity);
+}
+
+.blobTeal {
+  right: -70px;
+  top: 220px;
+  width: 240px;
+  height: 240px;
+  background: var(--teal);
+  opacity: var(--orb-blob-teal-opacity);
+}
+
+.ritmoBody {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 214px;
+}
+
+.parts {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.part {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+.partLabel { font-size: 12px; color: var(--text-2); }
+.partValue { font-size: 18px; font-weight: 500; }
+
+.quotePanel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 200px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 22px;
+  border-radius: var(--radius-card);
+  background: var(--quote-bg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  backdrop-filter: var(--glass-blur-lg);
+  border-top: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 0 var(--pastel-edge);
+}
+
+.quoteTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quoteLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.streak {
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.quote {
+  flex: 1;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+}
+
+.quoteActions {
+  display: flex;
+  gap: 8px;
+}
+
+.nextQuote {
+  height: 44px;
+  padding: 0 6px 0 16px;
+  border: none;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow-soft-btn);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.nextQuote:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.nextQuoteIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+/* ── Agenda ── */
+.agendaBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dayLabel {
+  min-width: 150px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ── Pagos y cobros ── */
+.moneyGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.moneyHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.moneyTitle { font-size: 14px; font-weight: 600; }
+.moneyTotal { font-size: 13px; color: var(--text-2); }
+
+.moneyScroller {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.moneyScroller::-webkit-scrollbar { display: none; }
+
+.moneyEmpty {
+  flex: 1;
+  min-height: 100px;
+  border-radius: 20px;
+  border: 1px dashed var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+/* ── Tareas de hoy ── */
+.taskList {
+  display: flex;
+  flex-direction: column;
+}
+
+.taskRow {
+  min-height: 48px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: inherit;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.taskRow:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.taskRow:disabled { cursor: progress; }
+
+.taskCheck {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border-radius: 13px;
+  border: 1.5px solid var(--line-check);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-primary);
+  transition: background var(--motion-fast), border-color var(--motion-fast);
+}
+
+.taskDone .taskCheck {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.taskCopy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.taskTitle {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.taskDone .taskTitle { color: var(--text-num-muted); }
+.taskMeta { font-size: 12px; color: var(--text-2); }
+
+/* ── Hábitos ── */
+.habits {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.habitList {
+  flex: 1 1 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.habitRow {
+  min-height: 52px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 6px 0 14px;
+  background: var(--surface-row);
+}
+
+.habitDone { background: var(--surface-soft); }
+
+.habitCopy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.habitName { font-size: 15px; font-weight: 500; }
+.habitDone .habitName { color: var(--text-done); }
+.habitMeta { font-size: 12px; color: var(--text-2); }
+
+.habitCheck {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border-radius: 20px;
+  border: 1.5px solid var(--line-check);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--motion-fast), color var(--motion-fast);
+}
+
+.habitCheck[aria-pressed="true"] {
+  border: none;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.habitCheck:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.habitCheck:disabled { cursor: progress; }
+
+/* ── Finanzas ── */
+.finTop {
+  display: flex;
+  flex-direction: column;
+}
+
+.finLabel { font-size: 13px; color: var(--text-2); }
+
+.finIncome {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.incomeIcon { color: var(--income); }
+.weekIcon { color: var(--danger-strong); }
+
+.shares {
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr);
+  gap: 8px 10px;
+  align-items: center;
+}
+
+.shareLabel { font-size: 14px; }
+
+.shareBar {
+  height: 42px;
+  min-width: 64px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  font-size: 16px;
+}
+
+.shareUnit { font-size: 12px; color: var(--text-2); }
+
+/* ── Gastos de la semana ── */
+.week {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.weekLead {
+  flex: 0 0 150px;
+  display: flex;
+  flex-direction: column;
+}

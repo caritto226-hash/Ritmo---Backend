@@ -23,3 +23,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Material de diseño y configuración de Claude (solo local)
+design-handoff/
+.claude/
+CLAUDE.md
+

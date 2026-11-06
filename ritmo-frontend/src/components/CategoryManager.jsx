@@ -4,9 +4,10 @@ import CategoryIconBadge from "./CategoryIconBadge";
 import CategoryIconPicker from "./CategoryIconPicker";
 import CategoryColorPicker from "./CategoryColorPicker";
 import categoryIcons from "../constants/categoryIcons";
+import { DEFAULT_CATEGORY_COLOR } from "../constants/categoryColors";
 import "../styles/category-manager.css";
 
-const emptyForm = { name: "", description: "", icon: "tag", color: "#1565C0", isRecurring: false };
+const emptyForm = { name: "", description: "", icon: "tag", color: DEFAULT_CATEGORY_COLOR, isRecurring: false };
 
 function CategoryManager({ module, categories, onClose, onChanged }) {
   const [editingId, setEditingId] = useState(null);

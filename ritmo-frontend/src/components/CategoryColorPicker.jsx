@@ -1,12 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-
-const colorPalette = [
-  "#D94F70", "#E8754D", "#F2A541", "#E3C547", "#83B84A",
-  "#38A780", "#36A6A6", "#4A9CD6", "#4972CF", "#7558C7",
-  "#A24FBA", "#D35A9A", "#7B8794", "#596579", "#2D3748",
-  "#1565C0", "#00897B", "#6D4C41", "#EF6C00", "#C62828",
-];
+import colorPalette from "../constants/categoryColors";
 
 const hexColorPattern = /^#[0-9A-F]{6}$/i;
 

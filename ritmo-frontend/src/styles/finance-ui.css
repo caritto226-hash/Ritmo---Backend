@@ -66,7 +66,7 @@
   gap: 6px;
   border: 1px solid var(--primary-border);
   background: var(--primary-solid);
-  color: var(--on-primary);
+  color: var(--legacy-on-primary);
   font: inherit;
   font-weight: 800;
   cursor: pointer;
@@ -355,7 +355,7 @@
 .finance-segmented button.active {
   border-color: var(--primary-border);
   background: var(--primary-solid);
-  color: var(--on-primary);
+  color: var(--legacy-on-primary);
 }
 .finance-sheet-date {
   min-height: 48px;
@@ -496,7 +496,7 @@
 .finance-toast.success {
   border: 1px solid var(--primary-border);
   background: var(--primary-solid);
-  color: var(--on-primary);
+  color: var(--legacy-on-primary);
 }
 .finance-toast.error {
   border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--surface-border));

@@ -39,6 +39,9 @@
 .soft { background: var(--surface-soft); }
 .soft:hover:not(:disabled) { background: var(--hover-soft); }
 
+.subtle { background: var(--surface-subtle); }
+.subtle:hover:not(:disabled) { background: var(--hover-soft); }
+
 .surface { background: var(--surface); }
 .surface:hover:not(:disabled) { background: var(--hover-surface); }
 

@@ -8,9 +8,10 @@ import styles from "./BottomSheet.module.css";
 /**
  * Hoja inferior (móvil). En web (≥ 760 px) se muestra como diálogo centrado.
  * Bloquea Escape y el clic en el fondo mientras busy=true (por ejemplo, al confirmar un pago).
- * header reemplaza el encabezado estándar (título + cerrar) cuando la hoja necesita uno propio.
+ * header reemplaza el encabezado estándar (título + cerrar) cuando la hoja necesita uno propio;
+ * en ese caso labelledBy apunta al id de su título.
  */
-function BottomSheet({ open, onClose, title, header, busy = false, className, children }) {
+function BottomSheet({ open, onClose, title, header, labelledBy, busy = false, className, children }) {
   const sheetRef = useRef(null);
   const titleId = useId();
 
@@ -31,7 +32,7 @@ function BottomSheet({ open, onClose, title, header, busy = false, className, ch
         ref={sheetRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
+        aria-labelledby={labelledBy || (title ? titleId : undefined)}
         className={cx(styles.sheet, className)}
       >
         <span className={styles.handle} aria-hidden="true" />

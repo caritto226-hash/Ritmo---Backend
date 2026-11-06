@@ -5,7 +5,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
-import Dashboard from "./pages/dashboard";
+import HomePage from "./pages/home/HomePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 import MainLayout from "./layouts/MainLayout";
@@ -32,7 +32,7 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard" element={<HomePage />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/habits" element={<Habits />} />
         <Route path="/events" element={<Events />} />

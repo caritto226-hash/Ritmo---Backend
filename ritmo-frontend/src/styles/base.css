@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap');
-
 /* ============================================================
    base.css — Reset, tema heredado y alias de variables antiguas.
    Los tokens nuevos viven en tokens.css; estos alias se eliminan en la fase 7.
@@ -57,7 +55,8 @@
   /* Geometría */
   --radius: 20px;
   --radius-sm: 12px;
-  --radius-card: 16px;
+  /* Radio de tarjeta del diseño anterior; --radius-card (28) vive en tokens.css. */
+  --legacy-radius-card: 16px;
   --radius-control: 12px;
   --radius-pill: 999px;
 
@@ -103,7 +102,7 @@
   /* --bg, --income y --danger viven ahora en tokens.css (rediseño 2026). */
   --primary-solid: #1d2b44;
   --primary-border: transparent;
-  --on-primary: #ffffff;
+  --legacy-on-primary: #ffffff;
   --accent-soft: var(--surface-quaternary);
   --balance-income-arrow: #4caf83;
   --balance-expense-arrow: var(--orange-light);
@@ -151,11 +150,11 @@
 /* ── BODY  ── */
 body {
   margin: 0;
-  font-family: 'Nunito', 'Roboto', sans-serif;
-  background: var(--app-bg-gradient);
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   transition: background .3s;
-  
 }
 
 /* main-container (auth) usa flex de centrado; lo activa esa clase, no body,

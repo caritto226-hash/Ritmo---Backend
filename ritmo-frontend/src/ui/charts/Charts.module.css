@@ -1,0 +1,310 @@
+/* Gráficas pequeñas del Inicio (Inicio.dc.html) y Hoy (Hoy.dc.html). Medidas copiadas de los mockups. */
+
+/* ── CurveChart ── */
+.curve {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.curveSvg { width: 100%; height: auto; }
+.curveArea { fill: var(--chart-area); }
+.curveLine { fill: none; stroke: var(--chart-line); stroke-width: 1.2; }
+.curveDot { fill: var(--text); }
+.curveTip { fill: var(--accent); }
+.curveTipText { font-size: 12px; font-weight: 600; fill: var(--on-accent); font-family: var(--font-sans); }
+
+.curveLabels {
+  display: grid;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+/* ── Sparkline ── */
+.spark { width: 100%; height: 44px; }
+.sparkLine { fill: none; stroke: var(--income); stroke-width: 1.6; stroke-linecap: round; }
+.sparkDot { fill: var(--surface); stroke: var(--income); stroke-width: 1.6; }
+
+/* ── HalfGauge ── */
+.gauge {
+  position: relative;
+  height: 92px;
+  margin-top: 2px;
+}
+
+.gaugeSvg {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 132px;
+  height: 73px;
+  margin-left: -66px;
+}
+
+.gaugeTrack { fill: none; stroke: var(--surface-muted); stroke-width: 10; stroke-linecap: round; }
+.gaugeArc {
+  fill: none;
+  stroke: var(--teal);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--motion-level);
+}
+
+.gaugeCenter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.gaugeValue { font-size: 30px; font-weight: 300; }
+.gaugeCaption { margin-top: 2px; font-size: 11px; color: var(--text-2); }
+
+/* ── HourBars ── */
+.hourBars {
+  flex: 1;
+  position: relative;
+  min-height: 140px;
+}
+
+.hourTrend {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 60px;
+}
+
+.hourTrendLine { fill: none; stroke: var(--chart-dash); stroke-width: 1.2; stroke-dasharray: 3 3; }
+.hourTrendDot { fill: var(--text); }
+
+.hourRow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.hourBar { flex: 1; border-radius: 5px; }
+.past { background: var(--bar-past); }
+.current { background: var(--accent-strong); box-shadow: var(--glow-accent); }
+.future { background: var(--future-stripes); }
+
+.hourNoData {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 34px;
+  text-align: center;
+}
+
+/* ── BubbleStats ── */
+.bubbles {
+  flex: 1 1 220px;
+  position: relative;
+  height: 200px;
+}
+
+.bubbleMain {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 132px;
+  height: 132px;
+  margin: -66px 0 0 -66px;
+  border-radius: 50%;
+  background: var(--bubble-gradient);
+  color: var(--ink-on-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.bubbleMainValue { font-size: 38px; font-weight: 400; letter-spacing: -1px; line-height: 1; }
+.bubbleMainUnit { font-size: 20px; }
+.bubbleMainCaption { font-size: 11px; font-weight: 600; color: var(--teal-ink); }
+
+.bubbleGlass {
+  position: absolute;
+  left: 50%;
+  box-sizing: border-box;
+  border-radius: 50%;
+  background: var(--glass-bubble);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  backdrop-filter: var(--glass-blur-sm);
+  border: 1px solid var(--glass-bg-strong);
+  box-shadow: var(--shadow-glass);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal-text);
+}
+
+.bubbleGlassValue { line-height: 1; }
+.bubbleGlassCaption { font-weight: 600; }
+
+/* ── LollipopTimeline ── */
+.lollipop {
+  position: relative;
+  height: 128px;
+  margin-top: 4px;
+}
+
+.lollipopTick {
+  position: absolute;
+  bottom: 22px;
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.lollipopAxis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.pinStem {
+  position: absolute;
+  bottom: 22px;
+  width: 2px;
+  margin-left: -1px;
+}
+
+.pinDot {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin-left: -7px;
+  box-sizing: border-box;
+  border-radius: 7px;
+  border: 2px solid;
+}
+
+.pinStem.pinEvent { background: var(--text); }
+.pinStem.pinTask { background: var(--teal); }
+.pinStem.pinDone { background: var(--line-strong); }
+.pinDot.pinEvent { background: var(--text); border-color: var(--text); }
+.pinDot.pinTask { background: var(--teal); border-color: var(--teal); }
+.pinDot.pinDone { background: var(--surface); border-color: var(--line-strong); }
+
+.lollipopNow {
+  position: absolute;
+  top: 0;
+  bottom: 22px;
+  width: 0;
+  border-left: 1.5px dashed var(--text);
+}
+
+.lollipopNowLabel {
+  position: absolute;
+  top: -2px;
+  width: 48px;
+  height: 22px;
+  margin-left: -24px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.lollipopAxisLabels {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+/* ── MonthMini ── */
+.monthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.monthTitle { font-size: 15px; font-weight: 600; }
+.monthNav { display: flex; gap: 6px; }
+
+.monthGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  text-align: center;
+}
+
+.monthWeekday {
+  padding-bottom: 4px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.monthCell {
+  height: 38px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.monthCell:focus-visible { outline: none; }
+.monthCell:focus-visible .monthDay { box-shadow: var(--focus-ring); }
+
+.monthDay {
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background var(--motion-fast);
+}
+
+.monthCell:hover .monthDay:not(.monthSelected):not(.monthToday) { background: var(--surface-soft); }
+
+.monthToday { background: var(--accent); color: var(--on-accent); }
+.monthSelected { background: var(--primary); color: var(--on-primary); }
+
+.monthDot {
+  width: 4px;
+  height: 4px;
+  margin-top: 1px;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.monthDotOn { background: var(--text-2); }
+.monthDotSelected { background: var(--text); }

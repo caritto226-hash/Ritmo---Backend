@@ -70,6 +70,17 @@
   --pastel-line: rgba(18, 18, 18, 0.2);
   --pastel-line-done: rgba(18, 18, 18, 0.14);
 
+  /* Tinta sobre colores de categoría guardados: no cambia con el tema porque
+     el fondo (el color de la categoría) tampoco cambia. Ver utils/color.js. */
+  --ink-on-light: #121212;
+  --ink-on-dark: #FFFFFF;
+
+  /* Esfera "Tu ritmo de hoy" */
+  --orb-rim: rgba(255, 255, 255, 0.95);
+  --orb-shine: rgba(255, 255, 255, 0.6);
+  --orb-blob-opacity: 0.55;
+  --orb-blob-teal-opacity: 0.5;
+
   /* ── Dinero y estados ── */
   --income: #2E7D4F;
   --income-on-dark: #9EE6B8;
@@ -234,6 +245,11 @@
   --pastel-done: rgba(42, 43, 48, 0.85);
   --pastel-line: rgba(242, 242, 243, 0.2);
   --pastel-line-done: rgba(242, 242, 243, 0.14);
+
+  --orb-rim: rgba(255, 255, 255, 0.35);
+  --orb-shine: rgba(255, 255, 255, 0.18);
+  --orb-blob-opacity: 0.18;
+  --orb-blob-teal-opacity: 0.18;
 
   --income: #4CAF83;
   --danger: #E0697E;

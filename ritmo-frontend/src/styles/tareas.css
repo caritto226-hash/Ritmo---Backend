@@ -9,7 +9,7 @@
   display: flex; justify-content: space-between; align-items: center;
   background: var(--surface-primary);
   border: var(--border-subtle);
-  border-radius: var(--radius-card);
+  border-radius: var(--legacy-radius-card);
   padding: 14px 16px 10px;
   box-shadow: var(--shadow-card);
   margin-bottom: 4px;

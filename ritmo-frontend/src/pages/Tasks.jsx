@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useCreateIntent from "../hooks/useCreateIntent";
 import tasksService from "../services/tasks.service";
 import categoriesService from "../services/categories.service";
 import MobileItemDetails from "../components/MobileItemDetails";
@@ -31,6 +32,7 @@ const recurrenceFrequencies = [
 ];
 
 function Tasks() {
+  useCreateIntent(() => openCreateForm());
   const [tasks, setTasks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -49,7 +49,7 @@
   border: 1px solid var(--primary-border);
   border-radius: 22px;
   background: var(--primary-solid);
-  color: var(--on-primary);
+  color: var(--legacy-on-primary);
 }
 .balance-card-top {
   display: flex;
@@ -100,7 +100,7 @@
   min-width: 0;
   padding: 10px 12px;
   border-radius: 14px;
-  background: color-mix(in srgb, var(--on-primary) 10%, transparent);
+  background: color-mix(in srgb, var(--legacy-on-primary) 10%, transparent);
 }
 .balance-mini-label {
   display: flex;
@@ -213,7 +213,7 @@
 .finance-chip.active span {
   border-color: var(--primary-border);
   background: var(--primary-solid);
-  color: var(--on-primary);
+  color: var(--legacy-on-primary);
 }
 .finance-chip:focus-visible { outline: none; }
 .finance-chip:focus-visible span {
@@ -463,7 +463,7 @@
   overflow-y: auto;
   padding: 6px;
   border: var(--border-subtle);
-  border-radius: var(--radius-card);
+  border-radius: var(--legacy-radius-card);
   background: var(--surface-primary);
   box-shadow: var(--shadow-raised);
 }

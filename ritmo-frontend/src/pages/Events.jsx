@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useCreateIntent from "../hooks/useCreateIntent";
 import eventsService from "../services/events.service";
 import categoriesService from "../services/categories.service";
 import MobileItemDetails from "../components/MobileItemDetails";
@@ -41,6 +42,7 @@ function formatTime(value) {
 }
 
 function Events() {
+  useCreateIntent(() => openCreateForm());
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);

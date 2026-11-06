@@ -6,7 +6,7 @@ const ICON_SIZES = { 46: 19, 44: 20, 40: 16, 36: 14 };
 
 /**
  * Botón circular de solo ícono. label es obligatorio (aria-label).
- * variant: muted | soft | surface | outline | float | glass | menu | ghost | onDark | primary.
+ * variant: muted | soft | subtle | surface | outline | float | glass | menu | ghost | onDark | primary.
  * Con as={NavLink} toma el estado activo de aria-current="page".
  */
 function IconButton({

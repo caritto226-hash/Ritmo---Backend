@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import useCreateIntent from "../hooks/useCreateIntent";
 import expensesService from "../services/expenses.service";
 import categoriesService from "../services/categories.service";
 import CategoryIconBadge from "../components/CategoryIconBadge";
@@ -129,6 +130,7 @@ function StrokeIcon({ children }) {
 }
 
 function Expenses() {
+  useCreateIntent(() => openCreateModal());
   // allExpenses siempre trae todos los movimientos (tipo, búsqueda y "Pagada [fecha]" salen de ahí);
   // categoryExpenses es la respuesta de la API cuando hay una categoría elegida en los chips.
   const [allExpenses, setAllExpenses] = useState([]);

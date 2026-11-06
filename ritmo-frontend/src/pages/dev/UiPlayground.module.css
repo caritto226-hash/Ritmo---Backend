@@ -168,3 +168,11 @@
   flex-direction: column;
   gap: 10px;
 }
+
+/* Insignia de categoría de la demo de la fase 2 */
+.badgeDemo {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--line-ring);
+}

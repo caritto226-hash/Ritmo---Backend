@@ -1,0 +1,11 @@
+## Diseño de interfaz (rediseño 2026)
+- La fuente de verdad visual está en `design-handoff/`. Antes de tocar cualquier componente o pantalla, lee `design-handoff/DESIGN_SPEC.md` y el archivo de `design-handoff/screens/` correspondiente.
+- Replica valores exactos (colores, tamaños, radios, espaciados, sombras) desde los estilos en línea de los `.dc.html`. No "mejores" ni aproximes el diseño sin preguntar.
+- Los datos de los `.dc.html` son de ejemplo: usa siempre datos reales de la API. Si un dato no existe en el backend, muestra un estado vacío y avísame; no inventes endpoints ni datos.
+- Colores solo mediante custom properties (tokens). Nada de hex sueltos en componentes.
+- Reutiliza los componentes base; si creas uno nuevo, agrégalo a la ruta `/dev/ui`.
+- Completado = gris con check negro, nunca tachado. Montos en pesos enteros con punto de miles.
+- Áreas táctiles mínimas de 44 px, `aria-label` en botones de solo ícono, contraste ≥ 4.5:1.
+- Código y valores guardados en inglés; interfaz en español.
+- Al terminar una tarea visual, compara con la captura de `design-handoff/screenshots/` y reporta diferencias.
+- Trabaja por fases y espera mi aprobación entre una y otra. No hagas commit ni push sin que te lo pida.

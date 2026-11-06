@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ritmo Tareas web</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E6E8EB}
+a{color:#121212;text-decoration:none}a:hover{color:#000}
+.hs{scrollbar-width:none}.hs::-webkit-scrollbar{display:none}
+@media (max-width: 760px){.rail{flex-direction:row !important;flex-wrap:wrap}.rail-spacer{display:none}.titlepad{padding-left:0 !important}}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #E6E8EB; padding: 16px; box-sizing: border-box; font-family: Urbanist, system-ui, sans-serif; color: #121212">
+<div style="max-width: 1480px; margin: 0 auto; background: #F7F7F8; border-radius: 36px; padding: 28px 36px 36px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px">
+<a href="Inicio.dc.html" aria-label="Ritmo, inicio" style="display: flex; align-items: center; gap: 8px; margin-right: 28px"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.5S5.5 9.5 5.5 14a6.5 6.5 0 0 0 13 0C18.5 9.5 12 2.5 12 2.5Z"/><path d="M9.5 15.5a2.5 2.5 0 0 0 2.5 2"/></svg><span style="font-size: 26px; font-weight: 600; letter-spacing: -0.5px">Ritmo</span></a>
+<nav aria-label="Principal" style="display: flex; flex-wrap: wrap; gap: 8px">
+<a href="Inicio.dc.html" style="height: 46px; padding: 0 20px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>Inicio</a>
+<a href="TareasWeb.dc.html" aria-current="page" style="height: 46px; padding: 0 20px; border-radius: 23px; background: #121212; color: #FFFFFF; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Tareas</a>
+<a href="HabitosWeb.dc.html" style="height: 46px; padding: 0 20px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c2 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 0-3 0-5 1-7.5Z"/></svg>Hábitos</a>
+<a href="EventosWeb.dc.html" style="height: 46px; padding: 0 20px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Eventos</a>
+<a href="FinanzasWeb.dc.html" style="height: 46px; padding: 0 20px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M3 10h18M16 14.5h2"/></svg>Finanzas</a>
+</nav>
+<span style="flex: 1 1 0"></span>
+<div style="display: flex; gap: 8px">
+<button type="button" aria-label="Cambiar a modo oscuro" style="width: 46px; height: 46px; border-radius: 23px; border: none; background: #ECEDEF; color: #121212; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 13.5A8.5 8.5 0 1 1 10.5 3.5a6.5 6.5 0 0 0 10 10Z"/></svg></button>
+<button type="button" aria-label="Notificaciones, 1 nueva" style="width: 46px; height: 46px; border-radius: 23px; border: none; background: #ECEDEF; color: #121212; display: flex; align-items: center; justify-content: center; position: relative"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8.5a6 6 0 0 1 12 0c0 6.5 2.5 8.5 2.5 8.5h-17S6 15 6 8.5"/><path d="M10.3 20.5a2 2 0 0 0 3.4 0"/></svg><span style="position: absolute; top: 11px; right: 13px; width: 7px; height: 7px; border-radius: 4px; background: #E5484D"></span></button>
+<button type="button" aria-label="Mi cuenta: Ana" style="width: 46px; height: 46px; border-radius: 23px; border: 2px solid #FFFFFF; background: #121212; color: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 600; box-shadow: 0 0 0 1px #E2E4E7">A</button>
+</div>
+</header>
+
+<div class="titlepad" style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 18px; padding-left: 66px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 28px 48px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 13px; color: #5F6268">Inicio → Tareas</div>
+<h1 style="margin: 0; font-size: 52px; font-weight: 400; letter-spacing: -1.2px; line-height: 1.05">Mis tareas</h1>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 36px; padding-bottom: 4px">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="4">
+<div style="display: flex; align-items: flex-start; gap: 8px"><span style="font-size: 40px; font-weight: 300; line-height: 1">{{s.n}}</span><span style="display: flex; flex-direction: column; font-size: 13px; line-height: 1.3"><span style="font-weight: 600; color: {{s.deltaColor}}">{{s.delta}}</span><span style="color: #5F6268">{{s.label}}</span></span></div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" aria-label="Buscar" style="width: 46px; height: 46px; border-radius: 23px; border: none; background: #ECEDEF; color: #121212; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+<button type="button" style="height: 46px; padding: 0 18px; border-radius: 23px; border: none; background: #ECEDEF; display: flex; align-items: center; gap: 10px; font-family: inherit; font-size: 14px; font-weight: 500; color: #121212"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Dom 1 nov, 2026<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+<button type="button" style="height: 46px; padding: 0 20px; border-radius: 23px; border: none; background: #121212; color: #FFFFFF; display: flex; align-items: center; gap: 10px; font-family: inherit; font-size: 14px; font-weight: 500"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Nueva tarea</button>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch">
+<nav class="rail" aria-label="Accesos" style="flex: 0 0 46px; display: flex; flex-direction: column; gap: 10px">
+<a href="Inicio.dc.html" aria-label="Inicio" style="width: 46px; height: 46px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19Z"/><path d="M10 20.5v-5h4v5"/></svg></a>
+<a href="#" aria-label="Tareas de hoy" aria-current="page" style="width: 46px; height: 46px; border-radius: 23px; background: #121212; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></a>
+<a href="#" aria-label="Próximas" style="width: 46px; height: 46px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></a>
+<a href="#" aria-label="Categorías" style="width: 46px; height: 46px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13.2 13.2 20a1.8 1.8 0 0 1-2.5 0L3.5 12.8V3.5h9.3L20 10.7a1.8 1.8 0 0 1 0 2.5Z"/><circle cx="8" cy="8" r="1.4"/></svg></a>
+<a href="#" aria-label="Archivo de completadas" style="width: 46px; height: 46px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="5" rx="1.5"/><path d="M5 9v9.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V9M10 13h4"/></svg></a>
+<span class="rail-spacer" style="flex: 1 1 auto"></span>
+<a href="#" aria-label="Cerrar sesión" style="width: 46px; height: 46px; border-radius: 23px; background: #ECEDEF; display: flex; align-items: center; justify-content: center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 20.5h-4a1.5 1.5 0 0 1-1.5-1.5V5a1.5 1.5 0 0 1 1.5-1.5h4M16 16.5l4.5-4.5L16 7.5M20.5 12H9.5"/></svg></a>
+</nav>
+
+<main style="flex: 999 1 600px; min-width: 0; display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start">
+<div style="flex: 2.4 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+
+<section aria-labelledby="h-hor" style="background: #FFFFFF; border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 id="h-hor" style="margin: 0; font-size: 22px; font-weight: 400">Tu horario de hoy</h2><span style="font-size: 13px; color: #4F525A">Toca una tarea para completarla</span></div>
+<div class="hs" style="overflow-x: auto; border-radius: 20px; background: repeating-linear-gradient(135deg, #F6F7F8 0 10px, #FFFFFF 10px 20px)">
+<div style="position: relative; min-width: 860px; height: 230px">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="13"><div style="position: absolute; top: 0; bottom: 0; left: {{h.left}}%; border-left: 1px solid #ECEDEF"><span style="position: absolute; top: 10px; left: 8px; font-size: 13px; color: #4F525A; white-space: nowrap">{{h.label}}</span></div></sc-for>
+<div aria-hidden="true" style="position: absolute; top: 6px; bottom: 0; left: {{nowLeft}}%; border-left: 1.5px solid #121212; z-index: 2"><span style="position: absolute; top: 0; left: -26px; height: 28px; width: 52px; border-radius: 9px; background: #121212; color: #FFFFFF; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center">10:40</span></div>
+<sc-for list="{{timed}}" as="t" hint-placeholder-count="5">
+<button type="button" onClick="{{t.toggle}}" aria-pressed="{{t.done}}" aria-label="{{t.aria}}" style="position: absolute; top: {{t.top}}px; left: {{t.left}}%; width: {{t.width}}%; min-width: 170px; height: 50px; z-index: 3; border-radius: 25px; border: none; padding: 0 16px 0 6px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; background: {{t.bg}}; color: {{t.fg}}; opacity: {{t.op}}; font-family: inherit; text-align: left; box-shadow: 0 6px 16px rgba(20,22,30,0.06)">
+<span style="width: 38px; height: 38px; flex-shrink: 0; border-radius: 19px; background: {{t.iconBg}}; display: flex; align-items: center; justify-content: center; color: {{t.iconFg}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.iconPath}}"/></svg></span>
+<span style="flex: 1; min-width: 0; font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.title}}</span>
+<span style="font-size: 12px; opacity: 0.8; white-space: nowrap">{{t.range}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="h-lista" style="background: #FFFFFF; border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px">
+<h2 id="h-lista" style="margin: 0; font-size: 22px; font-weight: 400">Todas las tareas</h2>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{statusTabs}}" as="f" hint-placeholder-count="3"><button type="button" aria-pressed="{{f.on}}" onClick="{{f.pick}}" style="height: 40px; padding: 0 16px; border-radius: 20px; border: none; background: {{f.bg}}; color: {{f.fg}}; font-family: inherit; font-size: 13px; font-weight: 500">{{f.label}}</button></sc-for>
+</div>
+</div>
+<div class="hs" style="display: flex; gap: 6px; overflow-x: auto">
+<sc-for list="{{catTabs}}" as="c" hint-placeholder-count="6"><button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}" style="flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid {{c.line}}; background: {{c.bg}}; font-family: inherit; font-size: 13px; font-weight: 500; color: #121212; display: flex; align-items: center; gap: 8px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{c.dot}}"></span>{{c.label}}</button></sc-for>
+</div>
+<div style="display: flex; flex-direction: column">
+<div style="display: grid; grid-template-columns: 44px minmax(0, 1fr) 140px 90px 120px; gap: 10px; padding: 0 8px 8px; font-size: 12px; color: #4F525A; border-bottom: 1px solid #F1F2F4"><span></span><span>Tarea</span><span>Categoría</span><span>Prioridad</span><span>Cuándo</span></div>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<div style="display: grid; grid-template-columns: 44px minmax(0, 1fr) 140px 90px 120px; gap: 10px; align-items: center; min-height: 56px; padding: 0 8px; border-bottom: 1px solid #F1F2F4">
+<button type="button" onClick="{{r.toggle}}" aria-pressed="{{r.done}}" aria-label="{{r.aria}}" style="width: 44px; height: 44px; border: none; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center"><span style="width: 26px; height: 26px; border-radius: 13px; box-sizing: border-box; border: 1.5px solid {{r.ring}}; background: {{r.fill}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><sc-if value="{{r.done}}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></sc-if></span></button>
+<span style="font-size: 15px; font-weight: 500; color: {{r.fg}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.title}}</span>
+<span style="justify-self: start; height: 30px; padding: 0 12px; border-radius: 15px; background: {{r.catBg}}; display: flex; align-items: center; font-size: 12px; font-weight: 500; white-space: nowrap">{{r.cat}}</span>
+<span style="font-size: 13px; display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 4px; background: {{r.prioDot}}"></span>{{r.prio}}</span>
+<span style="font-size: 13px; color: {{r.whenColor}}; font-weight: {{r.whenWeight}}">{{r.when}}</span>
+</div>
+</sc-for>
+<sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}"><div style="padding: 32px 0; text-align: center; font-size: 15px; color: #4F525A">No hay tareas con estos filtros.</div></sc-if>
+</div>
+</section>
+</div>
+
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<section aria-labelledby="h-sem" style="background: #FFFFFF; border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 10px; min-height: 300px">
+<h2 id="h-sem" style="margin: 0; font-size: 22px; font-weight: 400">Esta semana</h2>
+<span style="font-size: 13px; color: #4F525A">Completadas por día</span>
+<span style="font-size: 40px; font-weight: 400; letter-spacing: -1px; line-height: 1.05">{{weekTotal}}<span style="font-size: 20px; color: #6C6F75"> tareas</span></span>
+<div style="flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; min-height: 140px">
+<sc-for list="{{bars}}" as="b" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<sc-if value="{{b.today}}" hint-placeholder-val="{{ false }}"><span style="height: 26px; padding: 0 9px; border-radius: 13px; background: #EAF98F; display: flex; align-items: center; font-size: 12px; font-weight: 600">{{b.v}}</span></sc-if>
+<span style="width: 100%; height: {{b.h}}px; border-radius: 12px; background: {{b.bg}}"></span>
+<span style="font-size: 12px; color: #4F525A">{{b.day}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section aria-labelledby="h-sinhora" style="background: #FFFFFF; border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; justify-content: space-between"><h2 id="h-sinhora" style="margin: 0; font-size: 22px; font-weight: 400">Sin hora</h2><span style="font-size: 13px; color: #4F525A">Cuando puedas</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{untimed}}" as="u" hint-placeholder-count="3">
+<button type="button" onClick="{{u.toggle}}" aria-pressed="{{u.done}}" style="height: 44px; padding: 0 16px 0 8px; border-radius: 22px; border: none; background: {{u.bg}}; color: {{u.fg}}; display: flex; align-items: center; gap: 8px; font-family: inherit; font-size: 14px; font-weight: 500"><span style="width: 28px; height: 28px; border-radius: 14px; box-sizing: border-box; border: 1.5px solid {{u.ring}}; background: {{u.fill}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><sc-if value="{{u.done}}" hint-placeholder-val="{{ false }}"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></sc-if></span>{{u.title}}</button>
+</sc-for>
+</div>
+</section>
+
+<section aria-labelledby="h-cat" style="background: #FFFFFF; border-radius: 28px; padding: 24px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="h-cat" style="margin: 0; font-size: 22px; font-weight: 400">Por categoría</h2>
+<sc-for list="{{byCat}}" as="c" hint-placeholder-count="5">
+<div style="display: grid; grid-template-columns: 110px minmax(0, 1fr) 36px; gap: 10px; align-items: center">
+<span style="font-size: 14px">{{c.label}}</span>
+<span style="height: 32px; border-radius: 12px; background: #F4F5F6; overflow: hidden; display: flex"><span style="width: {{c.pct}}%; background: {{c.color}}; border-radius: 12px"></span></span>
+<span style="font-size: 14px; text-align: right">{{c.n}}</span>
+</div>
+</sc-for>
+</section>
+</div>
+</main>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1442,"height":1240}}'>
+const CATS = { lectura: ['Lectura', '#EAF98F'], ritmo: ['Proyecto Ritmo', '#B9DECD'], sena: ['SENA', '#8ED0CD'], hogar: ['Hogar', '#DCE0EB'], trabajo: ['Trabajo', '#F1F9C4'] };
+const PRIO = { alta: ['Alta', '#C2353C'], media: ['Media', '#D9A21B'], baja: ['Baja', '#8A8D93'] };
+const TASKS = [
+  { id: 't0', title: 'Enviar cotización a cliente', cat: 'trabajo', prio: 'alta', when: 'Venció ayer', late: true, s: null },
+  { id: 't1', title: 'Leer 20 minutos', cat: 'lectura', prio: 'baja', s: 7, e: 7.5, lane: 0, done: true },
+  { id: 't2', title: 'Rediseño módulo Finanzas', cat: 'ritmo', prio: 'alta', s: 8, e: 10, lane: 1 },
+  { id: 't3', title: 'Grabar video evidencia', cat: 'sena', prio: 'alta', s: 10.75, e: 11.75, lane: 0 },
+  { id: 't4', title: 'Mercado de la semana', cat: 'hogar', prio: 'media', s: 14, e: 15, lane: 1 },
+  { id: 't5', title: 'Responder correos', cat: 'trabajo', prio: 'media', s: 16, e: 16.5, lane: 2 },
+  { id: 't6', title: 'Planear evidencias SENA', cat: 'sena', prio: 'media', s: 17, e: 18, lane: 0 },
+  { id: 'u1', title: 'Pagar internet', cat: 'hogar', prio: 'media', s: null, when: 'Hoy · sin hora' },
+  { id: 'u2', title: 'Organizar escritorio', cat: 'hogar', prio: 'baja', s: null, when: 'Hoy · sin hora', done: true },
+  { id: 'u3', title: 'Terminar capítulo 3', cat: 'lectura', prio: 'baja', s: null, when: 'Hoy · sin hora' }
+];
+const START = 7, END = 19, SPAN = END - START, NOW = 10 + 40 / 60;
+const CHECK = 'M20 6 9 17l-5-5', DOT = 'M12 12h.01';
+function hm(h) { const H = Math.floor(h), m = Math.round((h - H) * 60); return (((H + 11) % 12) + 1) + ':' + String(m).padStart(2, '0'); }
+function hl(H) { return (((H + 11) % 12) + 1) + (H < 12 ? ' a. m.' : ' p. m.'); }
+class Component extends DCLogic {
+  constructor(p) { super(p); const d = {}; TASKS.forEach(t => { d[t.id] = !!t.done; }); this.state = { done: d, status: 'all', cat: 'all' }; }
+  flip(id) { this.setState({ done: { ...this.state.done, [id]: !this.state.done[id] } }); }
+  renderVals() {
+    const S = this.state, D = S.done;
+    const pending = TASKS.filter(t => !D[t.id]).length, doneN = TASKS.filter(t => D[t.id]).length, lateN = TASKS.filter(t => t.late && !D[t.id]).length;
+    const stats = [{ n: pending, delta: 'hoy', label: 'Por hacer', deltaColor: '#121212' }, { n: doneN, delta: '+' + doneN, label: 'Completadas', deltaColor: '#2E7D4F' },
+      { n: 12 + doneN, delta: '+3', label: 'Esta semana', deltaColor: '#2E7D4F' }, { n: lateN, delta: lateN ? '−' + lateN : '0', label: 'Vencidas', deltaColor: lateN ? '#C2353C' : '#4F525A' }];
+    const hours = []; for (let H = START; H <= END; H++) hours.push({ left: ((H - START) / SPAN * 100).toFixed(2), label: hl(H) });
+    const timed = TASKS.filter(t => t.s !== null).map(t => { const d = D[t.id], hot = !d && t.s <= NOW + 0.5 && t.e > NOW;
+      return { title: t.title, done: d, range: hm(t.s) + ' – ' + hm(t.e), top: 50 + t.lane * 58,
+        left: ((t.s - START) / SPAN * 100).toFixed(2), width: ((t.e - t.s) / SPAN * 100).toFixed(2),
+        bg: hot ? '#121212' : (d ? '#F1F2F4' : '#FFFFFF'), fg: hot ? '#FFFFFF' : '#121212', op: d ? 0.55 : 1,
+        iconBg: d ? '#121212' : (hot ? '#EAF98F' : CATS[t.cat][1]), iconFg: d ? '#FFFFFF' : '#121212', iconPath: d ? CHECK : DOT,
+        aria: (d ? 'Marcar pendiente: ' : 'Completar: ') + t.title + ', ' + hm(t.s), toggle: () => this.flip(t.id) }; });
+    const statusTabs = [['all', 'Todas'], ['pend', 'Pendientes'], ['done', 'Completadas']].map(([k, label]) => ({ label, on: S.status === k,
+      bg: S.status === k ? '#121212' : '#F1F2F4', fg: S.status === k ? '#FFFFFF' : '#121212', pick: () => this.setState({ status: k }) }));
+    const catTabs = [{ k: 'all', label: 'Todas las categorías', dot: '#121212' }].concat(Object.keys(CATS).map(k => ({ k, label: CATS[k][0], dot: CATS[k][1] })))
+      .map(c => ({ ...c, on: S.cat === c.k, bg: S.cat === c.k ? '#F1F2F4' : '#FFFFFF', line: S.cat === c.k ? '#121212' : '#ECEDEF', pick: () => this.setState({ cat: c.k }) }));
+    const rows = TASKS.filter(t => (S.status === 'all' || (S.status === 'done' ? D[t.id] : !D[t.id])) && (S.cat === 'all' || t.cat === S.cat))
+      .map(t => { const d = D[t.id]; return { title: t.title, done: d, cat: CATS[t.cat][0], catBg: CATS[t.cat][1], prio: PRIO[t.prio][0], prioDot: PRIO[t.prio][1],
+        when: t.s !== null ? hm(t.s) + (t.s < 12 ? ' a. m.' : ' p. m.') : t.when, whenColor: t.late && !d ? '#B42F36' : '#4F525A', whenWeight: t.late && !d ? 600 : 400,
+        ring: d ? '#121212' : '#C9CBD0', fill: d ? '#121212' : 'transparent', fg: d ? '#8A8D93' : '#121212',
+        aria: (d ? 'Marcar pendiente: ' : 'Completar: ') + t.title, toggle: () => this.flip(t.id) }; });
+    const vals = [3, 4, 2, 6, 5, 3, doneN], days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+    const bars = vals.map((v, i) => ({ v, day: days[i], today: i === 6, h: 30 + v * 16, bg: i === 6 ? '#EAF98F' : '#F1F2F4' }));
+    const untimed = TASKS.filter(t => t.id[0] === 'u').map(t => { const d = D[t.id]; return { title: t.title, done: d, bg: d ? '#F1F2F4' : '#F7F8F9', fg: d ? '#8A8D93' : '#121212',
+      ring: d ? '#121212' : '#C9CBD0', fill: d ? '#121212' : 'transparent', toggle: () => this.flip(t.id) }; });
+    const counts = Object.keys(CATS).map(k => ({ label: CATS[k][0], color: CATS[k][1], n: TASKS.filter(t => t.cat === k).length }));
+    const max = Math.max.apply(null, counts.map(c => c.n));
+    const byCat = counts.map(c => ({ ...c, pct: Math.round(c.n / max * 100) }));
+    return { stats, hours, nowLeft: ((NOW - START) / SPAN * 100).toFixed(2), timed, statusTabs, catTabs, rows, noRows: rows.length === 0,
+      bars, weekTotal: vals.reduce((a, b) => a + b, 0), untimed, byCat };
+  }
+}
+</script>
+</body>
+</html>

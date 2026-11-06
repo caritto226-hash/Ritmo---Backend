@@ -1,0 +1,180 @@
+/* Confirmar.dc.html */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tile {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lime-soft);
+  color: var(--ink-on-light);
+}
+
+.heading {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--text-3);
+}
+
+.close {
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+}
+
+.close:hover:not(:disabled) { background: var(--surface-soft); }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+.amount {
+  width: 100%;
+  height: 56px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border: 1px solid var(--line-ring);
+  border-radius: 16px;
+  background: var(--bg);
+  font-family: inherit;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--text);
+}
+
+.dates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.dateOption {
+  height: 44px;
+  border: 1px solid var(--line-ring);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.dateOption[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.dateInput {
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0 14px;
+  border: 1px solid var(--line-ring);
+  border-radius: 14px;
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.primary {
+  height: 54px;
+  border: none;
+  border-radius: 27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary:hover:not(:disabled) { background: var(--hover-primary); }
+
+.primary:disabled,
+.dateOption:disabled,
+.textButton:disabled,
+.close:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+.secondary {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.textButton {
+  height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.textButton:hover:not(:disabled) { background: var(--surface-soft); }
+
+.danger { color: var(--danger); }
+
+.primary:focus-visible,
+.dateOption:focus-visible,
+.textButton:focus-visible,
+.close:focus-visible,
+.dateInput:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}

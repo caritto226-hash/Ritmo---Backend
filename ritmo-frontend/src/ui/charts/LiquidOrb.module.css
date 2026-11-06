@@ -1,0 +1,78 @@
+/* Esfera: Inicio.dc.html (200 px) y Hoy.dc.html (150 px) */
+.orb {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.web { width: 200px; height: 200px; margin-top: 6px; }
+.mobile { width: 150px; height: 150px; }
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.stopTop { stop-color: var(--accent); }
+.stopMid { stop-color: var(--mint); }
+.stopBottom { stop-color: var(--teal); }
+
+.glass { fill: var(--glass-bubble); }
+.rim { fill: none; stroke: var(--orb-rim); stroke-width: 2; }
+.shine { fill: var(--orb-shine); }
+
+.ring {
+  fill: none;
+  stroke: var(--text);
+  stroke-linecap: round;
+  transition: stroke-dasharray var(--motion-level);
+}
+.web .ring { stroke-width: 1.5; }
+.mobile .ring { stroke-width: 1.6; }
+
+.level { transition: transform var(--motion-level); }
+
+.backWave { fill: var(--teal); opacity: 0.45; }
+
+.wave { animation: orb-wave 7s linear infinite; }
+.wave2 { animation: orb-wave 11s linear infinite reverse; }
+
+@keyframes orb-wave {
+  from { transform: translateX(0); }
+  to { transform: translateX(-160px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave,
+  .wave2 { animation: none; }
+  .level,
+  .ring { transition: none; }
+}
+
+.center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.pct {
+  font-weight: 300;
+  line-height: 1;
+}
+.web .pct { font-size: 52px; letter-spacing: -1.5px; }
+.mobile .pct { font-size: 42px; letter-spacing: -1px; }
+
+.sign { color: var(--text-strong-2); }
+.web .sign { font-size: 26px; }
+.mobile .sign { font-size: 20px; }
+
+.label {
+  font-weight: 500;
+  color: var(--text-orb);
+}
+.web .label { font-size: 13px; }
+.mobile .label { font-size: 11px; }

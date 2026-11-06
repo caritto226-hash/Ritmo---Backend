@@ -16,7 +16,7 @@
 .card {
   background: var(--card-bg);
   border: var(--border-subtle);
-  border-radius: var(--radius-card);
+  border-radius: var(--legacy-radius-card);
   box-shadow: var(--shadow-card);
   padding: var(--card-padding);
 }
@@ -91,7 +91,7 @@
   transform: translate(-50%, 100%);
   width: 100%; max-width: 420px;
   background: var(--surface-primary);
-  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  border-radius: var(--legacy-radius-card) var(--legacy-radius-card) 0 0;
   padding: var(--card-padding) var(--card-padding) calc(24px + env(safe-area-inset-bottom, 0px));
   box-shadow: var(--shadow-raised);
   transition: transform .25s ease, opacity .2s ease, visibility 0s linear .2s;
@@ -114,7 +114,7 @@
   .modal {
     left: 50%; top: 50%; bottom: auto;
     transform: translate(-50%, calc(-50% + 12px));
-    border-radius: var(--radius-card);
+    border-radius: var(--legacy-radius-card);
   }
   .modal.open { transform: translate(-50%, -50%); }
 }
@@ -453,7 +453,7 @@ button, a, input, select, textarea {
   display: flex; align-items: center; gap: 14px;
   background: var(--surface-primary);
   border: var(--border-subtle);
-  border-radius: var(--radius-card);
+  border-radius: var(--legacy-radius-card);
   padding: 14px 16px;
   box-shadow: var(--shadow-card);
 }

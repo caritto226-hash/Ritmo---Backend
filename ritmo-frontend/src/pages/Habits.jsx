@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useCreateIntent from "../hooks/useCreateIntent";
 import habitsService from "../services/habits.service";
 import categoriesService from "../services/categories.service";
 import MobileItemDetails from "../components/MobileItemDetails";
@@ -10,6 +11,7 @@ import "../styles/tareas.css";
 const emptyForm = { name: "", frequency: "", goal: "", categoryId: "", reminderTime: "" };
 
 function Habits() {
+  useCreateIntent(() => openCreateForm());
   const [habits, setHabits] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);

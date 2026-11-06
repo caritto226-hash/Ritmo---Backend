@@ -1,0 +1,130 @@
+/* Bento de Hoy móvil (Hoy.dc.html) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: minmax(150px, auto);
+  grid-auto-flow: row dense;
+  gap: var(--gap-bento);
+}
+
+.widget {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--pad-card-mobile);
+  border-radius: var(--radius-card-bento);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.full { grid-column: span 2; grid-row: span 1; }
+.half { grid-column: span 1; grid-row: span 1; }
+.tall { grid-column: span 1; grid-row: span 2; }
+
+.ritmo { background: var(--ritmo-gradient); }
+
+.editing { box-shadow: 0 0 0 2px var(--text); }
+
+.open {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.tools {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.emptyAdd {
+  min-height: 120px;
+  border-radius: var(--radius-card-bento);
+  border: 1.5px dashed var(--line-check);
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* Aviso lima */
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 14px 18px;
+  border-radius: 22px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 14px;
+}
+
+.bannerActions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Hoja "Agregar widget": padding 10 18 28 y separación 10 del mockup */
+.sheet {
+  gap: 10px;
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
+.sheetItem {
+  min-height: 60px;
+  border: none;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 8px 0 16px;
+  background: var(--surface-subtle);
+  font-family: inherit;
+  text-align: left;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sheetItem:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.sheetCopy {
+  display: flex;
+  flex-direction: column;
+}
+
+.sheetTitle { font-size: 15px; font-weight: 500; }
+.sheetDescription { font-size: 12px; color: var(--text-2); }
+
+.sheetPlus {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.sheetEmpty {
+  padding: 12px 0;
+  font-size: 14px;
+  color: var(--text-2);
+}

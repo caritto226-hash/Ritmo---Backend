@@ -13,6 +13,7 @@ function PillButton({
   variant = "secondary",
   size = "lg",
   icon,
+  iconSize: iconSizeProp,
   iconTone,
   trailingIcon,
   pressed,
@@ -22,7 +23,7 @@ function PillButton({
   ...rest
 }) {
   const isButton = Component === "button";
-  const iconSize = size === "sm" ? 16 : 18;
+  const iconSize = iconSizeProp || (size === "sm" ? 16 : 18);
 
   return (
     <Component

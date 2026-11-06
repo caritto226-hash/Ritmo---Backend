@@ -1,3 +1,8 @@
 node_modules/
 .env
 AGENTS.md
+
+# Material de diseño y configuración de Claude (solo local)
+design-handoff/
+.claude/
+CLAUDE.md

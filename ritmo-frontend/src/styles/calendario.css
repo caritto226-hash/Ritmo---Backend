@@ -5,7 +5,7 @@
 .calendar-panel {
   background: var(--surface-primary);
   border: var(--border-subtle);
-  border-radius: var(--radius-card);
+  border-radius: var(--legacy-radius-card);
   padding: var(--card-padding);
   box-shadow: var(--shadow-card);
 }

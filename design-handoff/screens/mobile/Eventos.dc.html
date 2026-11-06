@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ritmo Eventos</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#121212;text-decoration:none}a:hover{color:#000}
+.hs::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; isolation: isolate; overflow: hidden; background: #F7F7F8; font-family: Urbanist, system-ui, sans-serif; color: #121212">
+<div class="hs" style="height: 768px; overflow-y: auto; box-sizing: border-box; padding: 16px 20px 24px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; align-items: center; gap: 10px">
+<button type="button" aria-label="Menú" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #ECEDEF; border: none; color: #121212; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(18,18,18,0.06)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<span style="flex: 1"></span>
+<button type="button" aria-label="Nuevo evento" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #121212; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+<button type="button" aria-label="Notificaciones, 1 nueva" style="width: 44px; height: 44px; border-radius: 22px; border: none; background: #ECEDEF; color: #121212; display: flex; align-items: center; justify-content: center; position: relative"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span style="position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 4px; background: #E5484D"></span></button>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column">
+<h1 style="margin: 0; font-size: 30px; font-weight: 400; letter-spacing: -0.6px">Mis eventos</h1>
+<span style="font-size: 13px; color: #5F6268">Miércoles 28 de octubre</span>
+</div>
+<button type="button" style="height: 48px; padding: 0 16px 0 6px; border-radius: 24px; border: none; background: #ECEDEF; display: flex; align-items: center; gap: 10px; font-family: inherit; font-size: 14px; font-weight: 500; color: #121212"><span style="width: 36px; height: 36px; border-radius: 18px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>Calendario</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center">
+<sc-for list="{{week}}" as="d" hint-placeholder-count="7">
+<button type="button" aria-label="{{d.aria}}" style="border: none; background: transparent; padding: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; font-family: inherit; color: #121212">
+<span style="font-size: 13px; font-weight: 500; color: #5F6268">{{d.l}}</span>
+<span style="width: 44px; height: 44px; border-radius: 22px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 500; color: {{d.fg}}; background: {{d.bg}}; border: {{d.border}}">{{d.n}}</span>
+<span style="width: 5px; height: 5px; border-radius: 3px; background: {{d.dot}}"></span>
+</button>
+</sc-for>
+</div>
+
+<div style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border: none; box-shadow: none; border-radius: 18px; padding: 10px 12px">
+<span style="width: 40px; height: 40px; border-radius: 20px; background: #121212; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 12px; font-weight: 500; color: #5F6268">Siguiente · en 20 min</span>
+<span style="font-size: 15px; font-weight: 500">Reunión con cliente</span>
+</div>
+<span style="font-size: 13px; font-weight: 500; color: #5F6268">{{doneCount}}/{{total}} realizados</span>
+</div>
+
+<div style="position: relative; height: {{tlH}}px">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="12">
+<div style="position: absolute; left: 0; right: 0; top: {{h.top}}px; display: flex; align-items: center; gap: 8px; height: 0">
+<span style="width: 52px; flex-shrink: 0; font-size: 12px; font-weight: 600; color: #5F6268">{{h.label}}</span>
+<span style="flex: 1; border-top: 1px dashed #ECEDEF"></span>
+</div>
+</sc-for>
+<div aria-hidden="true" style="position: absolute; left: 52px; right: 0; top: {{nowTop}}px; height: 0; border-top: 1.5px solid #121212; z-index: 2"><span style="position: absolute; left: -5px; top: -6px; width: 10px; height: 10px; border-radius: 5px; background: #121212"></span></div>
+<sc-for list="{{timed}}" as="it" hint-placeholder-count="4">
+<div style="position: absolute; left: 60px; right: 0; top: {{it.top}}px; height: {{it.h}}px; box-sizing: border-box; border-radius: 24px; padding: 0 6px 0 16px; display: flex; align-items: center; gap: 8px; background-color: {{it.bg}}; background-image: {{it.stripes}}; color: {{it.fg}}; border: 1px solid rgba(255,255,255,0.55); backdrop-filter: blur(14px); box-shadow: 0 6px 18px rgba(18,18,18,0.07)">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<span style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.title}}</span>
+<span style="font-size: 12px; font-weight: 600; opacity: 0.8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.meta}}</span>
+</div>
+<span style="flex-shrink: 0; height: 30px; padding: 0 10px; border-radius: 15px; border: 1px solid {{it.line}}; display: flex; align-items: center; font-size: 12px; font-weight: 500">{{it.time}}</span>
+<button type="button" aria-pressed="{{it.done}}" aria-label="{{it.aria}}" onClick="{{it.toggle}}" style="flex-shrink: 0; width: 44px; height: 44px; border: none; background: transparent; padding: 0; display: flex; align-items: center; justify-content: center">
+<span style="width: 32px; height: 32px; border-radius: 16px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: {{it.checkBg}}; border: 1.5px solid {{it.checkBorder}}"><sc-if value="{{it.done}}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></sc-if></span>
+</button>
+</div>
+</sc-for>
+</div>
+
+</div>
+
+<nav aria-label="Principal" style="position: absolute; left: 12px; right: 12px; bottom: 10px; height: 64px; background: #FFFFFF; border: none; border-radius: 22px; box-shadow: 0 10px 30px rgba(18,18,18,0.10); display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; padding: 0 6px">
+<a href="Hoy.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; color: #5F6268"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21H3z"/></svg>Hoy</a>
+<a href="Tareas.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; color: #5F6268"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Tareas</a>
+<a href="Habitos.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; color: #5F6268"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Hábitos</a>
+<a href="Eventos.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: #121212"><span style="width: 44px; height: 28px; border-radius: 14px; background: #EAF98F; color: #121212; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>Eventos</a>
+<a href="Finanzas.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 500; color: #5F6268"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h2M3 10h18"/></svg>Finanzas</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+const PAL = {
+  lime: { bg: 'rgba(185,222,205,0.9)', fg: '#121212', line: 'rgba(18,18,18,0.2)' },
+  purple: { bg: 'rgba(142,208,205,0.82)', fg: '#121212', line: 'rgba(18,18,18,0.2)' },
+  black: { bg: 'rgba(234,249,143,0.9)', fg: '#121212', line: 'rgba(18,18,18,0.2)' },
+  grey: { bg: 'rgba(220,224,235,0.92)', fg: '#121212', line: 'rgba(18,18,18,0.2)' }
+};
+const DONE = { bg: 'rgba(241,242,244,0.85)', fg: '#5F6268', line: 'rgba(18,18,18,0.14)' };
+const STRIPES = 'repeating-linear-gradient(135deg, rgba(255,255,255,0.35) 0 2px, transparent 2px 9px)';
+const START = 7, END = 20, HOUR = 56;
+const EVENTS = [
+  { id: 'e1', title: 'Clase SENA', cat: 'purple', place: 'Sede Calle 52', s: 7, e: 9, done: true },
+  { id: 'e2', title: 'Reunión con cliente', cat: 'black', place: 'Videollamada', s: 11, e: 12, done: false },
+  { id: 'e3', title: 'Almuerzo familiar', cat: 'lime', place: 'Casa', s: 13, e: 14.5, done: false },
+  { id: 'e4', title: 'Entrenamiento', cat: 'grey', place: 'Parque Simón Bolívar', s: 18, e: 19, done: false }
+];
+function hm(h) { const H = Math.floor(h), m = Math.round((h - H) * 60); const h12 = ((H + 11) % 12) + 1; return h12 + ':' + String(m).padStart(2, '0'); }
+function hl(H) { const h12 = ((H + 11) % 12) + 1; return h12 + (H < 12 ? ' a. m.' : ' p. m.'); }
+class Component extends DCLogic {
+  constructor(p) { super(p); const d = {}; EVENTS.forEach(t => { d[t.id] = t.done; }); this.state = { done: d }; }
+  flip(id) { this.setState({ done: { ...this.state.done, [id]: !this.state.done[id] } }); }
+  renderVals() {
+    const timed = EVENTS.map(t => {
+      const done = this.state.done[t.id], c = done ? DONE : PAL[t.cat];
+      return { ...t, done, bg: c.bg, fg: c.fg, line: c.line, stripes: done ? 'none' : STRIPES,
+        checkBg: done ? '#121212' : 'transparent', checkBorder: done ? '#121212' : c.line,
+        toggle: () => this.flip(t.id), top: (t.s - START) * HOUR + 4, h: Math.max((t.e - t.s) * HOUR - 8, 52),
+        time: hm(t.s) + '–' + hm(t.e), meta: (done ? 'Realizado · ' : '') + t.place,
+        aria: (done ? 'Marcar programado: ' : 'Marcar realizado: ') + t.title };
+    });
+    const doneCount = EVENTS.filter(t => this.state.done[t.id]).length;
+    const hours = []; for (let H = START; H <= END; H++) hours.push({ top: (H - START) * HOUR, label: hl(H) });
+    const L = ['D', 'L', 'M', 'M', 'J', 'V', 'S'], dots = [false, true, false, true, false, true, true];
+    const week = L.map((l, i) => { const n = 25 + i, sel = n === 28; return { l, n, aria: l + ' ' + n,
+      bg: sel ? '#121212' : 'transparent', fg: sel ? '#FFFFFF' : '#121212', border: 'none', dot: dots[i] ? '#121212' : 'transparent' }; });
+    return { timed, hours, week, doneCount, total: EVENTS.length,
+      tlH: (END - START) * HOUR + 20, nowTop: (10 + 40 / 60 - START) * HOUR };
+  }
+}
+</script>
+</body>
+</html>
