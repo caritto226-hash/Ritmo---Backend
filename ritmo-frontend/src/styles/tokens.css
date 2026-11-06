@@ -102,6 +102,7 @@
   --on-dark-3: rgba(255, 255, 255, 0.8);
   --dark-card-sheen: linear-gradient(150deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 55%);
   --dark-card-sheen-mobile: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 55%);
+  --dark-card-sheen-event: linear-gradient(150deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 55%);
   --dark-card-border: rgba(255, 255, 255, 0.14);
   --dark-tile: rgba(255, 255, 255, 0.08);
   --dark-tile-border: rgba(255, 255, 255, 0.12);

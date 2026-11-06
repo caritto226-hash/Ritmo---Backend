@@ -176,3 +176,8 @@
   border-radius: 12px;
   box-shadow: 0 0 0 1px var(--line-ring);
 }
+
+/* La cabecera de la tarjeta de ejemplo del AppShellWeb es de web (≥ 760 px): en el catálogo a
+   390 px salta de línea para no desbordar la página. */
+.wrapHeader { flex-wrap: wrap; }
+.wrapHeader span { white-space: normal; }

@@ -15,6 +15,7 @@ import PageTitle from "../../ui/shell/PageTitle";
 import MobileShell, { CirclePill, MobilePageTitle, MobileTopBar } from "../../ui/shell/MobileShell";
 import HomeComponentsDemo from "./HomeComponentsDemo";
 import TasksComponentsDemo from "./TasksComponentsDemo";
+import EventsComponentsDemo from "./EventsComponentsDemo";
 import styles from "./UiPlayground.module.css";
 
 // Catálogo visual del sistema de diseño (solo desarrollo: la ruta no existe en producción).
@@ -259,7 +260,7 @@ function UiPlayground() {
             }
           >
             <Card>
-              <CardHeader title="Contenido de la pantalla" meta="Toca una tarea para completarla" />
+              <CardHeader className={styles.wrapHeader} title="Contenido de la pantalla" meta="Toca una tarea para completarla" />
             </Card>
           </AppShellWeb>
           <PageTitle
@@ -295,6 +296,7 @@ function UiPlayground() {
 
         <HomeComponentsDemo theme={theme} onToggleTheme={toggleTheme} />
         <TasksComponentsDemo />
+        <EventsComponentsDemo />
       </div>
 
       <Toast toast={toast} onDone={() => setToast(null)} />

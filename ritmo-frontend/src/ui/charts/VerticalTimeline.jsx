@@ -2,6 +2,7 @@ import CheckCircle from "../primitives/CheckCircle";
 import cx from "../cx";
 import { getInkOnColor } from "../../utils/color";
 import { formatClock, formatHourLabel } from "../../utils/dates";
+import layoutColumns from "./layoutColumns";
 import styles from "./VerticalTimeline.module.css";
 
 const DEFAULT_START = 7;
@@ -10,41 +11,17 @@ const HOUR_HEIGHT = 56;
 const MIN_BLOCK = 52;
 const FALLBACK_COLOR = "var(--lav-grey)";
 
-// Columnas para bloques que se solapan: cada grupo que se cruza se reparte en carriles
-// del mismo ancho (el mockup no dibuja solapes; así ningún bloque tapa a otro).
-function layoutColumns(items) {
-  const sorted = [...items].sort((a, b) => a.start - b.start);
-  const placed = [];
-  let cluster = [];
-  let clusterEnd = -Infinity;
-
-  function closeCluster() {
-    const columns = Math.max(1, ...cluster.map((entry) => entry.column + 1));
-    cluster.forEach((entry) => placed.push({ ...entry, columns }));
-    cluster = [];
-  }
-
-  sorted.forEach((item) => {
-    if (item.start >= clusterEnd && cluster.length > 0) closeCluster();
-    const taken = new Set(cluster.filter((entry) => entry.end > item.start).map((entry) => entry.column));
-    let column = 0;
-    while (taken.has(column)) column += 1;
-    cluster.push({ ...item, column });
-    clusterEnd = Math.max(clusterEnd, item.end);
-  });
-  if (cluster.length > 0) closeCluster();
-  return placed;
-}
-
 /**
- * Línea de tiempo vertical del día (Tareas móvil): una fila por hora y bloques pastel con rayas.
- * items: [{ key, title, meta, start, end, done, color, onToggle, onOpen, disabled, toggleLabel, openLabel }].
- * El color es el de la categoría (tal cual); completado = gris, sin rayas, check negro.
- * now (horas) dibuja la línea negra de la hora actual.
+ * Línea de tiempo vertical del día (Tareas y Eventos móvil): una fila por hora y bloques pastel
+ * con rayas. items: [{ key, title, meta, start, end, done, canceled, color, onToggle, onOpen,
+ * disabled, toggleLabel, openLabel }]. El color es el de la categoría (tal cual); completado =
+ * gris, sin rayas, check negro. Cancelado (Eventos) = sin color, borde punteado, "Cancelado" en
+ * lugar de la hora y sin check (se restaura desde el detalle). now (horas) dibuja la línea negra de la hora actual. startHour y endHour
+ * fijan el rango mínimo (Tareas 7–18, Eventos 7–20); se amplía si un bloque queda fuera.
  */
-function VerticalTimeline({ items, now = null, emptyText }) {
-  const start = Math.min(DEFAULT_START, ...items.map((item) => Math.floor(item.start)));
-  const end = Math.max(DEFAULT_END, ...items.map((item) => Math.ceil(item.end)));
+function VerticalTimeline({ items, now = null, emptyText, startHour = DEFAULT_START, endHour = DEFAULT_END }) {
+  const start = Math.min(startHour, ...items.map((item) => Math.floor(item.start)));
+  const end = Math.max(endHour, ...items.map((item) => Math.ceil(item.end)));
   const hours = [];
   for (let hour = start; hour <= end; hour += 1) hours.push(hour);
   const showNow = now !== null && now >= start && now <= end;
@@ -69,10 +46,10 @@ function VerticalTimeline({ items, now = null, emptyText }) {
         return (
           <div
             key={item.key}
-            className={cx(styles.block, item.done && styles.done)}
+            className={cx(styles.block, item.done && styles.done, item.canceled && styles.canceled)}
             style={{
               "--block-tint": color,
-              "--block-ink": item.done ? undefined : getInkOnColor(item.color),
+              "--block-ink": item.done || item.canceled ? undefined : getInkOnColor(item.color),
               "--block-column": item.column,
               "--block-columns": item.columns,
               top: (item.start - start) * HOUR_HEIGHT + 4,
@@ -83,15 +60,21 @@ function VerticalTimeline({ items, now = null, emptyText }) {
               <span className={styles.title}>{item.title}</span>
               {item.meta && <span className={styles.meta}>{item.meta}</span>}
             </button>
-            <span className={styles.time}>{formatClock(item.start)}–{formatClock(item.end)}</span>
-            <CheckCircle
-              size={32}
-              tone="pastel"
-              checked={item.done}
-              onToggle={item.onToggle}
-              label={item.toggleLabel}
-              disabled={item.disabled}
-            />
+            <span className={styles.time}>
+              {item.canceled ? "Cancelado" : `${formatClock(item.start)}–${formatClock(item.end)}`}
+            </span>
+            {item.canceled ? (
+              <span className={styles.checkSpace} aria-hidden="true" />
+            ) : (
+              <CheckCircle
+                size={32}
+                tone="pastel"
+                checked={item.done}
+                onToggle={item.onToggle}
+                label={item.toggleLabel}
+                disabled={item.disabled}
+              />
+            )}
           </div>
         );
       })}

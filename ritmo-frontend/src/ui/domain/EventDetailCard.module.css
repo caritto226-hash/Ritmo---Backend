@@ -1,0 +1,142 @@
+/* Detalle del evento: valores de design-handoff/screens/web/EventosWeb.dc.html */
+.card {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: var(--radius-card);
+  background-color: var(--dark-card);
+  background-image: var(--dark-card-sheen-event);
+  color: var(--on-dark);
+  padding: var(--pad-card);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.blob {
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: var(--teal);
+  filter: blur(70px);
+  opacity: 0.35;
+}
+
+.top,
+.title,
+.rows,
+.actions { position: relative; }
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.kicker {
+  font-size: 13px;
+  color: var(--on-dark-2);
+}
+
+.chip {
+  height: 30px;
+  max-width: 60%;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border-radius: 15px;
+  background: var(--chip-bg);
+  color: var(--chip-ink, var(--ink-on-light));
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.row > svg { flex-shrink: 0; }
+
+/* "Próximamente" sobre fondo oscuro: --text-3 no llega a 4,5:1 aquí. */
+.noData { color: var(--on-dark-2); }
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.toggle {
+  flex: 1;
+  height: 48px;
+  border-radius: 24px;
+  border: none;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggle[aria-pressed="true"],
+.toggleWhite {
+  background: var(--on-dark);
+  color: var(--ink-on-light);
+}
+
+.circle {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 24px;
+  border: 1px solid var(--dark-outline);
+  background: transparent;
+  color: var(--on-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.circle:hover:not(:disabled) { background: var(--dark-tile); }
+
+.toggle:focus-visible,
+.circle:focus-visible {
+  outline: 2px solid var(--on-dark);
+  outline-offset: 2px;
+}
+
+.toggle:disabled,
+.circle:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}

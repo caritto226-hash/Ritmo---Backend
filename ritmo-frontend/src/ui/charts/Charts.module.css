@@ -320,3 +320,13 @@
 
 .monthDotOn { background: var(--text-2); }
 .monthDotSelected { background: var(--text); }
+
+/* Variante de Eventos (EventosWeb.dc.html): título de tarjeta y puntos teal */
+.monthTitleCard {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+}
+
+.monthEvents .monthDotOn { background: var(--teal); }
+.monthEvents .monthDotSelected { background: var(--text); }

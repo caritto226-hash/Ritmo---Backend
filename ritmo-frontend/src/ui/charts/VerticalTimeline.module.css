@@ -116,6 +116,29 @@
   opacity: 0.8;
 }
 
+/* Completado: el gris ya es el tono atenuado; con opacidad bajaría de 4,5:1. */
+.done .meta { opacity: 1; }
+
+/* Cancelado: sin color de categoría, borde punteado de los estados vacíos y sin tachar. */
+.canceled {
+  background-color: transparent;
+  background-image: none;
+  border: 1.5px dashed var(--line-strong);
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  color: var(--text-done);
+  --block-line: var(--line-strong);
+}
+
+.canceled .meta { opacity: 1; }
+
+/* Mismo ancho que el check (44) para que el bloque no cambie de forma */
+.checkSpace {
+  width: var(--touch-min);
+  flex-shrink: 0;
+}
+
 .time {
   flex-shrink: 0;
   height: 30px;

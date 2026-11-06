@@ -34,6 +34,13 @@ const ICON_PATHS = {
       <path d="M3.5 10h17M8 3v4M16 3v4" />
     </>
   ),
+  // Cancelar evento: el calendario del mockup con una "x" en lugar de los días.
+  calendarX: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
+      <path d="M3.5 10h17M8 3v4M16 3v4M10 13l4 4M14 13l-4 4" />
+    </>
+  ),
   calendarDays: (
     <>
       <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
@@ -167,7 +174,9 @@ const ICON_PATHS = {
       <path d="M10.3 20.5a2 2 0 0 0 3.4 0" />
     </>
   ),
-  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  // Recordatorio del detalle de evento (EventosWeb.dc.html): la campana sin badajo.
+  bellSm: <path d="M6 8.5a6 6 0 0 1 12 0c0 6.5 2.5 8.5 2.5 8.5h-17S6 15 6 8.5" />,
+  menu:<path d="M4 7h16M4 12h16M4 17h16" />,
   search: (
     <>
       <circle cx="11" cy="11" r="7" />

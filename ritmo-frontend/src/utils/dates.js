@@ -64,6 +64,11 @@ export function daysInMonth(year, month) {
   return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 }
 
+// Lunes de la semana de dateKey (semanas de lunes a domingo).
+export function mondayOf(dateKey) {
+  return addDays(dateKey, -((parseDateKey(dateKey).weekday + 6) % 7));
+}
+
 // Días de calendario de fromKey a toKey (negativo si toKey es anterior).
 export function daysBetween(fromKey, toKey) {
   const from = parseDateKey(fromKey);
@@ -75,6 +80,19 @@ export function daysBetween(fromKey, toKey) {
 export function formatShortDay(dateKey) {
   const { month, day, weekday } = parseDateKey(dateKey);
   return `${WEEKDAYS_SHORT[weekday]} ${day} ${MONTHS_SHORT[month]}`;
+}
+
+// "26 oct – 1 nov" (píldora de la semana en Eventos web)
+export function formatWeekRange(fromKey, toKey) {
+  const from = parseDateKey(fromKey);
+  const to = parseDateKey(toKey);
+  return `${from.day} ${MONTHS_SHORT[from.month]} – ${to.day} ${MONTHS_SHORT[to.month]}`;
+}
+
+// "Semana del 26 de octubre"
+export function formatWeekTitle(mondayKey) {
+  const { month, day } = parseDateKey(mondayKey);
+  return `Semana del ${day} de ${MONTHS[month]}`;
 }
 
 // "Jue 29 oct, 2026" (píldora de fecha del Inicio web)

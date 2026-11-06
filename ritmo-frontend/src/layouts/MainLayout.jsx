@@ -14,9 +14,11 @@ import styles from "./MainLayout.module.css";
 
 const THEME_KEY = "ritmo-theme";
 
-// En móvil, el + de la pantalla de un módulo abre directo su formulario (Tareas.dc.html: "Nueva tarea").
+// En móvil, el + de la pantalla de un módulo abre directo su formulario (Tareas.dc.html: "Nueva tarea",
+// Eventos.dc.html: "Nuevo evento").
 const CREATE_SHORTCUTS = {
   "/tasks": "Nueva tarea",
+  "/events": "Nuevo evento",
 };
 
 function readTheme() {

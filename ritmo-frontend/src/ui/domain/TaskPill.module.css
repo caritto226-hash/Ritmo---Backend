@@ -80,6 +80,22 @@ button.pill:disabled,
   color: var(--on-primary);
 }
 
+/* Evento cancelado: mismo trato que en la línea de tiempo (punteado, sin color, sin tachar) */
+.canceled {
+  padding: 0 16px;
+  border: 1.5px dashed var(--line-strong);
+  background: transparent;
+  color: var(--text-done);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.canceledTitle {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Variante con dos botones: el círculo (área de 44 × 44) y el título */
 .toggle {
   position: relative;

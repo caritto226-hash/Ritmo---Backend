@@ -1,5 +1,5 @@
 // Cálculos de Tareas a partir de GET /tasks (todo en el cliente: la API no filtra por fecha).
-import { addDays, daysBetween, formatClockWithPeriod, formatShortDay, parseDateKey, toDateKey, WEEKDAYS_SHORT } from "../../utils/dates";
+import { addDays, daysBetween, formatClockWithPeriod, formatShortDay, mondayOf, parseDateKey, toDateKey, WEEKDAYS_SHORT } from "../../utils/dates";
 import { assignLanes, getTaskTimeRange, isTaskDone, selectDayTasks } from "./todaySelectors";
 
 export const TASK_STATUS_LABELS = {
@@ -95,11 +95,6 @@ export function selectTimedTasks(tasks, dateKey, nowHours = null) {
 
 export function selectUntimedTasks(tasks, dateKey) {
   return selectDayTasks(tasks, dateKey).filter((task) => !getTaskTimeRange(task));
-}
-
-// Lunes a domingo de la semana de dateKey.
-function mondayOf(dateKey) {
-  return addDays(dateKey, -((parseDateKey(dateKey).weekday + 6) % 7));
 }
 
 // Domingo a sábado de la semana de dateKey (tira de días móvil: D L M M J V S).

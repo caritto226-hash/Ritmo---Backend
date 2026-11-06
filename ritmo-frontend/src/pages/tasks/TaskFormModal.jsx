@@ -6,7 +6,8 @@ import TimePicker from "../../components/TimePicker";
 import CategorySelect from "../../components/CategorySelect";
 import CategoryManager from "../../components/CategoryManager";
 import { TASK_STATUS_LABELS } from "../../hooks/data/taskSelectors";
-import styles from "./TaskFormModal.module.css";
+import { RECURRENCE_FREQUENCIES } from "../../constants/recurrence";
+import styles from "../../ui/domain/FormSheet.module.css";
 
 const emptyForm = {
   title: "",
@@ -26,13 +27,6 @@ function timeOf(dateTime) {
   const match = typeof dateTime === "string" ? dateTime.match(/[ T](\d{2}:\d{2})/) : null;
   return match ? match[1] : "";
 }
-
-const recurrenceFrequencies = [
-  ["daily", "Diaria"],
-  ["weekly", "Semanal"],
-  ["monthly", "Mensual"],
-  ["yearly", "Anual"],
-];
 
 function formFromTask(task) {
   return {
@@ -184,7 +178,7 @@ function TaskFormModal({ task, categories, onClose, onSubmit, onCategoriesChange
               onChange={handleChange}
             >
               <option value="">No repetir</option>
-              {recurrenceFrequencies.map(([value, label]) => (
+              {RECURRENCE_FREQUENCIES.map(([value, label]) => (
                 <option value={value} key={value}>{label}</option>
               ))}
             </select>

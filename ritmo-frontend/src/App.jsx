@@ -11,7 +11,7 @@ import PublicRoute from "./routes/PublicRoute";
 import MainLayout from "./layouts/MainLayout";
 import TasksPage from "./pages/tasks/TasksPage";
 import Habits from "./pages/Habits";
-import Events from "./pages/Events";
+import EventsPage from "./pages/events/EventsPage";
 import Expenses from "./pages/Expenses";
 
 // Catálogo del sistema de diseño: solo existe en desarrollo (no entra al build de producción).
@@ -35,7 +35,7 @@ function App() {
         <Route path="/dashboard" element={<HomePage />} />
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/habits" element={<Habits />} />
-        <Route path="/events" element={<Events />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route path="/expenses" element={<Expenses />} />
       </Route>
 
