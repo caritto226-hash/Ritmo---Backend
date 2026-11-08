@@ -52,6 +52,9 @@ function MainLayout() {
   const [sheet, setSheet] = useState(null);
   const [toast, setToast] = useState(null);
   const [pageRail, setPageRail] = useState(null);
+  // Estado de la página que sobrevive al cambio de shell (usePageState); vive aquí porque
+  // MainLayout no se vuelve a montar al cruzar los 760 px.
+  const [pageStore] = useState(() => new Map());
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -80,6 +83,13 @@ function MainLayout() {
     setSheet(null);
   }
 
+  // Al salir de una pantalla se descarta lo que guardó con usePageState.
+  useEffect(() => {
+    for (const key of pageStore.keys()) {
+      if (!key.startsWith(`${location.pathname}|`)) pageStore.delete(key);
+    }
+  }, [pageStore, location.pathname]);
+
   const notify = useCallback((message, type = "success") => {
     setToast({ id: Date.now(), message, type });
   }, []);
@@ -102,7 +112,8 @@ function MainLayout() {
     titleSlot,
     setRailItems: setPageRail,
     openSettings: () => setSheet("settings"),
-  }), [profile, isWeb, theme, toggleTheme, notify, comingSoon, titleSlot]);
+    pageStore,
+  }), [profile, isWeb, theme, toggleTheme, notify, comingSoon, titleSlot, pageStore]);
 
   const userName = profile?.name?.trim() || "";
   const email = user?.correo || "";

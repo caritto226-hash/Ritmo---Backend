@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { usePageState } from "../../ui/shell/ShellContext";
 import ShellTitle from "../../ui/shell/ShellTitle";
 import PageTitle from "../../ui/shell/PageTitle";
 import Card, { CardHeader } from "../../ui/primitives/Card";
@@ -52,8 +52,8 @@ function TasksWeb({
   onCreate,
   comingSoon,
 }) {
-  const [status, setStatus] = useState("all");
-  const [categoryKey, setCategoryKey] = useState("all");
+  const [status, setStatus] = usePageState("web.status", "all");
+  const [categoryKey, setCategoryKey] = usePageState("web.categoryKey", "all");
 
   const isToday = selectedKey === todayKey;
   const stats = selectTaskStats(tasks, todayKey);

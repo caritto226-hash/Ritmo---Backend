@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useShell, useShellRail } from "../../ui/shell/ShellContext";
+import { usePageState, useShell, useShellRail } from "../../ui/shell/ShellContext";
 import useFinance from "../../hooks/data/useFinance";
 import useNow from "../../hooks/useNow";
 import useCreateIntent from "../../hooks/useCreateIntent";
@@ -65,10 +65,10 @@ function FinancePage({ view = "summary" }) {
   const todayKey = now.dateKey;
   const currentMonth = toMonthKey(todayKey);
 
-  const [monthKey, setMonthKey] = useState(currentMonth);
+  const [monthKey, setMonthKey] = usePageState("monthKey", currentMonth);
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
-  const [filter, setFilter] = useState({ type: "all", categoryId: "" });
-  const [query, setQuery] = useState("");
+  const [filter, setFilter] = usePageState("filter", { type: "all", categoryId: "" });
+  const [query, setQuery] = usePageState("query", "");
   const [hidden, setHidden] = useState(readHideBalance);
   const [form, setForm] = useState(null);
   const [detailId, setDetailId] = useState(null);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { usePageState } from "../../ui/shell/ShellContext";
 import ShellTitle from "../../ui/shell/ShellTitle";
 import PageTitle from "../../ui/shell/PageTitle";
 import Card from "../../ui/primitives/Card";
@@ -23,7 +23,7 @@ function plainAmount(item) {
  * su fecha, el mismo día si son diarios); no se filtran en el cliente.
  */
 function RecurrencesView({ isWeb, loading, today, reminders, settled, lastPaid, onBack, onCreate, onOpenReminder, onOpenRecurrence }) {
-  const [tab, setTab] = useState(null);
+  const [tab, setTab] = usePageState("tab", null);
   // Sin elección, abre en "Por confirmar" si hay pendientes; si no, en "Al día".
   const shownTab = tab ?? (reminders.length > 0 ? "pending" : "settled");
 

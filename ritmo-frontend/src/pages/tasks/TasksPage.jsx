@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useShell, useShellRail } from "../../ui/shell/ShellContext";
+import { usePageState, useShell, useShellRail } from "../../ui/shell/ShellContext";
 import useTasks from "../../hooks/data/useTasks";
 import useNow from "../../hooks/useNow";
 import useCreateIntent from "../../hooks/useCreateIntent";
@@ -21,8 +21,8 @@ function TasksPage() {
   const now = useNow();
   const data = useTasks({ notify });
   const todayKey = now.dateKey;
-  const [selectedKey, setSelectedKey] = useState(todayKey);
-  const [view, setView] = useState("day");
+  const [selectedKey, setSelectedKey] = usePageState("selectedKey", todayKey);
+  const [view, setView] = usePageState("view", "day");
   const [form, setForm] = useState(null);
   const [detailId, setDetailId] = useState(null);
   const [pickingDate, setPickingDate] = useState(false);

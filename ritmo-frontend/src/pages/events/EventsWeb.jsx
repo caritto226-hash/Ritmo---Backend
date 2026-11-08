@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { usePageState } from "../../ui/shell/ShellContext";
 import ShellTitle from "../../ui/shell/ShellTitle";
 import PageTitle from "../../ui/shell/PageTitle";
 import Card, { CardHeader } from "../../ui/primitives/Card";
@@ -76,9 +77,9 @@ function EventsWeb({
   onOpen,
   onCreate,
 }) {
-  const [view, setView] = useState("week");
+  const [view, setView] = usePageState("web.view", "week");
   const [pickedId, setPickedId] = useState(null);
-  const [month, setMonth] = useState(() => ({ ...parseDateKey(selectedKey), anchor: selectedKey }));
+  const [month, setMonth] = usePageState("web.month", () => ({ ...parseDateKey(selectedKey), anchor: selectedKey }));
 
   // El mes visible sigue al día elegido; las flechas lo mueven sin cambiar ese día.
   if (month.anchor !== selectedKey) setMonth({ ...parseDateKey(selectedKey), anchor: selectedKey });

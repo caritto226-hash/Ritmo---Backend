@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useShell, useShellRail } from "../../ui/shell/ShellContext";
+import { usePageState, useShell, useShellRail } from "../../ui/shell/ShellContext";
 import useEvents from "../../hooks/data/useEvents";
 import useNow from "../../hooks/useNow";
 import useCreateIntent from "../../hooks/useCreateIntent";
@@ -20,7 +20,7 @@ function EventsPage() {
   const now = useNow();
   const data = useEvents({ notify });
   const todayKey = now.dateKey;
-  const [selectedKey, setSelectedKey] = useState(todayKey);
+  const [selectedKey, setSelectedKey] = usePageState("selectedKey", todayKey);
   const [form, setForm] = useState(null);
   const [detailId, setDetailId] = useState(null);
   const [pickingDate, setPickingDate] = useState(false);

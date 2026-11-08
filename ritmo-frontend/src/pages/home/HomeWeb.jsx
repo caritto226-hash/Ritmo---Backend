@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { usePageState } from "../../ui/shell/ShellContext";
 import ShellTitle from "../../ui/shell/ShellTitle";
 import PageTitle from "../../ui/shell/PageTitle";
 import IconButton from "../../ui/primitives/IconButton";
@@ -39,9 +39,9 @@ function HomeWeb({
   layout,
 }) {
   const { todayKey } = model;
-  const [selectedKey, setSelectedKey] = useState(todayKey);
-  const [viewMonth, setViewMonth] = useState(() => parseDateKey(todayKey));
-  const [filter, setFilter] = useState("all");
+  const [selectedKey, setSelectedKey] = usePageState("web.selectedKey", todayKey);
+  const [viewMonth, setViewMonth] = usePageState("web.viewMonth", () => parseDateKey(todayKey));
+  const [filter, setFilter] = usePageState("web.filter", "all");
   const { quote, next: nextQuote } = useQuote();
 
   function selectDay(dateKey) {
