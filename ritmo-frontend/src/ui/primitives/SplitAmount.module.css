@@ -3,6 +3,10 @@
 .lg { font-size: 40px; letter-spacing: -1px; line-height: 1.1; }
 .lg .currency { font-size: 26px; }
 
+/* Gastos de la semana (FinanzasWeb.dc.html): igual que lg con el $ de 24 */
+.stat { font-size: 40px; letter-spacing: -1px; line-height: 1.1; }
+.stat .currency { font-size: 24px; }
+
 .md { font-size: 24px; letter-spacing: -0.5px; line-height: 1; }
 .md .currency { font-size: 16px; }
 

@@ -22,6 +22,12 @@ const CREATE_SHORTCUTS = {
   "/habits": "Nuevo hábito",
 };
 
+// Finanzas.dc.html: barra con menú y campana, sin "+" (los accesos rápidos de la pantalla crean
+// ingresos, gastos y recurrentes). Recurrentes.dc.html es una subpantalla con "Volver" propio:
+// sin barra superior ni barra inferior.
+const NO_ADD_PATHS = ["/expenses"];
+const SUB_SCREENS = ["/expenses/recurrences"];
+
 function readTheme() {
   try {
     return localStorage.getItem(THEME_KEY) === "dark" ? "dark" : "light";
@@ -102,6 +108,8 @@ function MainLayout() {
   const email = user?.correo || "";
   const isHome = location.pathname === "/dashboard";
   const createLabel = CREATE_SHORTCUTS[location.pathname];
+  const hideAdd = NO_ADD_PATHS.includes(location.pathname);
+  const isSubScreen = SUB_SCREENS.includes(location.pathname);
 
   // Rail del Inicio; cada pantalla puede poner el suyo con useShellRail.
   const homeRail = [
@@ -164,14 +172,16 @@ function MainLayout() {
 
   return (
     <ShellContext.Provider value={shell}>
-      <MobileShell layout={isHome ? "home" : "default"}>
-        <MobileTopBar
-          elevated={Boolean(createLabel)}
-          addLabel={createLabel}
-          onMenu={() => setDrawerOpen(true)}
-          onAdd={() => (createLabel ? startActivity(location.pathname) : setSheet("new"))}
-          onNotifications={() => comingSoon("Notificaciones")}
-        />
+      <MobileShell layout={isHome ? "home" : "default"} showTabBar={!isSubScreen}>
+        {!isSubScreen && (
+          <MobileTopBar
+            elevated={Boolean(createLabel) || hideAdd}
+            addLabel={createLabel}
+            onMenu={() => setDrawerOpen(true)}
+            onAdd={hideAdd ? undefined : () => (createLabel ? startActivity(location.pathname) : setSheet("new"))}
+            onNotifications={() => comingSoon("Notificaciones")}
+          />
+        )}
         <Outlet />
       </MobileShell>
       <MobileDrawer

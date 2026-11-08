@@ -8,8 +8,9 @@ const PLOT_HEIGHT = 112;
 /**
  * Curva suave con puntos y etiqueta lima sobre el valor más alto ("Gastos de la semana").
  * values: números (uno por etiqueta); formatTip da el texto de la etiqueta.
+ * guide dibuja la línea punteada bajo la etiqueta (FinanzasWeb.dc.html).
  */
-function CurveChart({ values, labels, formatTip = String, ariaLabel }) {
+function CurveChart({ values, labels, formatTip = String, ariaLabel, guide = false }) {
   const max = Math.max(...values, 0);
   const step = values.length > 1 ? (WIDTH - 24) / (values.length - 1) : 0;
   const points = values.map((value, index) => [
@@ -26,6 +27,7 @@ function CurveChart({ values, labels, formatTip = String, ariaLabel }) {
     <div className={styles.curve}>
       <svg viewBox="0 0 360 170" role="img" aria-label={ariaLabel} className={styles.curveSvg}>
         <path d={area} className={styles.curveArea} />
+        {guide && <line x1={tip[0]} y1={tip[1]} x2={tip[0]} y2="168" className={styles.curveGuide} />}
         <path d={line} className={styles.curveLine} />
         {points.map(([x, y], index) => (
           <circle key={labels[index]} cx={x} cy={y} r="3.5" className={styles.curveDot} />

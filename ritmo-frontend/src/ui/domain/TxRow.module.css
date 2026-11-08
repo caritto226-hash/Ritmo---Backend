@@ -1,0 +1,133 @@
+/* Web: FinanzasWeb.dc.html (Movimientos) · Móvil: Finanzas.dc.html y Recurrentes.dc.html */
+.row {
+  box-sizing: border-box;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: background var(--motion-fast);
+}
+
+.clickable:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
+  border-radius: var(--radius-box-xs);
+}
+
+/* ── Web: 44 / concepto / 160 / 140 ── */
+.web {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(0, 160px) minmax(96px, 140px);
+  gap: 12px;
+  align-items: center;
+  min-height: 60px;
+  padding: 0 8px;
+  border-top: 1px solid var(--line);
+}
+
+.web.clickable:hover { background: var(--surface-row); }
+
+/* ── Móvil ── */
+.mobile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.list {
+  min-height: 64px;
+  padding: 12px 0;
+}
+
+.tile {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: var(--radius-box-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.web .tile {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.copy {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: var(--fs-body);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note {
+  font-size: var(--fs-small);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.web .note { color: var(--text-2); }
+.mobile .note { color: var(--text-3); }
+
+.mobile .noteStrong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.category {
+  justify-self: start;
+  max-width: 100%;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amount {
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.web .amount {
+  text-align: right;
+  font-size: 16px;
+}
+
+.mobile .amount { font-size: var(--fs-body); }
+
+.income { color: var(--income); }
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--text-3);
+}

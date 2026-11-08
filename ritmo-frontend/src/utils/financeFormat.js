@@ -13,10 +13,10 @@ export function formatAmountDigits(digits) {
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-// Pesos enteros: -1110800 → "-$1.110.800".
+// Pesos enteros: -1110800 → "−$1.110.800" (signo menos tipográfico, U+2212).
 export function formatCurrency(value) {
   const amount = Math.round(Number(value));
-  return `${amount < 0 ? "-$" : "$"}${formatAmountDigits(String(Math.abs(amount)))}`;
+  return `${amount < 0 ? "−$" : "$"}${formatAmountDigits(String(Math.abs(amount)))}`;
 }
 
 // Movimientos: "+$2.000.000" para ingresos y "−$12.000" (signo menos tipográfico) para gastos.

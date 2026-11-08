@@ -1,11 +1,13 @@
 import { useState } from "react";
 import categoriesService from "../services/categories.service";
 import CategoryIconBadge from "./CategoryIconBadge";
+// category-shared.css va después de category-manager.css (mismo orden que tenía finanzas.css).
+import "../styles/category-manager.css";
+import "../styles/category-shared.css";
 import CategoryIconPicker from "./CategoryIconPicker";
 import CategoryColorPicker from "./CategoryColorPicker";
 import categoryIcons from "../constants/categoryIcons";
 import { DEFAULT_CATEGORY_COLOR } from "../constants/categoryColors";
-import "../styles/category-manager.css";
 
 const emptyForm = { name: "", description: "", icon: "tag", color: DEFAULT_CATEGORY_COLOR, isRecurring: false };
 

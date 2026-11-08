@@ -1,0 +1,83 @@
+/* Lo propio del formulario de movimientos; el resto viene de ui/domain/FormSheet.module.css. */
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.suggested {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+/* Gasto / Ingreso: mismos botones que "Fecha real" de la hoja de confirmar */
+.typeToggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.typeOption {
+  height: 44px;
+  border: 1px solid var(--line-ring);
+  border-radius: var(--radius-box-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: var(--fs-nav);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.typeOption:hover:not([aria-pressed="true"]) { background: var(--hover-surface); }
+
+.typeOption[aria-pressed="true"] {
+  border-color: transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+/* Fondo tenido + texto principal: el blanco sobre el verde oscuro no llega a 4,5:1 en modo oscuro. */
+.typeOption.income[aria-pressed="true"] {
+  border-color: var(--income);
+  background: color-mix(in srgb, var(--income) 16%, var(--surface));
+  color: var(--text);
+}
+
+.typeOption:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.hint {
+  font-size: var(--fs-small);
+  color: var(--text-3);
+}
+
+.recurrenceInfo {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--radius-box-sm);
+  background: var(--surface-subtle);
+  font-size: var(--fs-nav);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.recurrence {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

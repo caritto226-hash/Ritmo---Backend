@@ -1,14 +1,16 @@
+import cx from "../cx";
 import styles from "./Charts.module.css";
 
 /**
- * Burbuja teal con el valor principal y burbujas de vidrio satélite (Hábitos del Inicio web).
+ * Burbuja teal con el valor principal y burbujas de vidrio satélite.
+ * variant "home" (Hábitos del Inicio web) o "finance" ("En qué gastas" de FinanzasWeb.dc.html).
  * main: { value, unit, caption, ariaLabel }.
  * satellites: [{ key, value, caption, ariaLabel, size, valueSize, captionSize, position }];
  * position son las coordenadas del mockup ({ top, bottom, marginLeft }) relativas al centro.
  */
-function BubbleStats({ main, satellites = [] }) {
+function BubbleStats({ main, satellites = [], variant = "home" }) {
   return (
-    <div className={styles.bubbles}>
+    <div className={cx(styles.bubbles, variant === "finance" && styles.bubblesFinance)}>
       <div className={styles.bubbleMain} role="img" aria-label={main.ariaLabel}>
         <span className={styles.bubbleMainValue}>
           {main.value}

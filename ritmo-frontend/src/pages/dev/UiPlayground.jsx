@@ -17,6 +17,7 @@ import HomeComponentsDemo from "./HomeComponentsDemo";
 import TasksComponentsDemo from "./TasksComponentsDemo";
 import EventsComponentsDemo from "./EventsComponentsDemo";
 import HabitsComponentsDemo from "./HabitsComponentsDemo";
+import FinanceComponentsDemo from "./FinanceComponentsDemo";
 import styles from "./UiPlayground.module.css";
 
 // Catálogo visual del sistema de diseño (solo desarrollo: la ruta no existe en producción).
@@ -299,6 +300,7 @@ function UiPlayground() {
         <TasksComponentsDemo />
         <EventsComponentsDemo />
         <HabitsComponentsDemo />
+        <FinanceComponentsDemo />
       </div>
 
       <Toast toast={toast} onDone={() => setToast(null)} />

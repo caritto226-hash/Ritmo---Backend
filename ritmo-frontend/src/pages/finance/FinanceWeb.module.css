@@ -1,0 +1,366 @@
+/* Finanzas web: valores de design-handoff/screens/web/FinanzasWeb.dc.html */
+
+.loading {
+  margin: 0;
+  padding: 24px;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-cards);
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-cards);
+  align-items: stretch;
+}
+
+.flex { flex: 1; }
+
+.cardTitle {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: 400;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.meta {
+  font-size: var(--fs-meta);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── Disponible (tarjeta negra) ── */
+.saldo.saldo {
+  flex: 1 1 300px;
+  min-height: 300px;
+  gap: 10px;
+}
+
+.saldoBlob {
+  position: absolute;
+  right: -70px;
+  top: -70px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: var(--accent);
+  filter: blur(80px);
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.saldo > :not(.saldoBlob) { position: relative; }
+
+.saldoHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.saldoTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--on-dark-3);
+}
+
+.eye {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 22px;
+  border: 1px solid var(--dark-outline-soft);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: var(--on-dark);
+  cursor: pointer;
+}
+
+.eye:hover { background: var(--dark-tile); }
+
+.eye:focus-visible {
+  outline: 2px solid var(--on-dark);
+  outline-offset: 2px;
+}
+
+.saldoAmount {
+  margin-top: 8px;
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+.saldoDelta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-meta);
+  color: var(--accent);
+}
+
+.saldoDelta svg { flex-shrink: 0; }
+
+.saldoDeltaMuted { color: var(--on-dark-2); }
+
+.saldoMinis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.saldoMini {
+  border-radius: 16px;
+  background: var(--dark-tile);
+  border: 1px solid var(--dark-tile-border);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.saldoMiniLabel {
+  font-size: var(--fs-small);
+  color: var(--on-dark-4);
+}
+
+.saldoMiniValue {
+  font-size: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* ── Gastos de la semana ── */
+.week.week {
+  flex: 1.6 1 420px;
+  min-height: 300px;
+  gap: 10px;
+}
+
+.weekBody {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.weekLead {
+  flex: 0 0 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weekDiff {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-meta);
+  color: var(--text-2);
+}
+
+.weekDiff svg { flex-shrink: 0; }
+
+.iconIncome { color: var(--income); }
+.iconMore { color: var(--danger-strong); }
+
+.avg {
+  height: 42px;
+  box-sizing: border-box;
+  border-radius: var(--radius-box-sm);
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  font-size: var(--fs-meta);
+  color: var(--text-2);
+  white-space: nowrap;
+}
+
+.avgValue {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* ── En qué gastas ── */
+.cats.cats {
+  flex: 1 1 300px;
+  min-height: 300px;
+  gap: 10px;
+}
+
+.catStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.catStat {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px;
+  border-left: 1px solid var(--line-ring);
+}
+
+.catStat:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.catStat:last-child { padding-right: 0; }
+
+.catValue { font-size: 20px; }
+
+.catLabel {
+  font-size: var(--fs-small);
+  color: var(--text-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Por confirmar y Movimientos ── */
+.section.section { gap: 14px; }
+
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.totals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  font-size: var(--fs-meta);
+  color: var(--text-2);
+}
+
+.totalOut { color: var(--text); font-weight: 600; }
+.totalIn { color: var(--income); font-weight: 600; }
+
+.track {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar { display: none; }
+
+.allClear {
+  flex: 1;
+  min-height: 110px;
+  border-radius: var(--radius-box-lg);
+  border: 1px dashed var(--line-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.search {
+  height: 44px;
+  min-width: 240px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border-radius: 22px;
+  background: var(--surface-soft);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--fs-nav);
+  color: var(--text-2);
+}
+
+.search:focus-within { box-shadow: var(--focus-ring); }
+
+.searchInput {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--fs-nav);
+  color: var(--text);
+  outline: none;
+}
+
+.searchInput::placeholder { color: var(--text-2); }
+.searchInput::-webkit-search-cancel-button { cursor: pointer; }
+
+.chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar { display: none; }
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.dayLabel {
+  margin: 0;
+  padding: 14px 8px 6px;
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.noRows {
+  padding: 32px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.noRowsText {
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+/* Ingreso / Gasto: ícono de 16 con 8 de separación */
+.tightPill.tightPill { gap: 8px; }

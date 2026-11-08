@@ -1,0 +1,68 @@
+/* Recurrentes: valores de design-handoff/screens/mobile/Recurrentes.dc.html */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header .back {
+  margin-left: -10px;
+  color: var(--text);
+}
+
+.h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.6px;
+}
+
+.loading {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-2);
+}
+
+.listCard {
+  background: var(--surface);
+  border-radius: var(--radius-box-md);
+  padding: 0 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.listCard > :last-child { border-bottom: none; }
+
+.empty {
+  margin: 0;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text-2);
+}
+
+.note {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: var(--fs-meta);
+  color: var(--text-3);
+}
+
+.noteIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Web: la misma lista dentro de una tarjeta del shell */
+.webCard.webCard { gap: 18px; }
+
+.webCard .tabs { max-width: 420px; }
+
+.webCard .listCard {
+  padding: 0 4px;
+  border-radius: 0;
+}

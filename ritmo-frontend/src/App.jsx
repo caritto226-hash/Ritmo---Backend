@@ -12,7 +12,7 @@ import MainLayout from "./layouts/MainLayout";
 import TasksPage from "./pages/tasks/TasksPage";
 import HabitsPage from "./pages/habits/HabitsPage";
 import EventsPage from "./pages/events/EventsPage";
-import Expenses from "./pages/Expenses";
+import FinancePage from "./pages/finance/FinancePage";
 
 // Catálogo del sistema de diseño: solo existe en desarrollo (no entra al build de producción).
 const UiPlayground = import.meta.env.DEV ? lazy(() => import("./pages/dev/UiPlayground")) : null;
@@ -36,7 +36,8 @@ function App() {
         <Route path="/tasks" element={<TasksPage />} />
         <Route path="/habits" element={<HabitsPage />} />
         <Route path="/events" element={<EventsPage />} />
-        <Route path="/expenses" element={<Expenses />} />
+        <Route path="/expenses" element={<FinancePage />} />
+        <Route path="/expenses/recurrences" element={<FinancePage view="recurrences" />} />
       </Route>
 
       {UiPlayground && (

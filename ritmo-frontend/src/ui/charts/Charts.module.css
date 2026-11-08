@@ -13,6 +13,7 @@
 .curveSvg { width: 100%; height: auto; }
 .curveArea { fill: var(--chart-area); }
 .curveLine { fill: none; stroke: var(--chart-line); stroke-width: 1.2; }
+.curveGuide { stroke: var(--line-check); stroke-dasharray: 3 3; }
 .curveDot { fill: var(--text); }
 .curveTip { fill: var(--accent); }
 .curveTipText { font-size: 12px; font-weight: 600; fill: var(--on-accent); font-family: var(--font-sans); }
@@ -153,6 +154,30 @@
   align-items: center;
   justify-content: center;
   color: var(--teal-text);
+}
+
+/* "En qué gastas" (FinanzasWeb.dc.html): 150 de alto, burbuja de 130 arriba y un poco a la izquierda */
+.bubblesFinance {
+  flex: none;
+  height: 150px;
+}
+
+.bubblesFinance .bubbleMain {
+  top: 10px;
+  width: 130px;
+  height: 130px;
+  margin: 0 0 0 -70px;
+}
+
+.bubblesFinance .bubbleMainValue { font-size: 36px; }
+.bubblesFinance .bubbleMainUnit { font-size: 18px; }
+
+.bubbleMainCaption,
+.bubbleGlassCaption {
+  max-width: 86%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bubbleGlassValue { line-height: 1; }

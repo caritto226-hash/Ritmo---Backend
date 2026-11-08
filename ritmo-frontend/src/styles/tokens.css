@@ -109,12 +109,15 @@
   --on-dark: #FFFFFF;
   --on-dark-2: rgba(255, 255, 255, 0.7);
   --on-dark-3: rgba(255, 255, 255, 0.8);
+  --on-dark-4: rgba(255, 255, 255, 0.75);
   --dark-card-sheen: linear-gradient(150deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 55%);
   --dark-card-sheen-mobile: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 55%);
   --dark-card-sheen-event: linear-gradient(150deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 55%);
   --dark-card-border: rgba(255, 255, 255, 0.14);
   --dark-tile: rgba(255, 255, 255, 0.08);
   --dark-tile-border: rgba(255, 255, 255, 0.12);
+  --dark-tile-mobile: rgba(255, 255, 255, 0.1);
+  --dark-outline-soft: rgba(255, 255, 255, 0.25);
   --dark-outline: rgba(255, 255, 255, 0.3);
   --dark-outline-web: rgba(255, 255, 255, 0.35);
   --dark-outline-mobile: rgba(255, 255, 255, 0.4);

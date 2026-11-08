@@ -170,6 +170,26 @@
 
 .danger { color: var(--danger); }
 
+/* Recurrente al día: sin campos, solo las acciones (sin la línea de arriba) */
+.secondaryOnly {
+  padding-top: 0;
+  border-top: none;
+}
+
+/* Confirmación de Detener futuras / Eliminar dentro de la hoja */
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.confirmText {
+  margin: 0;
+  font-size: var(--fs-body);
+  line-height: 1.4;
+  color: var(--text);
+}
+
 .primary:focus-visible,
 .dateOption:focus-visible,
 .textButton:focus-visible,

@@ -144,12 +144,8 @@ export default function useToday({ notify } = {}) {
   }
 
   // Detener = scope "future" (los vencidos siguen confirmables); Eliminar = scope "all".
+  // La hoja de confirmar pide la confirmación antes de llegar aquí.
   async function cancelRecurrence(reminder, scope) {
-    const confirmationMessage = scope === "future"
-      ? `¿Detener las próximas fechas de "${reminder.concept}"? Los movimientos históricos y los recordatorios vencidos se conservarán.`
-      : `¿Eliminar todos los recordatorios de "${reminder.concept}"? Los movimientos históricos ya registrados se conservarán.`;
-    if (!window.confirm(confirmationMessage)) return false;
-
     try {
       await expensesService.cancelRecurrence(reminder.recurrenceId, scope);
       notifyRef.current?.(scope === "future" ? "Se detuvieron las próximas fechas." : "Recurrente eliminado.");
