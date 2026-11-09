@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
 import categoriesService from "../services/categories.service";
+import useDialogFocus from "../hooks/useDialogFocus";
+import PillButton from "../ui/primitives/PillButton";
 import CategoryIconBadge from "./CategoryIconBadge";
-// category-shared.css va después de category-manager.css (mismo orden que tenía finanzas.css).
-import "../styles/category-manager.css";
-import "../styles/category-shared.css";
+import "../styles/categories.css";
 import CategoryIconPicker from "./CategoryIconPicker";
 import CategoryColorPicker from "./CategoryColorPicker";
 import categoryIcons from "../constants/categoryIcons";
@@ -15,6 +15,13 @@ function CategoryManager({ module, categories, onClose, onChanged }) {
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState("");
+  // Categoría que se va a desactivar: la hoja pregunta antes (antes era window.confirm).
+  const [deactivating, setDeactivating] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const dialogRef = useRef(null);
+  const titleId = useId();
+  // Mismo manejo de foco que las demás hojas: foco dentro, Escape cierra y devuelve el foco.
+  useDialogFocus(dialogRef, true, onClose, !busy);
 
   function editCategory(category) {
     setEditingId(category.id);
@@ -53,11 +60,10 @@ function CategoryManager({ module, categories, onClose, onChanged }) {
     }
   }
 
+  // Se llama desde "Sí, desactivar"; la pregunta (mismo texto que el window.confirm anterior) se
+  // muestra en la hoja. Cancelar vuelve a la lista sin cambios.
   async function deactivateCategory(category) {
-    if (!window.confirm(`¿Desactivar "${category.name}"? Los registros existentes se conservarán.`)) {
-      return;
-    }
-
+    setBusy(true);
     try {
       await categoriesService.remove(category.id);
       if (editingId === category.id) {
@@ -67,6 +73,9 @@ function CategoryManager({ module, categories, onClose, onChanged }) {
       await onChanged();
     } catch (requestError) {
       setError(requestError.response?.data?.message || "No se pudo desactivar la categoría");
+    } finally {
+      setBusy(false);
+      setDeactivating(null);
     }
   }
 
@@ -78,13 +87,32 @@ function CategoryManager({ module, categories, onClose, onChanged }) {
 
   return (
     <>
-      <div className="modal-overlay open" onClick={onClose} />
-      <div className="modal open category-manager-modal" onClick={(event) => event.stopPropagation()}>
+      <div className="modal-overlay open" onClick={busy ? undefined : onClose} />
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="modal open category-manager-modal"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="modal-header">
-          <h3>Administrar categorías</h3>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar categorías">✕</button>
+          <h3 id={titleId}>Administrar categorías</h3>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Cerrar categorías" disabled={busy}>✕</button>
         </div>
 
+        {deactivating ? (
+          <div className="category-manager-confirm" role="alert">
+            <p>¿Desactivar "{deactivating.name}"? Los registros existentes se conservarán.</p>
+            <PillButton size="cta" variant="danger" block disabled={busy} onClick={() => deactivateCategory(deactivating)} autoFocus>
+              {busy ? "Desactivando..." : "Sí, desactivar"}
+            </PillButton>
+            <button type="button" className="finance-cancel-category-edit" onClick={() => setDeactivating(null)} disabled={busy}>
+              Cancelar
+            </button>
+          </div>
+        ) : (
+        <>
         {error && <p className="modal-form-error" role="alert">{error}</p>}
 
         <form className="category-manager-form" onSubmit={saveCategory}>
@@ -184,13 +212,22 @@ function CategoryManager({ module, categories, onClose, onChanged }) {
               <button type="button" onClick={() => editCategory(category)} aria-label={`Editar ${category.name}`}>
                 Editar
               </button>
-              <button type="button" onClick={() => deactivateCategory(category)} aria-label={`Desactivar ${category.name}`}>
+              <button
+                type="button"
+                onClick={() => {
+                  setError("");
+                  setDeactivating(category);
+                }}
+                aria-label={`Desactivar ${category.name}`}
+              >
                 Desactivar
               </button>
             </div>
           ))}
           {categories.length === 0 && <p className="task-empty">No hay categorías disponibles.</p>}
         </div>
+        </>
+        )}
       </div>
     </>
   );

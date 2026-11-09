@@ -3,7 +3,7 @@
 
 const HEX_COLOR = /^#([0-9a-f]{6})$/i;
 
-// Luminancia relativa de #121212, la tinta oscura (--ink-on-light).
+// Luminancia relativa de la tinta oscura (--ink-on-light en tokens.css).
 const DARK_INK_LUMINANCE = 0.006;
 
 export function isHexColor(value) {

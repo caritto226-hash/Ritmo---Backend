@@ -84,6 +84,7 @@
   --habit-day-empty: rgba(255, 255, 255, 0.7);
   --habit-day-partial: rgba(18, 18, 18, 0.35);
   --habit-btn: #FFFFFF;
+  --habit-tint-base: transparent;
 
   /* Esfera "Tu ritmo de hoy" */
   --orb-rim: rgba(255, 255, 255, 0.95);
@@ -147,6 +148,7 @@
   --glass-bubble: rgba(255, 255, 255, 0.45);
   --glass-border: rgba(255, 255, 255, 0.85);
   --glass-blur-sm: blur(8px) saturate(140%);
+  --glass-blur-md: blur(12px);
   --glass-blur: blur(14px);
   --glass-blur-lg: blur(20px) saturate(140%);
   --quote-bg: rgba(240, 241, 247, 0.6);
@@ -169,7 +171,9 @@
   --ring-edit: 0 0 0 2px #121212, 0 12px 30px rgba(20, 22, 30, 0.08);
   --ring-avatar: 0 0 0 1px #E2E4E7;
   --ring-avatar-border: #FFFFFF;
-  --focus-ring: 0 0 0 3px rgba(18, 18, 18, 0.28);
+  /* Foco dibujado con sombra (días, accesos rápidos, buscadores): separación del color de la
+     superficie y anillo de 2 px en --text, para pasar 3:1 también sobre el día elegido en negro. */
+  --focus-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px #121212;
 
   /* ── Tipografía ── */
   --font-sans: 'Urbanist', system-ui, sans-serif;
@@ -259,6 +263,10 @@
 
   --mint-soft: #1E2A25;
   --teal-soft: #1B2A29;
+  /* Texto de las burbujas de vidrio: el vidrio es oscuro en este tema. */
+  --teal-text: #8ED0CD;
+
+  --habit-tint-base: #D8DADF;
 
   --pastel-done: rgba(42, 43, 48, 0.85);
   --pastel-line: rgba(242, 242, 243, 0.2);
@@ -302,7 +310,7 @@
   --ring-edit: 0 0 0 2px #F2F2F3, 0 12px 30px rgba(0, 0, 0, 0.4);
   --ring-avatar: 0 0 0 1px #2E2F34;
   --ring-avatar-border: #1A1B1E;
-  --focus-ring: 0 0 0 3px rgba(242, 242, 243, 0.35);
+  --focus-ring: 0 0 0 2px #1A1B1E, 0 0 0 4px #F2F2F3;
 
   color-scheme: dark;
 }
@@ -315,17 +323,35 @@
     --glass-bubble: #F1F4F6;
     --quote-bg: #EEF0F5;
   }
+
+  [data-theme="dark"] {
+    --glass-bg: #26272B;
+    --glass-bg-strong: #1E1F23;
+    --glass-bubble: #2A2B30;
+    --quote-bg: #222327;
+  }
 }
 
 @media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-blur-sm: none;
+    --glass-blur-md: none;
+    --glass-blur: none;
+    --glass-blur-lg: none;
+  }
+
   :root:not([data-theme="dark"]) {
     --glass-bg: #F4F5F7;
     --glass-bg-strong: #FFFFFF;
     --glass-bubble: #F1F4F6;
     --quote-bg: #EEF0F5;
-    --glass-blur-sm: none;
-    --glass-blur: none;
-    --glass-blur-lg: none;
+  }
+
+  [data-theme="dark"] {
+    --glass-bg: #26272B;
+    --glass-bg-strong: #1E1F23;
+    --glass-bubble: #2A2B30;
+    --quote-bg: #222327;
   }
 }
 

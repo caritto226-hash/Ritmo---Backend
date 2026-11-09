@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import authService from "../services/auth.service";
+import BrandLogo from "../ui/shell/BrandLogo";
+import Icon from "../ui/icons/Icon";
 import "../styles/auth.css";
 
 function Register() {
@@ -36,16 +38,16 @@ function Register() {
 
   return (
     <div className="main-container">
-      <div className="logo-wrapper">
-        <img src="/Ritmo-logo.png" alt="Logo de Ritmo" className="logo" />
+      <div className="logo-wrapper" role="img" aria-label="Ritmo">
+        <BrandLogo size="auth" />
       </div>
 
-      <h2 className="welcome-text">Crea tu cuenta</h2>
+      <h1 className="welcome-text">Crea tu cuenta</h1>
       <p className="subtitle">Organiza tus tareas, hábitos, eventos y finanzas</p>
 
       {error && (
         <div className="error-banner" role="alert">
-          <span className="error-icon">⚠</span>
+          <span className="error-icon"><Icon name="info" size={18} strokeWidth={2} /></span>
           <div>
             <strong>No se pudo registrar</strong>
             <p>{error}</p>

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import habitsService from "../../services/habits.service";
 import categoriesService from "../../services/categories.service";
 import { isHabitDone } from "./todaySelectors";
+import { usePageState } from "../../ui/shell/ShellContext";
 
 function apiMessage(error, fallback) {
   return error?.response?.data?.message || fallback;
@@ -20,10 +21,12 @@ function timeOf(value) {
  * lista. notify(message, type) muestra el aviso del shell.
  */
 export default function useHabits({ notify } = {}) {
-  const [habits, setHabits] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [habits, setHabits] = usePageState("data:habits", []);
+  const [categories, setCategories] = usePageState("data:habits-categories", []);
+  const [loading, setLoading] = usePageState("data:habits-loading", true);
+  const [error, setError] = usePageState("data:habits-error", "");
+  // Ya cargado en esta visita a la ruta: la página se volvió a montar al cruzar los 760 px.
+  const restoredRef = useRef(!loading);
   const [pending, setPending] = useState({});
   const activeRef = useRef(true);
   const notifyRef = useRef(notify);
@@ -41,7 +44,7 @@ export default function useHabits({ notify } = {}) {
     } catch (loadError) {
       if (activeRef.current) setError(apiMessage(loadError, "No se pudieron cargar los hábitos."));
     }
-  }, []);
+  }, [setHabits, setError]);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -50,7 +53,7 @@ export default function useHabits({ notify } = {}) {
     } catch {
       // Sin categorías la pantalla funciona igual: los hábitos traen su propia categoría.
     }
-  }, []);
+  }, [setCategories]);
 
   const load = useCallback(async () => {
     const [habitsResult, categoriesResult] = await Promise.allSettled([
@@ -65,11 +68,11 @@ export default function useHabits({ notify } = {}) {
     setCategories((current) => (categoriesResult.status === "fulfilled" ? categoriesResult.value ?? [] : current));
     setError(loadError);
     setLoading(false);
-  }, []);
+  }, [setHabits, setCategories, setError, setLoading]);
 
   useEffect(() => {
     activeRef.current = true;
-    load();
+    if (!restoredRef.current) load();
 
     function refreshWhenVisible() {
       if (document.visibilityState === "visible") loadHabits();

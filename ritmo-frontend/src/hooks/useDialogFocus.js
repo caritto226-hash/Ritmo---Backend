@@ -24,6 +24,8 @@ export default function useDialogFocus(containerRef, open, onClose, active = tru
     function handleKeyDown(event) {
       if (!activeRef.current || !container) return;
       if (event.key === "Escape") {
+        // Un selector abierto dentro del diálogo (ícono, color) ya cerró lo suyo con este Escape.
+        if (event.defaultPrevented) return;
         event.preventDefault();
         onCloseRef.current();
         return;

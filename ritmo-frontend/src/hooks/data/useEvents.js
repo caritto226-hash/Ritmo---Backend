@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import eventsService from "../../services/events.service";
 import categoriesService from "../../services/categories.service";
 import { isEventDone } from "./todaySelectors";
+import { usePageState } from "../../ui/shell/ShellContext";
 
 function apiMessage(error, fallback) {
   return error?.response?.data?.message || fallback;
@@ -19,10 +20,12 @@ function timeOf(value) {
  * también vuelven a pedir la lista. notify(message, type) muestra el aviso del shell.
  */
 export default function useEvents({ notify } = {}) {
-  const [events, setEvents] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [events, setEvents] = usePageState("data:events", []);
+  const [categories, setCategories] = usePageState("data:events-categories", []);
+  const [loading, setLoading] = usePageState("data:events-loading", true);
+  const [error, setError] = usePageState("data:events-error", "");
+  // Ya cargado en esta visita a la ruta: la página se volvió a montar al cruzar los 760 px.
+  const restoredRef = useRef(!loading);
   const [pending, setPending] = useState({});
   const activeRef = useRef(true);
   const notifyRef = useRef(notify);
@@ -40,7 +43,7 @@ export default function useEvents({ notify } = {}) {
     } catch (loadError) {
       if (activeRef.current) setError(apiMessage(loadError, "No se pudieron cargar los eventos."));
     }
-  }, []);
+  }, [setEvents, setError]);
 
   const loadCategories = useCallback(async () => {
     try {
@@ -49,7 +52,7 @@ export default function useEvents({ notify } = {}) {
     } catch {
       // Sin categorías la pantalla funciona igual: los eventos traen su propia categoría.
     }
-  }, []);
+  }, [setCategories]);
 
   const load = useCallback(async () => {
     const [eventsResult, categoriesResult] = await Promise.allSettled([
@@ -64,11 +67,11 @@ export default function useEvents({ notify } = {}) {
     setCategories((current) => (categoriesResult.status === "fulfilled" ? categoriesResult.value ?? [] : current));
     setError(loadError);
     setLoading(false);
-  }, []);
+  }, [setEvents, setCategories, setError, setLoading]);
 
   useEffect(() => {
     activeRef.current = true;
-    load();
+    if (!restoredRef.current) load();
 
     function refreshWhenVisible() {
       if (document.visibilityState === "visible") loadEvents();

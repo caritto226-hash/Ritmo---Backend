@@ -1,40 +1,10 @@
-/* Formularios en hoja (tarea y evento): sin mockup propio; adaptados a los tokens (PLAN, pregunta 6). */
+/* Formularios en hoja (tarea, evento, hábito y movimiento): sin mockup propio; adaptados a los
+   tokens (PLAN, pregunta 6). CategorySelect, DateCalendar y TimePicker traen su propio CSS global
+   con los mismos tokens (styles/categories.css, date-calendar.css y time-picker.css). */
 .form {
   display: flex;
   flex-direction: column;
   gap: 14px;
-
-  /* CategorySelect, DateCalendar y TimePicker son compartidos con las pantallas que aún no se
-     rediseñan y usan los alias heredados de base.css. Aquí los alias apuntan a los tokens, solo
-     dentro de este formulario, para no cambiar esas pantallas. */
-  --text-primary: var(--text);
-  --text-secondary: var(--text-3);
-  --surface-primary: var(--surface);
-  --surface-secondary: var(--line-ring);
-  --surface-tercy: var(--surface-soft);
-  --surface-quaternary: var(--surface-muted);
-  --surface-border: var(--line-ring);
-  --border-subtle: 1px solid var(--line-ring);
-  --accent-solid: var(--text);
-  --radius-control: var(--radius-box-sm);
-  --legacy-radius-card: var(--radius-box-md);
-  --shadow-raised: var(--shadow-popover);
-}
-
-.form :global(.category-select-trigger) {
-  border-width: 1px;
-  background: var(--surface);
-}
-
-.form :global(.date-calendar-day.today) {
-  background: var(--accent);
-  color: var(--on-accent);
-}
-
-.form :global(.date-calendar-day.selected) {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: var(--on-primary);
 }
 
 .field {

@@ -1,0 +1,21 @@
+/* Logo de la marca. Altura de la cabecera de los mockups web (Inicio.dc.html: el logo mide 30 px
+   de alto); el ancho sale de la proporción del archivo (459 × 192). */
+.logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.logo img {
+  display: block;
+  width: auto;
+}
+
+.header img { height: 30px; }
+/* Cabecera web: 40 px (pedido por la usuaria), centrado en vertical con las píldoras de 46 px. */
+.web img { height: 40px; }
+.auth img { height: 64px; }
+
+.dark { display: none !important; }
+
+:global([data-theme="dark"]) .light { display: none !important; }
+:global([data-theme="dark"]) .dark { display: block !important; }

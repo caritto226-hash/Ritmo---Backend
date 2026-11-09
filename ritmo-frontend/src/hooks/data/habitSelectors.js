@@ -28,11 +28,13 @@ export function getHabitColor(habit) {
 }
 
 // platform "web" (tarjeta) o "mobile" (burbuja); percent fija la opacidad (relleno del conteo).
+// La base de la mezcla (--habit-tint-base) es transparente en modo claro, como el mockup; en el
+// oscuro es un gris claro opaco para que la tinta fija (--ink-on-light) siga contrastando.
 export function getHabitTint(habit, platform = "web", percent) {
   const color = getHabitColor(habit);
   const alphas = platform === "web" ? WEB_ALPHA : MOBILE_ALPHA;
   const alpha = percent ?? alphas[color] ?? (platform === "web" ? 80 : 90);
-  return `color-mix(in srgb, ${color} ${alpha}%, transparent)`;
+  return `color-mix(in srgb, ${color} ${alpha}%, var(--habit-tint-base))`;
 }
 
 export function selectTodaySummary(habits) {

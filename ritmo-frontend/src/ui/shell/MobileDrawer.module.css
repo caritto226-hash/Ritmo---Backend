@@ -51,9 +51,9 @@
 }
 
 .logo {
-  display: block;
-  height: 40px;
-  width: auto;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
 }
 
 .account {

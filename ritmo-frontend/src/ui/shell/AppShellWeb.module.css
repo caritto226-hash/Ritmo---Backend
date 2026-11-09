@@ -34,6 +34,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-height: var(--touch-min);
   margin-right: 28px;
   color: var(--text);
   text-decoration: none;
@@ -43,13 +44,6 @@
   outline: 2px solid var(--text);
   outline-offset: 4px;
   border-radius: 8px;
-}
-
-/* Logo de marca (public/Ritmo-logo.*): 46 px de alto, igual que las píldoras de la cabecera. */
-.logoImage {
-  display: block;
-  height: 46px;
-  width: auto;
 }
 
 .nav {
@@ -87,9 +81,11 @@
 }
 
 /* Cuerpo: rail + contenido */
+/* Sin salto de línea: con flex-wrap del mockup y el main de 600 px, entre 760 y ~790 px el
+   contenido caía debajo del rail y dejaba un hueco vacío. */
 .body {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 20px;
   align-items: stretch;
 }

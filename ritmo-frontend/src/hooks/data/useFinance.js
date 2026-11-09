@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import expensesService from "../../services/expenses.service";
 import categoriesService from "../../services/categories.service";
 import { getTodayDate } from "../../utils/financeFormat";
+import { usePageState } from "../../ui/shell/ShellContext";
 
 // Fuentes de Finanzas. GET /expenses trae todos los movimientos: el mes, la semana, los chips y
 // la búsqueda se calculan en el cliente (financeSelectors.js).
@@ -32,8 +33,10 @@ function apiMessage(error, fallback) {
  * aviso del shell con los mismos textos de la pantalla anterior.
  */
 export default function useFinance({ notify } = {}) {
-  const [data, setData] = useState(initialData);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = usePageState("data:finance", initialData);
+  const [loading, setLoading] = usePageState("data:finance-loading", true);
+  // Ya cargado en esta visita a la ruta: la página se volvió a montar al cruzar los 760 px.
+  const restoredRef = useRef(!loading);
   const [busy, setBusy] = useState(false);
   const busyRef = useRef(false);
   const activeRef = useRef(true);
@@ -57,11 +60,11 @@ export default function useFinance({ notify } = {}) {
     setLoading(false);
     if (failedError) notifyRef.current?.(apiMessage(failedError, "No se pudieron cargar las finanzas"), "error");
     return !failedError;
-  }, []);
+  }, [setData, setLoading]);
 
   useEffect(() => {
     activeRef.current = true;
-    load();
+    if (!restoredRef.current) load();
 
     function refreshWhenVisible() {
       if (document.visibilityState === "visible" && !busyRef.current) load(MONEY_SOURCES);

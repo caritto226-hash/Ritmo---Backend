@@ -1,6 +1,8 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
+import BrandLogo from "../ui/shell/BrandLogo";
+import Icon from "../ui/icons/Icon";
 import "../styles/auth.css";
 
 function Login() {
@@ -45,11 +47,11 @@ function Login() {
 
   return (
     <div className="main-container">
-      <div className="logo-wrapper">
-        <img src="/Ritmo-logo.png" alt="Logo de Ritmo" className="logo" />
+      <div className="logo-wrapper" role="img" aria-label="Ritmo">
+        <BrandLogo size="auth" />
       </div>
 
-      <h2 className="welcome-text">Bienvenido de nuevo</h2>
+      <h1 className="welcome-text">Bienvenido de nuevo</h1>
       <p className="subtitle">Ingresa tus datos para continuar</p>
 
       {!error && (sessionExpired || passwordWasReset || accountCreated) && (
@@ -62,7 +64,7 @@ function Login() {
 
       {error && (
         <div className="error-banner" role="alert">
-          <span className="error-icon">⚠</span>
+          <span className="error-icon"><Icon name="info" size={18} strokeWidth={2} /></span>
           <div>
             <strong>Error al iniciar sesión</strong>
             <p>{error}</p>

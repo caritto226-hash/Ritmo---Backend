@@ -94,7 +94,21 @@
   color: var(--text);
 }
 
-.done { opacity: 0.45; }
+/* Hecho (tarea o evento): el mockup lo atenúa con opacity 0.45, pero el texto quedaba en 2,3–3,3:1.
+   Se usa el estado Completado del spec (fondo gris, texto --text-done, check negro), sin opacidad. */
+.done,
+.event.done {
+  background: var(--surface-soft);
+  color: var(--text-done);
+  box-shadow: none;
+}
+
+.item.done .icon {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.done .time { opacity: 1; }
 
 .icon {
   width: 38px;
@@ -145,10 +159,11 @@
   color: var(--item-ink, var(--text));
 }
 
-/* Completada: gris al 55 % con el círculo negro y check blanco (nunca tachada) */
+/* Completada: gris con el círculo negro y check blanco (nunca tachada). Sin la opacidad 0.55 del
+   mockup, que dejaba el texto en 2,9–4:1; el gris sale de --text-done. */
 .taskVariant.done {
-  opacity: 0.55;
   background: var(--surface-soft);
+  color: var(--text-done);
 }
 
 .taskVariant.done .icon {

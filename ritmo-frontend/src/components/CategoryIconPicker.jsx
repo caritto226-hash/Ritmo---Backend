@@ -11,8 +11,17 @@ function CategoryIconPicker({ icons, value, onChange, label }) {
     }
   }
 
+  // Escape cierra solo la lista (desde el botón o desde una opción). preventDefault avisa al
+  // diálogo que la contiene (useDialogFocus) que ese Escape ya se atendió.
+  function handleKeyDown(event) {
+    if (event.key !== "Escape" || !open) return;
+    event.preventDefault();
+    setOpen(false);
+    event.currentTarget.querySelector(".category-icon-picker-trigger")?.focus();
+  }
+
   return (
-    <div className="category-icon-picker" onBlur={handleBlur}>
+    <div className="category-icon-picker" onBlur={handleBlur} onKeyDown={handleKeyDown}>
       <button
         type="button"
         className="category-icon-picker-trigger"
@@ -21,9 +30,6 @@ function CategoryIconPicker({ icons, value, onChange, label }) {
         aria-expanded={open}
         aria-controls="category-icon-picker-options"
         onClick={() => setOpen((isOpen) => !isOpen)}
-        onKeyDown={(event) => {
-          if (event.key === "Escape") setOpen(false);
-        }}
       >
         <CategoryIcon name={value} size={22} />
         <svg viewBox="0 0 24 24" aria-hidden="true">

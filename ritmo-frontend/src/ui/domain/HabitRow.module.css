@@ -103,6 +103,9 @@
   white-space: nowrap;
 }
 
+/* Cumplido: el gris --text-3 ya es el atenuado; con 0.85 encima quedaba en 4:1. */
+.done .meta { opacity: 1; }
+
 .countBlock {
   flex-shrink: 0;
   display: flex;

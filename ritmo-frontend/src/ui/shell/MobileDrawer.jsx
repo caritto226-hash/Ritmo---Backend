@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import useDialogFocus from "../../hooks/useDialogFocus";
 import Icon from "../icons/Icon";
 import IconButton from "../primitives/IconButton";
-import { LOGO_DARK, LOGO_LIGHT } from "./logo";
+import BrandLogo from "./BrandLogo";
 import styles from "./MobileDrawer.module.css";
 
 /**
@@ -24,7 +24,7 @@ function MobileDrawer({ open, onClose, userName, email, theme, onToggleTheme, on
       <button type="button" className={styles.scrim} aria-label="Cerrar menú" tabIndex={-1} onClick={onClose} />
       <aside ref={panelRef} role="dialog" aria-modal="true" aria-label="Menú" className={styles.panel}>
         <div className={styles.header}>
-          <img src={isDark ? LOGO_DARK : LOGO_LIGHT} alt="Ritmo" className={styles.logo} />
+          <span role="img" aria-label="Ritmo" className={styles.logo}><BrandLogo /></span>
           <IconButton icon="close" label="Cerrar menú" size={44} variant="soft" iconSize={14} strokeWidth={2.2} onClick={onClose} />
         </div>
 

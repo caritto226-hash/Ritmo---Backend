@@ -38,22 +38,35 @@
 }
 
 .tileTitle {
+  min-width: 0;
   margin: 0;
   font-size: 16px;
   font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
+/* Bajo 380 px el tile bento no deja sitio al título completo junto al ícono y la flecha. */
+@media (max-width: 379.98px) {
+  .tileTitle { font-size: 15px; }
+}
+
+/* La flecha de abrir (MobileWidgetGrid) va encima, en la esquina: el título le deja su espacio
+   para cortarse con elipsis en vez de quedar tapado. */
 .head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 6px;
+  padding-right: 30px;
 }
 
 .headLead {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .footRow {

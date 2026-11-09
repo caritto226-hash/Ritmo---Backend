@@ -1,8 +1,6 @@
 import { useState } from "react";
 import CategoryIconBadge from "./CategoryIconBadge";
-// category-shared.css va después de category-manager.css (mismo orden que tenía finanzas.css).
-import "../styles/category-manager.css";
-import "../styles/category-shared.css";
+import "../styles/categories.css";
 
 function CategorySelect({
   categories,

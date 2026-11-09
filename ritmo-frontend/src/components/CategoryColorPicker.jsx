@@ -43,15 +43,18 @@ function CategoryColorPicker({ value, onChange, label }) {
   useLayoutEffect(() => {
     if (!open) return undefined;
 
+    // En captura y con preventDefault: el diálogo que lo contiene (useDialogFocus) ve el Escape
+    // como atendido y no se cierra junto con el selector.
     function closeOnEscape(event) {
       if (event.key === "Escape") {
+        event.preventDefault();
         setOpen(false);
         triggerRef.current?.focus();
       }
     }
 
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
+    document.addEventListener("keydown", closeOnEscape, true);
+    return () => document.removeEventListener("keydown", closeOnEscape, true);
   }, [open]);
 
   function updateCustomColor(nextColor) {

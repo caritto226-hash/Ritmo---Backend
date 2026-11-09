@@ -5,11 +5,12 @@ import PillButton from "../primitives/PillButton";
 import cx from "../cx";
 import Rail from "./Rail";
 import { MAIN_NAV } from "./navigation";
-import { LOGO_DARK, LOGO_LIGHT } from "./logo";
+import BrandLogo from "./BrandLogo";
 import styles from "./AppShellWeb.module.css";
 
 /**
  * Shell web (≥ 760 px): cabecera con logo, píldoras y acciones; título de página; rail lateral.
+ * headerAction: solo lo pasa el Inicio ("Nueva actividad", Inicio.dc.html); los demás mockups no lo tienen.
  * hasUnread: sin API de notificaciones llega en null y la campana se muestra sin punto.
  */
 function AppShellWeb({
@@ -35,7 +36,7 @@ function AppShellWeb({
       <div className={styles.frame}>
         <header className={styles.header}>
           <Link to="/dashboard" className={styles.logo} aria-label="Ritmo, inicio">
-            <img src={isDark ? LOGO_DARK : LOGO_LIGHT} alt="" className={styles.logoImage} />
+            <BrandLogo size="web" />
           </Link>
 
           <nav aria-label="Principal" className={styles.nav}>

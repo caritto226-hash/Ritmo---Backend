@@ -1,247 +1,27 @@
 /* ============================================================
-   base.css — Reset, tema heredado y alias de variables antiguas.
-   Los tokens nuevos viven en tokens.css; estos alias se eliminan en la fase 7.
+   base.css — Reset y cuerpo de la página. Los colores, la fuente y las medidas
+   salen de tokens.css (único archivo con colores literales).
    ============================================================ */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  /* Fondo de la app (igual en ambos temas) */
-  --app-bg-gradient: linear-gradient(160deg, #e5f3f766 0%, #f3f1ff33 72%, rgb(25 176 210 / 7%) 100%);
-
-  /* Superficies */
-  --surface-primary: #FFFFFF;
-  --surface-secondary: linear-gradient(135deg, #d3aba8bf 0%, #f7c6adb5 100%);
-  --surface-tercy: linear-gradient(135deg, #d3aba859 0%, #f7c6ad29 100%);
-  --surface-quaternary: #e7cbcca6;
-  --surface-border: #ece3f0;
-  --surface-blur: none;
-
-  /* Texto */
-  --text-primary: #1D2B44;
-  /* #616b7c: 5.38:1 sobre blanco (antes #B4B4B4, 2.07:1). */
-  --text-secondary: #616b7c;
-
-  /* Énfasis (acento de marca) */
-  --accent-gradient: linear-gradient(135deg, rgba(29, 35, 56, 0.78) 0%, #1d2b44 100%);
-  --accent-solid: #cd8784;
-
-  /* Paleta de categorías */
-  --orange: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
-  --orange-light: #fde8d8;
-  --purple: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
-  --purple-light: #ede8f8;
-  --green: linear-gradient(135deg, #FEFEFE , #DDDDDD 58%, #D1CFD2 100%);
-  --green-light: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
-  --blue: linear-gradient(135deg, #FEFEFE 1%, #DDDDDD 58%, #D1CFD2 100%);
-  --blue-light: #dbeef8;
-  --pink: #f48fa0;
-  
-
-
-/*
-  --orange: #7566B1;
-  --orange-light: #fde8d8;
-  --purple: #b8a8e8;
-  --purple-light: #ede8f8;
-  --green: #7dd9b8;
-  --green-light: #d8f5eb;
-  --blue: #8ac4e8;
-  --blue-light: #dbeef8;
-  --pink: #f48fa0;*/
-
-
-
-  /* Geometría */
-  --radius: 20px;
-  --radius-sm: 12px;
-  /* Radio de tarjeta del diseño anterior; --radius-card (28) vive en tokens.css. */
-  --legacy-radius-card: 16px;
-  --radius-control: 12px;
-  --radius-pill: 999px;
-
-  /* Espaciado */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --screen-gutter: 16px;
-  --card-padding: 16px;
-
-  /* Superficies y movimiento */
-  --border-subtle: 1px solid rgb(29 43 68 / 8%);
-  --shadow-card: 0 1px 3px rgb(29 43 68 / 6%);
-  --shadow-raised: 0 4px 16px rgb(29 43 68 / 6%);
-  --motion-fast: 150ms ease;
-
-  /* Escala tipográfica responsiva: móvil primero */
-  --type-display: 32px;
-  --type-headline: 24px;
-  --type-title: 18px;
-  --type-body: 15px;
-  --type-input: 16px;
-  --type-supporting: 14px;
-  --type-label: 13px;
-  --type-caption: 12px;
-  --type-metric: 24px;
-
-  /* Alias retro-compatibles (usados por módulos heredados) */
-  --navy: var(--text-primary);
-  --navy-soft: #2d3a5c;
-  --card-bg: var(--surface-primary);
-  --text-muted: var(--text-secondary);
-  --azul-oscuro: var(--text-primary);
-  --beige-fondo: #f9f6f1;
-  --blanco: var(--surface-primary);
-  --gris-texto: var(--text-secondary);
-  --naranja-ritmo: #f9a03f;
-  --rojo-error: #c0392b;
-
-  /* --bg, --income y --danger viven ahora en tokens.css (rediseño 2026). */
-  --primary-solid: #1d2b44;
-  --primary-border: transparent;
-  --legacy-on-primary: #ffffff;
-  --accent-soft: var(--surface-quaternary);
-  --balance-income-arrow: #4caf83;
-  --balance-expense-arrow: var(--orange-light);
-}
-
-
-
-[data-theme="dark"] {
-  --surface-primary: rgba(29, 35, 56, 0.78);
-  --surface-secondary: rgba(45, 58, 92, 0.65);
-  --surface-border: rgba(255, 255, 255, 0.10);
-  --surface-blur: blur(18px);
-
-  --text-primary: #ffffff;
-  --text-secondary: #b9c1d6;
-
-  --navy-soft: #d7dcef;
-  --beige-fondo: #11162a;
-  --blanco: rgba(29, 35, 56, 0.78);
-
-  /* El navy se perdería sobre el fondo oscuro: se usa la superficie elevada con borde. */
-  --primary-solid: rgba(45, 58, 92, 0.65);
-  --primary-border: var(--surface-border);
-  --accent-soft: #875ab640;
-  
-  --app-bg-gradient: linear-gradient(160deg, #1a1a2e 0%, #16213e 72%, #0f3460 100%);
-}
-
-@media (min-width: 768px) {
-  :root {
-    --screen-gutter: 24px;
-    --card-padding: 24px;
-    --type-display: 40px;
-    --type-headline: 30px;
-    --type-title: 20px;
-    --type-body: 16px;
-    --type-supporting: 15px;
-    --type-label: 14px;
-    --type-metric: 28px;
-  }
-}
-
-
-
-/* ── BODY  ── */
 body {
-  margin: 0;
+  min-height: 100vh;
   font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
-  transition: background .3s;
+  transition: background 0.3s;
 }
 
-/* main-container (auth) usa flex de centrado; lo activa esa clase, no body,
-   para no afectar al layout de la app (dashboard/tareas/etc). */
-body:has(.main-container) {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+button, a, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* ============================================================
-   TEMA OSCURO — overrides de superficie
-   El fondo cálido se mantiene; sólo cambian las superficies a
-   un efecto "vidrio" oscuro y el texto a blanco.
-   ============================================================ */
-.card, .ritmo-card, .motiv-card, .header-btn, .notif-btn,
-.input-wrapper input, input, .item-icon, .qa-btn,
-.bottom-nav, .side-menu, .calendar-cell, .tx-item, .summary-card {
-  transition: background var(--motion-fast), color var(--motion-fast),
-    border-color var(--motion-fast), box-shadow var(--motion-fast);
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
-
-[data-theme="dark"] .card,
-[data-theme="dark"] .motiv-card,
-[data-theme="dark"] .summary-card {
-  background: var(--surface-primary);
-  backdrop-filter: var(--surface-blur);
-  -webkit-backdrop-filter: var(--surface-blur);
-  border: 1px solid var(--surface-border);
-  box-shadow: 0 4px 16px rgba(0,0,0,.16);
-}
-
-[data-theme="dark"] .header-btn,
-[data-theme="dark"] .notif-btn,
-[data-theme="dark"] .bottom-nav,
-[data-theme="dark"] .calendar-strip,
-[data-theme="dark"] .calendar-panel {
-  background: var(--surface-primary);
-  backdrop-filter: var(--surface-blur);
-  -webkit-backdrop-filter: var(--surface-blur);
-  border-color: var(--surface-border);
-  color: var(--text-primary);
-}
-
-[data-theme="dark"] .nav-item.active { background: #875ab640; }
-[data-theme="dark"] .item-icon.orange { background: rgba(245, 166, 109, 0.18); }
-[data-theme="dark"] .item-icon.purple { background: rgba(184, 168, 232, 0.18); }
-[data-theme="dark"] .item-icon.green  { background: rgba(125, 217, 184, 0.18); }
-[data-theme="dark"] .qa-tarea  { background: rgba(245, 166, 109, 0.18); }
-[data-theme="dark"] .qa-habito { background: rgba(184, 168, 232, 0.18); }
-[data-theme="dark"] .qa-gasto  { background: rgba(125, 217, 184, 0.18); }
-[data-theme="dark"] .qa-evento { background: rgba(138, 196, 232, 0.18); }
-
-[data-theme="dark"] input,
-[data-theme="dark"] .input-wrapper input,
-[data-theme="dark"] textarea,
-[data-theme="dark"] select {
-  background: rgba(255,255,255,0.06);
-  color: var(--text-primary);
-  border-color: var(--surface-border);
-}
-[data-theme="dark"] input::placeholder,
-[data-theme="dark"] textarea::placeholder { color: #8893ad; }
-
-[data-theme="dark"] .donut-bg { stroke: rgba(255,255,255,0.10); }
-[data-theme="dark"] .timeline { border-left-color: rgba(255,255,255,0.14); }
-[data-theme="dark"] .footer-links a,
-[data-theme="dark"] .welcome-text,
-[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3, [data-theme="dark"] h4 { color: var(--text-primary); }
-
-/* ── Botón de cambio de tema ── */
-.theme-toggle {
-  width: 40px; height: 40px;
-  border-radius: var(--radius-sm, 12px);
-  border: 1.5px solid var(--surface-border);
-  background: var(--surface-primary);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  color: var(--text-primary);
-}
-.theme-toggle svg { width: 18px; height: 18px; }
-.theme-toggle .icon-sun { display: none; }
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-
-/* ---------------------------------------------------------------------------------  */

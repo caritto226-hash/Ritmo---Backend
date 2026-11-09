@@ -11,6 +11,7 @@ import NoData from "../../ui/primitives/NoData";
 import Toast from "../../ui/primitives/Toast";
 import BottomSheet from "../../ui/primitives/BottomSheet";
 import AppShellWeb from "../../ui/shell/AppShellWeb";
+import BrandLogo from "../../ui/shell/BrandLogo";
 import PageTitle from "../../ui/shell/PageTitle";
 import MobileShell, { CirclePill, MobilePageTitle, MobileTopBar } from "../../ui/shell/MobileShell";
 import HomeComponentsDemo from "./HomeComponentsDemo";
@@ -235,12 +236,16 @@ function UiPlayground() {
 
         <section className={styles.section} aria-labelledby="sec-shell-web">
           <h2 id="sec-shell-web" className={styles.h2}>AppShellWeb</h2>
+          <div className={styles.row}>
+            <BrandLogo />
+            <BrandLogo size="auth" />
+            <PillButton icon="plus" size="nav">Nueva actividad</PillButton>
+          </div>
           <AppShellWeb
             embedded
             userName="Ana"
             theme={theme}
             onToggleTheme={toggleTheme}
-            headerAction={<PillButton icon="plus">Nueva actividad</PillButton>}
             railItems={RAIL_DEMO}
             onLogout={() => {}}
             title={

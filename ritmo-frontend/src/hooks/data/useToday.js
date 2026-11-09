@@ -4,6 +4,7 @@ import eventsService from "../../services/events.service";
 import habitsService from "../../services/habits.service";
 import expensesService from "../../services/expenses.service";
 import { isHabitDone, isTaskDone } from "./todaySelectors";
+import { usePageState } from "../../ui/shell/ShellContext";
 
 // Fuentes del Inicio. Ningún GET acepta filtro de fechas: el día, la semana y el mes
 // se calculan en el cliente (ver todaySelectors.js).
@@ -34,9 +35,11 @@ function apiMessage(error, fallback) {
  * notify(message, type) muestra el aviso del shell.
  */
 export default function useToday({ notify } = {}) {
-  const [data, setData] = useState(initialData);
-  const [failed, setFailed] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [data, setData] = usePageState("data:today", initialData);
+  const [failed, setFailed] = usePageState("data:today-failed", []);
+  const [loading, setLoading] = usePageState("data:today-loading", true);
+  // Ya cargado en esta visita a la ruta: la página se volvió a montar al cruzar los 760 px.
+  const restoredRef = useRef(!loading);
   const [pending, setPending] = useState({});
   const activeRef = useRef(true);
   const notifyRef = useRef(notify);
@@ -59,11 +62,11 @@ export default function useToday({ notify } = {}) {
     setData((current) => ({ ...current, ...loaded }));
     setFailed((current) => [...current.filter((key) => !keys.includes(key)), ...failedKeys]);
     setLoading(false);
-  }, []);
+  }, [setData, setFailed, setLoading]);
 
   useEffect(() => {
     activeRef.current = true;
-    load();
+    if (!restoredRef.current) load();
 
     function refreshWhenVisible() {
       if (document.visibilityState === "visible") load();

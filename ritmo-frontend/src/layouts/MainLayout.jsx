@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import dashboardService from "../services/dashboard.service";
@@ -167,14 +167,15 @@ function MainLayout() {
           onToggleTheme={toggleTheme}
           onNotifications={() => comingSoon("Notificaciones")}
           onAccount={() => setSheet("settings")}
-          headerAction={
+          headerAction={isHome && (
+            // Inicio.dc.html: píldora gris entre dos espaciadores; las demás pantallas web no la tienen.
             <PillButton icon="plus" size="nav" onClick={() => setSheet("new")}>Nueva actividad</PillButton>
-          }
+          )}
           title={<div ref={setTitleSlot} className={styles.titleSlot} />}
           railItems={pageRail || homeRail}
           onLogout={logout}
         >
-          <Outlet />
+          <Suspense fallback={null}><Outlet /></Suspense>
         </AppShellWeb>
         {sheets}
       </ShellContext.Provider>
@@ -193,7 +194,7 @@ function MainLayout() {
             onNotifications={() => comingSoon("Notificaciones")}
           />
         )}
-        <Outlet />
+        <Suspense fallback={null}><Outlet /></Suspense>
       </MobileShell>
       <MobileDrawer
         open={drawerOpen}

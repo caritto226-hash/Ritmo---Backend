@@ -19,6 +19,9 @@ export function useShell() {
  * página se vuelve a montar. El valor queda en MainLayout por ruta y clave, así que el mes, los
  * filtros, la búsqueda, el día o la vista siguen igual en el otro layout. Al salir de la ruta se
  * descarta: volver a la pantalla empieza de cero. Fuera del shell (/dev/ui) es un useState común.
+ * Los hooks de datos (useToday, useTasks, useEvents, useHabits, useFinance) guardan aquí la última
+ * respuesta de la API ("data:*"): si al montar ya está cargada, no la vuelven a pedir. Se pide al
+ * entrar a la ruta, al recuperar el foco y después de cada cambio.
  */
 export function usePageState(key, initial) {
   const { pageStore } = useShell();

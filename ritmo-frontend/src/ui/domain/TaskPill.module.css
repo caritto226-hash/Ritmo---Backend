@@ -42,8 +42,8 @@ button.pill:disabled,
   border: 1px solid var(--pastel-line);
   background-color: color-mix(in srgb, var(--pill-tint, var(--lav-grey)) 90%, transparent);
   color: var(--pill-ink, var(--text));
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: var(--glass-blur-md);
+  backdrop-filter: var(--glass-blur-md);
   --pill-line: var(--pastel-line);
 }
 
@@ -118,9 +118,11 @@ button.pill:disabled,
   transform: translate(-50%, -50%);
 }
 
+/* En móvil la píldora tiene borde de 1 px: el botón lo cubre para llegar a los 44 px de alto. */
 .open {
   min-width: 0;
-  height: 100%;
+  height: calc(100% + 2px);
+  margin-block: -1px;
   padding: 0;
   border: none;
   background: transparent;

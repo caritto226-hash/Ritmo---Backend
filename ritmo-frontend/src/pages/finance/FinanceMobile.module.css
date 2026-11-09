@@ -175,7 +175,9 @@
 }
 
 .link {
-  padding: 12px 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch-min);
   font-size: var(--fs-meta);
   font-weight: 500;
   color: var(--text);

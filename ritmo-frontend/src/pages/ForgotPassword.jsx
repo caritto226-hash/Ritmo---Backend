@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import authService from "../services/auth.service";
+import BrandLogo from "../ui/shell/BrandLogo";
+import Icon from "../ui/icons/Icon";
 import "../styles/auth.css";
 
 function ForgotPassword() {
@@ -27,11 +29,11 @@ function ForgotPassword() {
 
   return (
     <div className="main-container">
-      <div className="logo-wrapper">
-        <img src="/Ritmo-logo.png" alt="Logo de Ritmo" className="logo" />
+      <div className="logo-wrapper" role="img" aria-label="Ritmo">
+        <BrandLogo size="auth" />
       </div>
 
-      <h2 className="welcome-text">Recupera tu contraseña</h2>
+      <h1 className="welcome-text">Recupera tu contraseña</h1>
       <p className="subtitle">Escribe el correo con el que te registraste</p>
 
       {message && (
@@ -43,7 +45,7 @@ function ForgotPassword() {
 
       {error && (
         <div className="error-banner" role="alert">
-          <span className="error-icon">⚠</span>
+          <span className="error-icon"><Icon name="info" size={18} strokeWidth={2} /></span>
           <div>
             <strong>No se pudo enviar la solicitud</strong>
             <p>{error}</p>

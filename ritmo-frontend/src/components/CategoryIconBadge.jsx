@@ -1,5 +1,6 @@
 import CategoryIcon from "./CategoryIcon";
 import { getInkOnColor } from "../utils/color";
+import "../styles/categories.css";
 
 // El fondo es el color guardado de la categoría, tal cual; el ícono usa la tinta
 // (oscura o blanca) que más contrasta con él. Antes el ícono se pintaba del mismo

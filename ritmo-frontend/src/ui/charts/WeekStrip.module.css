@@ -6,6 +6,12 @@
   text-align: center;
 }
 
+/* A 360 px las columnas con 4 px de separación quedan en 42 px: se junta un poco más para que
+   cada día mida los 44 px de su círculo. */
+@media (max-width: 379.98px) {
+  .strip { gap: 2px; }
+}
+
 .day {
   border: none;
   background: transparent;
