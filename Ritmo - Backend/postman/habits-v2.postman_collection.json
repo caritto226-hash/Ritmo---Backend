@@ -1,0 +1,1558 @@
+{
+  "info": {
+    "name": "Ritmo · Hábitos v2",
+    "description": "Pruebas de la fase A de Hábitos v2.\n\nEste archivo NO guarda tokens ni credenciales. Antes de correrla:\n1. Crea un entorno de Postman (por ejemplo \"Ritmo local\") con la variable `token` de tipo secret.\n2. Inicia sesión con POST {{baseUrl}}/auth/login desde Postman o la app y pega el token en ese entorno.\n3. Opcional: `pastTestHabitId`: un hábito DE PRUEBA de solo marcar y de todos los días, creado hace 6 días o más (estas peticiones marcan y desmarcan su ayer y su hace 6 días; no uses un hábito real), y `otherUserHabitId` (un hábito de otro usuario) para el 404.\n\nLas fechas (hoy, ayer, etc.) se calculan en hora de Bogotá antes de cada petición y no se guardan.\nCorre las carpetas en orden; la última borra (soft delete) los hábitos de prueba.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.variables.get('token')) throw new Error('Falta la variable token en el entorno (no se guarda en la colección).');",
+          "const fmt = (ms) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(ms));",
+          "const DAY = 86400000;",
+          "const now = Date.now();",
+          "pm.variables.set('today', fmt(now));",
+          "pm.variables.set('yesterday', fmt(now - DAY));",
+          "pm.variables.set('sixDaysAgo', fmt(now - 6 * DAY));",
+          "pm.variables.set('sevenDaysAgo', fmt(now - 7 * DAY));",
+          "pm.variables.set('tomorrow', fmt(now + DAY));",
+          "pm.variables.set('fiveWeeksAgo', fmt(now - 34 * DAY));"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "checkHabitId",
+      "value": ""
+    },
+    {
+      "key": "countHabitId",
+      "value": ""
+    },
+    {
+      "key": "durationHabitId",
+      "value": ""
+    },
+    {
+      "key": "legacyHabitId",
+      "value": ""
+    },
+    {
+      "key": "pastTestHabitId",
+      "value": ""
+    },
+    {
+      "key": "otherUserHabitId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1 · Crear",
+      "item": [
+        {
+          "name": "Solo marcar, lunes a viernes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prueba v2 · meditar\",\n  \"goalType\": \"check\",\n  \"days\": [\n    1,\n    2,\n    3,\n    4,\n    5\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "const h = pm.response.json().data;",
+                  "pm.test('tipo y días', () => { pm.expect(h.goalType).to.eql('check'); pm.expect(h.goal).to.eql(null); pm.expect(h.days).to.eql([1, 2, 3, 4, 5]); pm.expect(h.frequency).to.eql('Lunes a viernes'); });",
+                  "pm.test('empieza hoy', () => pm.expect(h.startDate).to.eql(pm.variables.get('today')));",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('checkHabitId', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cantidad, todos los días, 8 vasos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prueba v2 · agua\",\n  \"goalType\": \"count\",\n  \"goal\": 8,\n  \"unit\": \"vasos\",\n  \"days\": [\n    1,\n    2,\n    3,\n    4,\n    5,\n    6,\n    7\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "const h = pm.response.json().data;",
+                  "pm.test('cantidad', () => { pm.expect(h.goalType).to.eql('count'); pm.expect(h.goal).to.eql(8); pm.expect(h.unit).to.eql('vasos'); pm.expect(h.frequency).to.eql('Todos los días'); });",
+                  "pm.test('avance de hoy en 0/8', () => { pm.expect(h.todayAmount).to.eql(0); pm.expect(h.todayTarget).to.eql(8); pm.expect(h.appliesToday).to.eql(true); pm.expect(h.status).to.eql('pendiente'); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('countHabitId', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tiempo, todos los días, 30 min (la unidad se ignora)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prueba v2 · leer\",\n  \"goalType\": \"duration\",\n  \"goal\": 30,\n  \"unit\": \"min\",\n  \"days\": [\n    1,\n    2,\n    3,\n    4,\n    5,\n    6,\n    7\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "const h = pm.response.json().data;",
+                  "pm.test('tiempo sin unidad', () => { pm.expect(h.goalType).to.eql('duration'); pm.expect(h.goal).to.eql(30); pm.expect(h.unit).to.eql(null); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('durationHabitId', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cliente anterior: frecuencia en texto y meta 8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prueba v2 · formulario anterior\",\n  \"frequency\": \"lunes a VIERNES\",\n  \"goal\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 201', () => pm.response.to.have.status(201));",
+                  "const h = pm.response.json().data;",
+                  "pm.test('se interpreta como la migración', () => { pm.expect(h.goalType).to.eql('count'); pm.expect(h.days).to.eql([1, 2, 3, 4, 5]); pm.expect(h.frequency).to.eql('lunes a VIERNES'); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('legacyHabitId', pm.response.json().data.id);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2 · Validaciones al crear (400)",
+      "item": [
+        {
+          "name": "Sin días ni frecuencia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/día de la semana/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Días repetidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"days\": [\n    1,\n    1\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/days/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Día 8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"days\": [\n    8\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/days/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tipo desconocido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"days\": [\n    1\n  ],\n  \"goalType\": \"timer\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/goalType/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cantidad sin meta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"days\": [\n    1\n  ],\n  \"goalType\": \"count\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/cantidad/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cantidad 1000",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"days\": [\n    1\n  ],\n  \"goalType\": \"count\",\n  \"goal\": 1000\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/999/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tiempo 1441 min",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"days\": [\n    1\n  ],\n  \"goalType\": \"duration\",\n  \"goal\": 1441\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/meta/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unidad de 21 caracteres",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\",\n  \"days\": [\n    1\n  ],\n  \"goalType\": \"count\",\n  \"goal\": 2,\n  \"unit\": \"abcdefghijklmnopqrstu\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/20 caracteres/i));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3 · Avance del día",
+      "item": [
+        {
+          "name": "+1 vaso",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 1', () => pm.expect(p.amount).to.eql(1));",
+                  "pm.test('cumplido false', () => pm.expect(p.completed).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "+1 vaso otra vez",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 2', () => pm.expect(p.amount).to.eql(2));",
+                  "pm.test('cumplido false', () => pm.expect(p.completed).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ajustar a 8 (cumple)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 8\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 8', () => pm.expect(p.amount).to.eql(8));",
+                  "pm.test('cumplido true', () => pm.expect(p.completed).to.eql(true));",
+                  "pm.test('status completado', () => pm.expect(pm.response.json().data.status).to.eql('completado'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pasar la meta: 10",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 10\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 10', () => pm.expect(p.amount).to.eql(10));",
+                  "pm.test('cumplido true', () => pm.expect(p.completed).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deshacer: 0",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 0\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 0', () => pm.expect(p.amount).to.eql(0));",
+                  "pm.test('cumplido false', () => pm.expect(p.completed).to.eql(false));",
+                  "pm.test('status pendiente', () => pm.expect(pm.response.json().data.status).to.eql('pendiente'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "-1 desde 0 se queda en 0",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": -1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 0', () => pm.expect(p.amount).to.eql(0));",
+                  "pm.test('cumplido false', () => pm.expect(p.completed).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estado completado en cantidad: llena la meta",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completado\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 8', () => pm.expect(p.amount).to.eql(8));",
+                  "pm.test('cumplido true', () => pm.expect(p.completed).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Estado pendiente en cantidad: borra el avance",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"pendiente\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 0', () => pm.expect(p.amount).to.eql(0));",
+                  "pm.test('cumplido false', () => pm.expect(p.completed).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tiempo: 15 min",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{durationHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 15\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 15', () => pm.expect(p.amount).to.eql(15));",
+                  "pm.test('cumplido false', () => pm.expect(p.completed).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tiempo: +30 min (45/30)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{durationHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": 30\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 45', () => pm.expect(p.amount).to.eql(45));",
+                  "pm.test('cumplido true', () => pm.expect(p.completed).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Solo marcar no admite avance",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{checkHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/solo marcar/i));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4 · Fechas (400 y días pasados)",
+      "item": [
+        {
+          "name": "Futuro",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"{{tomorrow}}\",\n  \"amount\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/futuros/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hace 7 días (fuera de la ventana)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"{{sevenDaysAgo}}\",\n  \"amount\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/6 días atrás/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ayer en un hábito creado hoy",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"{{yesterday}}\",\n  \"amount\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/no existía/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Fecha inexistente",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-02-30\",\n  \"amount\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/fecha/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "amount y delta a la vez",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1,\n  \"delta\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/solo uno/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Día que no aplica (sábado/domingo en lunes a viernes)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{checkHabitId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completado\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Solo es un 400 si hoy es sábado o domingo; entre semana responde 200.",
+                  "const weekend = [0, 6].includes(new Date(pm.variables.get('today') + 'T12:00:00Z').getUTCDay());",
+                  "pm.test('400 en fin de semana, 200 entre semana', () => pm.response.to.have.status(weekend ? 400 : 200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hábito de prueba antiguo: marcar ayer (requiere pastTestHabitId)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{pastTestHabitId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completado\",\n  \"date\": \"{{yesterday}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('progreso de ayer', () => { const p = pm.response.json().data.progress; pm.expect(p.date).to.eql(pm.variables.get('yesterday')); pm.expect(p.completed).to.eql(true); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hábito de prueba antiguo: desmarcar ayer",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{pastTestHabitId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"pendiente\",\n  \"date\": \"{{yesterday}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const p = pm.response.json().data.progress;",
+                  "pm.test('avance 0', () => pm.expect(p.amount).to.eql(0));",
+                  "pm.test('cumplido false', () => pm.expect(p.completed).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hábito de prueba antiguo: hace 6 días (último día permitido)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{pastTestHabitId}}/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"pendiente\",\n  \"date\": \"{{sixDaysAgo}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5 · Editar",
+      "item": [
+        {
+          "name": "Meta 8 → 10 actualiza la meta de hoy",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goal\": 10\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('todayTarget 10', () => pm.expect(pm.response.json().data.todayTarget).to.eql(10));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cambiar unidad",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"unit\": \"tazas\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('unidad', () => pm.expect(pm.response.json().data.unit).to.eql('tazas'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cambiar días a fines de semana",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{legacyHabitId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"days\": [\n    6,\n    7\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('días y etiqueta', () => { const h = pm.response.json().data; pm.expect(h.days).to.eql([6, 7]); pm.expect(h.frequency).to.eql('Fines de semana'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Pasar a solo marcar limpia meta y unidad",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{legacyHabitId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"goalType\": \"check\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('check', () => { const h = pm.response.json().data; pm.expect(h.goal).to.eql(null); pm.expect(h.unit).to.eql(null); pm.expect(h.todayTarget).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Días vacíos (400)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{legacyHabitId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"days\": []\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/days/i));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6 · Historial, rachas y dashboard",
+      "item": [
+        {
+          "name": "Historial de 5 semanas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/progress?from={{fiveWeeksAgo}}&to={{today}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('forma', () => pm.response.json().data.forEach((r) => pm.expect(r).to.have.all.keys('habitId', 'date', 'amount', 'target', 'completed', 'completedAt')));",
+                  "pm.test('incluye el tiempo de hoy (45/30)', () => pm.expect(pm.response.json().data.some((r) => r.habitId === Number(pm.collectionVariables.get('durationHabitId')) && r.amount === 45 && r.completed)).to.eql(true));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Historial: from posterior a to (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/progress?from={{today}}&to={{yesterday}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/posterior/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Historial: sin fechas (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/progress"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/obligatorias/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Historial: más de 366 días (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/progress?from=2025-01-01&to=2026-01-02"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.match(/366/i));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rachas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/stats"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "const s = pm.response.json().data;",
+                  "pm.test('forma', () => { pm.expect(s.streak).to.have.all.keys('current', 'best'); pm.expect(s.habits).to.be.an('array'); });",
+                  "pm.test('tiempo cumplido hoy: racha 1', () => pm.expect(s.habits.find((h) => h.habitId === Number(pm.collectionVariables.get('durationHabitId'))).streak.current).to.eql(1));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dashboard: solo cuenta los que aplican hoy",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/dashboard"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('todayRitmo.habits', () => pm.expect(pm.response.json().data.todayRitmo.habits).to.have.all.keys('completed', 'total'));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7 · 404 unificado",
+      "item": [
+        {
+          "name": "GET de un id que no existe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/999999999"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));",
+                  "pm.test('mensaje', () => pm.expect(pm.response.json().message).to.eql('Hábito no encontrado'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Avance en un id que no existe",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/999999999/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Hábito de otro usuario (requiere otherUserHabitId)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{otherUserHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Id no numérico (400)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/abc"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8 · Limpieza (soft delete)",
+      "item": [
+        {
+          "name": "Borrar solo marcar",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/habits/{{checkHabitId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Borrar cantidad",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/habits/{{countHabitId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Borrar tiempo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/habits/{{durationHabitId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Borrar cliente anterior",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/habits/{{legacyHabitId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Avance en un hábito borrado (404)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/habits/{{durationHabitId}}/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delta\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "El historial ya no lo incluye",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/habits/progress?from={{fiveWeeksAgo}}&to={{today}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('responde 200', () => pm.response.to.have.status(200));",
+                  "pm.test('sin el hábito borrado', () => pm.expect(pm.response.json().data.some((r) => r.habitId === Number(pm.collectionVariables.get('durationHabitId')))).to.eql(false));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

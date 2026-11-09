@@ -26,9 +26,39 @@ function addDaysToDate(dateValue, days) {
 	return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`;
 }
 
+// true solo para una fecha YYYY-MM-DD que existe en el calendario (rechaza 2026-02-30).
+function isValidDateKey(value) {
+	if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+		return false;
+	}
+
+	return addDaysToDate(value, 0) === value;
+}
+
+// Día de la semana ISO de una fecha YYYY-MM-DD: 1 = lunes … 7 = domingo.
+function getIsoWeekday(dateValue) {
+	const [year, month, day] = dateValue.split('-').map(Number);
+	const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+
+	return weekday === 0 ? 7 : weekday;
+}
+
+// Días de diferencia entre dos fechas YYYY-MM-DD (positivo si toDate es posterior).
+function diffInDays(fromDate, toDate) {
+	const toUtc = (dateValue) => {
+		const [year, month, day] = dateValue.split('-').map(Number);
+		return Date.UTC(year, month - 1, day);
+	};
+
+	return Math.round((toUtc(toDate) - toUtc(fromDate)) / 86400000);
+}
+
 module.exports = {
 	APP_TIME_ZONE,
 	getDateInTimeZone,
 	getTodayInBogota,
 	addDaysToDate,
+	isValidDateKey,
+	getIsoWeekday,
+	diffInDays,
 };

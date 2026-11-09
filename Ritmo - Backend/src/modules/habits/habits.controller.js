@@ -45,9 +45,40 @@ async function updateHabit(req, res, next) {
 async function changeStatus(req, res, next) {
 	try {
 		const habitId = Number(req.params.id);
-		const habit = await habitsService.changeStatus(habitId, req.user.id, req.body.status);
+		const habit = await habitsService.changeStatus(habitId, req.user.id, req.body.status, req.body.date);
 
 		return res.status(200).json({ data: habit });
+	} catch (error) {
+		return next(error);
+	}
+}
+
+async function updateProgress(req, res, next) {
+	try {
+		const habitId = Number(req.params.id);
+		const habit = await habitsService.updateProgress(habitId, req.user.id, req.body);
+
+		return res.status(200).json({ data: habit });
+	} catch (error) {
+		return next(error);
+	}
+}
+
+async function getProgress(req, res, next) {
+	try {
+		const progress = await habitsService.getProgress(req.user.id, req.query.from, req.query.to);
+
+		return res.status(200).json({ data: progress });
+	} catch (error) {
+		return next(error);
+	}
+}
+
+async function getStats(req, res, next) {
+	try {
+		const stats = await habitsService.getStats(req.user.id);
+
+		return res.status(200).json({ data: stats });
 	} catch (error) {
 		return next(error);
 	}
@@ -70,5 +101,8 @@ module.exports = {
 	getHabitById,
 	updateHabit,
 	changeStatus,
+	updateProgress,
+	getProgress,
+	getStats,
 	deleteHabit,
 };
