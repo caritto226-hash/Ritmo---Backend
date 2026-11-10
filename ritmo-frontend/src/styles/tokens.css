@@ -44,10 +44,10 @@
   --disabled-opacity: 0.45;
 
   /* ── Acentos y pasteles ── */
-  --accent: #EAF98F;
+  --accent: #a99ec7;
   --on-accent: #121212;
-  --accent-strong: #C8F04A;
-  --glow-accent: 0 0 16px rgba(200, 240, 74, 0.85);
+  --accent-strong: #5b4af0;
+  --glow-accent: 0 0 16px #ca7054;
   --mint: #B9DECD;
   --mint-soft: #DDEFE6;
   --teal: #8ED0CD;

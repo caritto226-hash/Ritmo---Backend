@@ -18,8 +18,10 @@
   color: var(--ink-on-light);
 }
 
-/* Completado: gris, sin rayas, check negro en el botón. Nunca tachado. */
-.done {
+/* Completado: gris, sin rayas, check negro en el botón. Nunca tachado.
+   "No toca hoy" usa el mismo gris atenuado, sin botón (Hábitos v2, decisión 8). */
+.done,
+.offDay {
   background-color: var(--surface-soft);
   background-image: none;
   color: var(--text-done);
@@ -90,14 +92,16 @@
   border-radius: 6px;
 }
 
-.done .nameButton:focus-visible { outline-color: var(--text); }
+.done .nameButton:focus-visible,
+.offDay .nameButton:focus-visible { outline-color: var(--text); }
 
 .freq {
   font-size: 13px;
   color: var(--ink-on-light-2);
 }
 
-.done .freq { color: var(--text-strong-2); }
+.done .freq,
+.offDay .freq { color: var(--text-strong-2); }
 
 .streak {
   height: 30px;
@@ -150,6 +154,55 @@
 }
 
 .segmentOn { background: var(--ink-on-light); }
+
+/* Tiempo: barra continua con la misma pista y tinta que los segmentos. */
+.bar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--habit-glass);
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--ink-on-light);
+  transition: width var(--motion-level);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barFill { transition: none; }
+}
+
+/* La cifra de cantidad o tiempo abre la hoja de avance; se ve igual que el texto. */
+.figureButton {
+  align-self: flex-start;
+  position: relative;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.figureButton:hover:not(:disabled) .big {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+
+.figureButton:focus-visible {
+  outline: 2px solid var(--ink-on-light);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.done .figureButton:focus-visible { outline-color: var(--text); }
+
+.figureButton:disabled { cursor: progress; }
 
 /* "Próximamente" sobre el pastel: --text-3 no llega a 4,5:1 en el teal claro. */
 .noData { color: var(--ink-on-light-2); }
@@ -207,7 +260,8 @@
   color: var(--ink-on-light-2);
 }
 
-.done .dayLabel { color: var(--text-strong-2); }
+.done .dayLabel,
+.offDay .dayLabel { color: var(--text-strong-2); }
 
 .action {
   height: 48px;

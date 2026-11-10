@@ -10,12 +10,14 @@ import styles from "./DetailSheet.module.css";
  * true si salió bien; la hoja se cierra en ese caso.
  * extraAction ({ label, onRun }) agrega una acción de texto más (Eventos: "Cancelar evento" o
  * "Restaurar evento"; Hábitos: "Marcar cumplido hoy" o "Desmarcar hoy"), con el mismo estilo que
- * "Detener futuras" en la hoja de confirmar pago.
+ * "Detener futuras" en la hoja de confirmar pago. extraActions recibe varias (Hábitos de cantidad
+ * o tiempo: "Ajustar cantidad" o "Registrar tiempo" y "Marcar cumplido hoy").
  */
-function DetailSheet({ title, details, deleteQuestion, onClose, onEdit, onDuplicate, onDelete, extraAction }) {
+function DetailSheet({ title, details, deleteQuestion, onClose, onEdit, onDuplicate, onDelete, extraAction, extraActions }) {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [busy, setBusy] = useState(false);
   const shown = details.filter((detail) => detail.value);
+  const extras = extraActions ?? (extraAction ? [extraAction] : []);
 
   async function run(action) {
     setBusy(true);
@@ -56,11 +58,11 @@ function DetailSheet({ title, details, deleteQuestion, onClose, onEdit, onDuplic
               <button type="button" className={styles.textButton} disabled={busy} onClick={() => run(onDuplicate)}>
                 Duplicar
               </button>
-              {extraAction && (
-                <button type="button" className={styles.textButton} disabled={busy} onClick={() => run(extraAction.onRun)}>
-                  {extraAction.label}
+              {extras.map((extra) => (
+                <button key={extra.label} type="button" className={styles.textButton} disabled={busy} onClick={() => run(extra.onRun)}>
+                  {extra.label}
                 </button>
-              )}
+              ))}
               <button
                 type="button"
                 className={`${styles.textButton} ${styles.danger}`}

@@ -39,6 +39,15 @@
   gap: var(--gap-cards);
 }
 
+/* "No toca hoy" (Hábitos v2, decisión 8): ocupa toda la fila de la rejilla, antes de esas tarjetas. */
+.groupLabel {
+  grid-column: 1 / -1;
+  margin: 8px 0 -4px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
 .cardHeader { min-height: 0; }
 
 .side {

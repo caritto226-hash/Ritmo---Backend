@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import habitsService from "../../services/habits.service";
 import categoriesService from "../../services/categories.service";
 import { isHabitDone } from "./todaySelectors";
+import { getGoalType } from "./habitSelectors";
 import { usePageState } from "../../ui/shell/ShellContext";
 
 function apiMessage(error, fallback) {
@@ -15,8 +16,8 @@ function timeOf(value) {
 
 /**
  * Datos reales de Hábitos (GET /habits y las categorías de hábitos) con sus mutaciones.
- * Marcar o desmarcar hoy actualiza la lista local al instante y luego hace PATCH
- * /habits/:id/status y vuelve a pedir la lista; el Inicio la vuelve a pedir al abrirse, así que
+ * Marcar o desmarcar hoy (PATCH /habits/:id/status) y "+ 1" (PATCH /habits/:id/progress) actualizan
+ * la lista local al instante y luego vuelven a pedirla; el Inicio la vuelve a pedir al abrirse, así que
  * su esfera ya llega con el cambio. Crear, editar, duplicar y eliminar también vuelven a pedir la
  * lista. notify(message, type) muestra el aviso del shell.
  */
@@ -100,18 +101,23 @@ export default function useHabits({ notify } = {}) {
     setHabits((current) => current.map((habit) => (habit.id === id ? { ...habit, ...changes } : habit)));
   }
 
-  // Pendiente ↔ cumplido hoy. Devuelve true si salió bien.
+  // Pendiente ↔ cumplido hoy, para todos los tipos: "completado" lleva el avance a la meta y
+  // "pendiente" lo vuelve a 0 (así "✓ Completo" reinicia el conteo). Devuelve true si salió bien.
   async function toggleHabit(habit) {
     if (pending[habit.id]) return false;
     const nextStatus = isHabitDone(habit) ? "pendiente" : "completado";
+    const target = Number(habit.todayTarget ?? habit.goal) || 1;
     setPendingId(habit.id, true);
-    patchHabit(habit.id, { status: nextStatus });
+    patchHabit(habit.id, {
+      status: nextStatus,
+      todayAmount: nextStatus === "completado" ? Math.max(Number(habit.todayAmount) || 0, target) : 0,
+    });
     try {
       await habitsService.changeStatus(habit.id, nextStatus);
       await loadHabits();
       return true;
     } catch (statusError) {
-      patchHabit(habit.id, { status: habit.status });
+      patchHabit(habit.id, { status: habit.status, todayAmount: habit.todayAmount });
       notifyRef.current?.(apiMessage(statusError, `No se pudo actualizar "${habit.name}".`), "error");
       return false;
     } finally {
@@ -119,13 +125,55 @@ export default function useHabits({ notify } = {}) {
     }
   }
 
-  // Mismo payload que la pantalla anterior (Habits.jsx): solo un campo vacío significa "sin
-  // meta". Lanza el error para que el formulario lo muestre sin cerrarse.
+  // Avance de hoy en hábitos de cantidad o tiempo. "+ 1" suma en la API (delta, atómico) y
+  // muestra el cambio al instante; al llegar a la meta el hábito queda cumplido.
+  async function incrementHabit(habit) {
+    if (pending[habit.id]) return false;
+    const amount = (Number(habit.todayAmount) || 0) + 1;
+    const target = Number(habit.todayTarget ?? habit.goal) || 1;
+    setPendingId(habit.id, true);
+    patchHabit(habit.id, { todayAmount: amount, status: amount >= target ? "completado" : "pendiente" });
+    try {
+      await habitsService.updateProgress(habit.id, { delta: 1 });
+      await loadHabits();
+      return true;
+    } catch (progressError) {
+      patchHabit(habit.id, { todayAmount: habit.todayAmount, status: habit.status });
+      notifyRef.current?.(apiMessage(progressError, `No se pudo actualizar "${habit.name}".`), "error");
+      return false;
+    } finally {
+      setPendingId(habit.id, false);
+    }
+  }
+
+  // Valor exacto de hoy (hoja de avance: Guardar, y Deshacer con 0). Devuelve true si salió bien.
+  async function setHabitProgress(habit, amount) {
+    if (pending[habit.id]) return false;
+    setPendingId(habit.id, true);
+    try {
+      await habitsService.updateProgress(habit.id, { amount });
+      notifyRef.current?.(amount === 0 ? `"${habit.name}" volvió a 0 hoy.` : "Avance guardado.");
+      await loadHabits();
+      return true;
+    } catch (progressError) {
+      notifyRef.current?.(apiMessage(progressError, `No se pudo actualizar "${habit.name}".`), "error");
+      return false;
+    } finally {
+      setPendingId(habit.id, false);
+    }
+  }
+
+  // Días de la semana (days manda; la API genera la etiqueta de frequency), tipo de meta, meta y
+  // unidad. Solo marcar no lleva meta ni unidad; tiempo no lleva unidad. Lanza el error para que
+  // el formulario lo muestre sin cerrarse.
   async function saveHabit(form, original) {
+    const goalType = form.goalType;
     const payload = {
       name: form.name,
-      frequency: form.frequency,
-      goal: form.goal === "" ? null : Number(form.goal),
+      days: form.days,
+      goalType,
+      goal: goalType === "check" ? null : Number(form.goal),
+      unit: goalType === "count" ? form.unit.trim() || null : null,
       categoryId: form.categoryId ? Number(form.categoryId) : null,
       reminderTime: form.reminderTime || null,
     };
@@ -146,8 +194,10 @@ export default function useHabits({ notify } = {}) {
       await habitsService.create({
         // 92 + " (copia)" = 100, el máximo que admite el nombre del hábito.
         name: `${habit.name.slice(0, 92)} (copia)`,
-        frequency: habit.frequency,
+        days: habit.days,
+        goalType: getGoalType(habit),
         goal: habit.goal ?? null,
+        unit: habit.unit ?? null,
         categoryId: habit.categoryId ?? null,
         reminderTime: habit.reminderTime
           && categories.find((category) => category.id === habit.categoryId)?.isRecurring
@@ -187,6 +237,8 @@ export default function useHabits({ notify } = {}) {
     error,
     isPending: (id) => Boolean(pending[id]),
     toggleHabit,
+    incrementHabit,
+    setHabitProgress,
     saveHabit,
     duplicateHabit,
     deleteHabit,

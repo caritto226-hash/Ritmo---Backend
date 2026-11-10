@@ -3,8 +3,8 @@ import { useShell, useShellRail } from "../../ui/shell/ShellContext";
 import useHabits from "../../hooks/data/useHabits";
 import useNow from "../../hooks/useNow";
 import useCreateIntent from "../../hooks/useCreateIntent";
-import { isCounterHabit, isHabitDone } from "../../hooks/data/habitSelectors";
-import { HABITS_PREVIEW } from "./habitsPreview";
+import { selectHabitProgress } from "../../hooks/data/habitSelectors";
+import HabitProgressSheet from "../../ui/domain/HabitProgressSheet";
 import HabitFormModal from "./HabitFormModal";
 import HabitDetailSheet from "./HabitDetailSheet";
 import HabitsWeb from "./HabitsWeb";
@@ -12,10 +12,9 @@ import HabitsMobile from "./HabitsMobile";
 
 /**
  * Hábitos: web (HabitosWeb.dc.html, ≥ 760 px) y móvil (Habitos.dc.html, < 760 px) con los mismos
- * datos (GET /habits) y manejadores. El conteo del día ("+ 1 vaso") no existe en la API
- * (BACKEND_PENDIENTE #2): sin vista previa el botón queda deshabilitado y el hábito de conteo se
- * marca desde su detalle. En la vista previa el conteo es local y al llegar a la meta se marca
- * cumplido de verdad (PATCH), como en el mockup.
+ * datos (GET /habits) y manejadores. Hábitos v2: solo marcar (check), cantidad ("+ 1" suma con
+ * PATCH /habits/:id/progress) y tiempo; la cifra de los dos últimos y "Registrar tiempo" abren
+ * HabitProgressSheet (Guardar fija el valor de hoy y Deshacer lo vuelve a 0).
  */
 function HabitsPage() {
   const { isWeb, notify, comingSoon } = useShell();
@@ -23,7 +22,7 @@ function HabitsPage() {
   const data = useHabits({ notify });
   const [form, setForm] = useState(null);
   const [detailId, setDetailId] = useState(null);
-  const [previewCounts, setPreviewCounts] = useState({});
+  const [progressId, setProgressId] = useState(null);
 
   useCreateIntent(() => setForm({ habit: null }));
 
@@ -39,41 +38,17 @@ function HabitsPage() {
   ]);
 
   const detailHabit = data.habits.find((habit) => habit.id === detailId) || null;
-
-  function counterOf(habit) {
-    if (!isCounterHabit(habit)) return null;
-    const goal = Number(habit.goal);
-    if (!HABITS_PREVIEW) return { goal, count: null, unit: null };
-    return { goal, count: previewCounts[habit.id] ?? Math.min(HABITS_PREVIEW.count, goal - 1), unit: HABITS_PREVIEW.unit };
-  }
-
-  function setPreviewCount(habit, count) {
-    setPreviewCounts((current) => ({ ...current, [habit.id]: count }));
-  }
-
-  // Solo en la vista previa: sumar uno y, al llegar a la meta, marcar cumplido.
-  const increment = HABITS_PREVIEW
-    ? (habit) => {
-        const counter = counterOf(habit);
-        const next = counter.count + 1;
-        setPreviewCount(habit, Math.min(next, counter.goal));
-        if (next >= counter.goal) data.toggleHabit(habit);
-      }
-    : null;
-
-  function toggle(habit) {
-    if (HABITS_PREVIEW && isCounterHabit(habit) && isHabitDone(habit)) setPreviewCount(habit, 0);
-    return data.toggleHabit(habit);
-  }
+  const progressHabit = data.habits.find((habit) => habit.id === progressId) || null;
+  const progress = progressHabit ? selectHabitProgress(progressHabit) : null;
 
   const shared = {
     habits: data.habits,
     loading: data.loading,
     error: data.error,
     now,
-    counterOf,
-    onToggle: toggle,
-    onIncrement: increment,
+    onToggle: data.toggleHabit,
+    onIncrement: data.incrementHabit,
+    onAdjust: (habit) => setProgressId(habit.id),
     isPending: data.isPending,
     onOpen: (habit) => setDetailId(habit.id),
     onEdit: (habit) => setForm({ habit }),
@@ -85,7 +60,7 @@ function HabitsPage() {
     <>
       {isWeb ? <HabitsWeb {...shared} /> : <HabitsMobile {...shared} />}
 
-      {detailHabit && !form && (
+      {detailHabit && !form && !progressHabit && (
         <HabitDetailSheet
           key={detailHabit.id}
           habit={detailHabit}
@@ -96,7 +71,22 @@ function HabitsPage() {
           }}
           onDuplicate={data.duplicateHabit}
           onDelete={data.deleteHabit}
-          onToggle={toggle}
+          onToggle={data.toggleHabit}
+          onAdjust={(habit) => setProgressId(habit.id)}
+        />
+      )}
+
+      {progressHabit && progress && (
+        <HabitProgressSheet
+          key={progressHabit.id}
+          name={progressHabit.name}
+          type={progress.type}
+          count={progress.count}
+          goal={progress.goal}
+          unitLabel={progress.unitLabel}
+          onSave={(amount) => data.setHabitProgress(progressHabit, amount)}
+          onUndo={() => data.setHabitProgress(progressHabit, 0)}
+          onClose={() => setProgressId(null)}
         />
       )}
 

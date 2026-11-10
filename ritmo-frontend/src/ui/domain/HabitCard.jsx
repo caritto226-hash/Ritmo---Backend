@@ -17,12 +17,16 @@ function dayClass(value) {
 
 /**
  * Tarjeta pastel de un hábito (HabitosWeb.dc.html): ícono, nombre (abre el detalle), frecuencia,
- * racha, "Hecho/Pendiente" o el conteo con segmentos, la semana en círculos y el botón del día.
+ * racha, la cifra del día, la semana en círculos y el botón del día, según el tipo:
+ * - Solo marcar (progress null): "Hecho/Pendiente" y "Marcar hecho" / "✓ Hecho".
+ * - Cantidad: "4/8 vasos", segmentos y "+ 1 vaso" (con un atajo de unidad) o "+ 1" (onIncrement).
+ * - Tiempo: "15/30 min", barra continua y "Registrar tiempo" (onAdjust abre la hoja de avance).
+ * En cantidad y tiempo la cifra también abre la hoja (onAdjust) y, cumplido, "✓ Completo" llama
+ * onToggle (vuelve a 0). progress: { type, count, goal, unitLabel, unitOne }.
+ * offDay: el hábito no toca hoy; atenuado, sin botón (Hábitos v2, decisión 8).
  * tint: color de fondo (con transparencia). Completado = gris con check negro, sin rayas.
- * counter: { count (null sin datos), goal, unit? { one, many } }; onIncrement (sin él, "+ 1"
- * queda deshabilitado con "Próximamente"). streak: texto o null ("—").
- * week: [{ key, label, value (1, 0–1, 0, null = no aplica, undefined = sin datos), today }];
- * weekNoData muestra "Próximamente" sobre los círculos.
+ * streak: texto o null ("—"). week: [{ key, label, value (1, 0–1, 0, null = no aplica,
+ * undefined = sin datos), today }]; weekNoData muestra "Próximamente" sobre los círculos.
  */
 function HabitCard({
   name,
@@ -30,7 +34,8 @@ function HabitCard({
   icon,
   tint,
   done = false,
-  counter = null,
+  progress = null,
+  offDay = false,
   streak = null,
   week,
   weekLabel,
@@ -38,22 +43,31 @@ function HabitCard({
   disabled = false,
   onToggle,
   onIncrement,
+  onAdjust,
   onOpen,
 }) {
-  const isCounter = Boolean(counter);
-  const unit = counter?.unit;
-  let button;
-  if (isCounter && !done) {
+  const measured = Boolean(progress);
+  const isDuration = progress?.type === "duration";
+  const unit = progress?.unitLabel ? ` ${progress.unitLabel}` : "";
+  const amountText = measured ? `${progress.count} de ${progress.goal}${unit}` : "";
+  // Sin botón cuando el hábito no toca hoy.
+  let button = null;
+  if (offDay) {
+    button = null;
+  } else if (measured && done) {
+    button = { label: "✓ Completo", aria: `Volver a 0 hoy: ${name}`, onClick: onToggle, dark: true, pressed: true };
+  } else if (isDuration) {
+    button = { label: "Registrar tiempo", aria: `Registrar tiempo: ${name}`, onClick: onAdjust, dark: true };
+  } else if (measured) {
     button = {
-      label: `+ 1${unit ? ` ${unit.one}` : ""}`,
-      aria: `Sumar ${unit ? `un ${unit.one}` : "uno"}: ${name}`,
+      label: progress.unitOne ? `+ 1 ${progress.unitOne}` : "+ 1",
+      aria: `Sumar ${progress.unitOne ? `un ${progress.unitOne}` : "uno"}: ${name}`,
       onClick: onIncrement,
       dark: true,
-      unavailable: !onIncrement,
     };
   } else {
     button = {
-      label: done ? (isCounter ? "✓ Completo" : "✓ Hecho") : "Marcar hecho",
+      label: done ? "✓ Hecho" : "Marcar hecho",
       aria: `${done ? "Desmarcar" : "Marcar hecho"}: ${name}`,
       onClick: onToggle,
       dark: done,
@@ -61,14 +75,22 @@ function HabitCard({
     };
   }
 
-  const segments = isCounter ? Math.min(counter.goal, MAX_SEGMENTS) : 0;
-  const filled = isCounter && counter.count !== null ? Math.round((Math.min(counter.count, counter.goal) / counter.goal) * segments) : 0;
+  const ratio = measured ? Math.min(progress.count, progress.goal) / progress.goal : 0;
+  const segments = measured && !isDuration ? Math.min(progress.goal, MAX_SEGMENTS) : 0;
+  const filled = Math.round(ratio * segments);
+
+  const figure = measured && (
+    <span className={styles.big}>
+      {progress.count}
+      <span className={styles.unit}>/{progress.goal}{unit}</span>
+    </span>
+  );
 
   return (
     <section
       aria-label={name}
-      className={cx(styles.card, done && styles.done)}
-      style={done ? undefined : { "--habit-tint": tint }}
+      className={cx(styles.card, done && styles.done, offDay && styles.offDay)}
+      style={done || offDay ? undefined : { "--habit-tint": tint }}
     >
       <div className={styles.head}>
         <div className={styles.identity}>
@@ -94,23 +116,37 @@ function HabitCard({
       </div>
 
       <div className={styles.body}>
-        {isCounter ? (
+        {offDay ? (
+          <span className={styles.big}>No toca hoy</span>
+        ) : measured ? (
           <>
-            <span className={styles.big}>
-              {done ? counter.goal : counter.count ?? NO_DATA}
-              <span className={styles.unit}>/{counter.goal}{unit ? ` ${unit.many}` : ""}</span>
-            </span>
-            <div
-              className={styles.segments}
-              style={{ gridTemplateColumns: `repeat(${segments}, minmax(0, 1fr))` }}
-              role="img"
-              aria-label={counter.count === null && !done ? "Conteo del día: próximamente" : `${done ? counter.goal : counter.count} de ${counter.goal}`}
-            >
-              {Array.from({ length: segments }, (_, index) => (
-                <span key={index} className={cx(styles.segment, (done || index < filled) && styles.segmentOn)} />
-              ))}
-            </div>
-            {counter.count === null && !done && <NoData className={styles.noData} />}
+            {onAdjust ? (
+              <button
+                type="button"
+                className={styles.figureButton}
+                onClick={onAdjust}
+                disabled={disabled}
+                aria-label={`${isDuration ? "Registrar tiempo" : "Ajustar cantidad"} de ${name}: ${amountText}`}
+              >
+                {figure}
+              </button>
+            ) : figure}
+            {isDuration ? (
+              <div className={styles.bar} role="img" aria-label={amountText}>
+                <span className={styles.barFill} style={{ width: `${Math.round(ratio * 100)}%` }} />
+              </div>
+            ) : (
+              <div
+                className={styles.segments}
+                style={{ gridTemplateColumns: `repeat(${segments}, minmax(0, 1fr))` }}
+                role="img"
+                aria-label={amountText}
+              >
+                {Array.from({ length: segments }, (_, index) => (
+                  <span key={index} className={cx(styles.segment, index < filled && styles.segmentOn)} />
+                ))}
+              </div>
+            )}
           </>
         ) : (
           <span className={styles.big}>{done ? "Hecho" : "Pendiente"}</span>
@@ -129,16 +165,18 @@ function HabitCard({
             ))}
           </div>
         </div>
-        <button
-          type="button"
-          className={cx(styles.action, button.dark && styles.actionDark)}
-          aria-pressed={button.pressed}
-          aria-label={button.unavailable ? `${button.aria} (próximamente)` : button.aria}
-          disabled={disabled || button.unavailable}
-          onClick={button.onClick}
-        >
-          {button.label}
-        </button>
+        {button && (
+          <button
+            type="button"
+            className={cx(styles.action, button.dark && styles.actionDark)}
+            aria-pressed={button.pressed}
+            aria-label={button.aria}
+            disabled={disabled || !button.onClick}
+            onClick={button.onClick}
+          >
+            {button.label}
+          </button>
+        )}
       </div>
     </section>
   );

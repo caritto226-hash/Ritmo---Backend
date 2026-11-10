@@ -3,17 +3,93 @@ import { getInkOnColor, isHexColor } from "../../utils/color";
 import { addDays, formatClockWithPeriod, formatHourLabel, mondayOf, toHours } from "../../utils/dates";
 import { isHabitDone } from "./todaySelectors";
 
-// GET /habits solo dice si cada hábito está cumplido hoy (status). El historial por día, la racha
-// y el conteo (4/8 vasos) no existen en la API (BACKEND_PENDIENTE #1 y #2): aquí solo se calcula
-// lo que sale de ese dato y de reminderTime.
+// GET /habits trae, por hábito, sus días (days, ISO 1 = lunes … 7 = domingo), el tipo de meta
+// (goalType: check, count o duration), la meta (goal), la unidad en plural (unit) y el avance de
+// hoy (todayAmount / todayTarget, status y appliesToday). El historial por día y la racha son de
+// la fase C de Hábitos v2: aquí solo se calcula lo que sale del día de hoy y de reminderTime.
 
 export { isHabitDone };
 
 export const HABIT_STATUS_LABELS = { completado: "Cumplido hoy", pendiente: "Pendiente" };
 
-// Hábito de conteo ("Tomar agua · 8 vasos"): la meta (goal) es la cantidad del día.
+export const DAY_LETTERS = ["L", "M", "X", "J", "V", "S", "D"];
+export const DAY_NAMES = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+export const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
+export const WEEKDAYS = [1, 2, 3, 4, 5];
+
+// Atajos de unidad del formulario (se guardan en plural). Solo con ellos el botón usa el singular
+// ("+ 1 vaso"); con una unidad escrita a mano dice "+ 1" y la cifra lleva la unidad ("3/8 tazas").
+export const UNIT_PRESETS = [
+  { many: "vasos", one: "vaso" },
+  { many: "páginas", one: "página" },
+  { many: "veces", one: "vez" },
+];
+export const MINUTE_PRESETS = [15, 30, 45, 60];
+
+// Límites de la API (Hábitos v2, decisión 11).
+export const GOAL_LIMITS = { count: 999, duration: 1440 };
+export const MAX_DAY_AMOUNT = 9999;
+export const MAX_UNIT_LENGTH = 20;
+
+export function getUnitPreset(unit) {
+  return UNIT_PRESETS.find((preset) => preset.many === unit) || null;
+}
+
+// Hábitos anteriores a v2 sin goalType: la meta decide, igual que la migración.
+export function getGoalType(habit) {
+  if (habit.goalType) return habit.goalType;
+  return Number(habit.goal) > 1 ? "count" : "check";
+}
+
+// Hábito que se mide (cantidad o tiempo): lleva cifra, barra y la hoja de avance.
 export function isCounterHabit(habit) {
-  return Number(habit.goal) > 1;
+  return getGoalType(habit) !== "check";
+}
+
+// "No toca hoy": sus días no incluyen hoy (o empieza después). Sin el dato, aplica.
+export function appliesToday(habit) {
+  return habit.appliesToday !== false;
+}
+
+/**
+ * Avance de hoy de un hábito de cantidad o tiempo, listo para la tarjeta, la burbuja y la hoja.
+ * null en los de solo marcar. unitLabel: "vasos", "tazas" o "min" (null si no tiene unidad);
+ * unitOne: singular del atajo (null con texto libre); inlineUnit: la cifra corta del móvil lleva
+ * la unidad (texto libre y tiempo; con los atajos el mockup muestra solo "4/8").
+ */
+export function selectHabitProgress(habit) {
+  const type = getGoalType(habit);
+  if (type === "check") return null;
+  const goal = Number(habit.todayTarget ?? habit.goal) || 1;
+  const preset = type === "count" ? getUnitPreset(habit.unit) : null;
+  const unitLabel = type === "duration" ? "min" : habit.unit || null;
+  return {
+    type,
+    count: Number(habit.todayAmount) || 0,
+    goal,
+    unitLabel,
+    unitOne: preset?.one ?? null,
+    inlineUnit: Boolean(unitLabel) && !preset,
+  };
+}
+
+// "8 vasos", "8" o "30 min".
+export function formatGoal(habit) {
+  const type = getGoalType(habit);
+  if (type === "duration") return `${habit.goal} min`;
+  if (type === "count") return habit.unit ? `${habit.goal} ${habit.unit}` : String(habit.goal);
+  return null;
+}
+
+// Frecuencia de la tarjeta: "Diario · 8 vasos" en el mockup.
+export function formatHabitMeta(habit) {
+  const goal = formatGoal(habit);
+  return goal ? `${habit.frequency} · ${goal}` : habit.frequency;
+}
+
+// "4 de 8 vasos" / "15 de 30 min" (lectores de pantalla y detalle).
+export function describeProgress(progress) {
+  return `${progress.count} de ${progress.goal}${progress.unitLabel ? ` ${progress.unitLabel}` : ""}`;
 }
 
 // Opacidad de cada pastel en las tarjetas (web) y las burbujas (móvil) de los mockups.
@@ -37,8 +113,34 @@ export function getHabitTint(habit, platform = "web", percent) {
   return `color-mix(in srgb, ${color} ${alpha}%, var(--habit-tint-base))`;
 }
 
+// Los que tocan hoy primero y "No toca hoy" al final (Hábitos v2, decisión 8), en el orden de la API.
+export function splitByToday(habits) {
+  return { today: habits.filter(appliesToday), offDay: habits.filter((habit) => !appliesToday(habit)) };
+}
+
+// Semana de la tarjeta (web), lunes a domingo: hoy sale del avance real; los días que el hábito no
+// tiene son null (círculo punteado); los días anteriores no tienen datos todavía (undefined, fase
+// C) salvo en la vista previa (previewWeek: lunes a sábado del mockup).
+export function selectCardWeek(habit, weekKeys, todayKey, previewWeek) {
+  const progress = selectHabitProgress(habit);
+  const days = habit.days?.length ? habit.days : ALL_DAYS;
+  return weekKeys.map((key, index) => {
+    let value;
+    if (!days.includes(index + 1)) value = null;
+    else if (key < todayKey) value = previewWeek ? previewWeek[index] : undefined;
+    else if (key === todayKey) {
+      if (!appliesToday(habit)) value = null;
+      else if (isHabitDone(habit)) value = 1;
+      else value = progress ? Math.min(1, progress.count / progress.goal) : 0;
+    }
+    return { key, label: DAY_LETTERS[index], value, today: key === todayKey };
+  });
+}
+
+// Cumplidos / aplicables hoy (Hábitos v2, decisión 2): los que no tocan hoy no cuentan.
 export function selectTodaySummary(habits) {
-  return { done: habits.filter(isHabitDone).length, total: habits.length };
+  const today = habits.filter(appliesToday);
+  return { done: today.filter(isHabitDone).length, total: today.length };
 }
 
 // Mensaje bajo el anillo "Hoy" según el avance (los del mockup, para cualquier cantidad de hábitos).
@@ -92,7 +194,8 @@ const LABEL_GAP = 9;
  */
 export function selectReminderLine(habits, nowHours) {
   const byTime = new Map();
-  habits.forEach((habit) => {
+  // Un hábito que no toca hoy no tiene recordatorio hoy (si no, saldría como no cumplido).
+  habits.filter(appliesToday).forEach((habit) => {
     const hours = toHours(habit.reminderTime);
     if (hours === null) return;
     byTime.set(hours, [...(byTime.get(hours) || []), habit]);

@@ -1,0 +1,45 @@
+/* Partes propias del formulario de hábito (días, tipo de medida, unidad y minutos). Sin mockup:
+   chips del sistema (Chip, variante filter: 40 px, apagado --surface-soft, elegido negro). */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* L M X J V S D: círculos de 40 px (el ::after de Chip amplía el área táctil a 44). */
+.days {
+  display: flex;
+  gap: 6px;
+}
+
+.day {
+  width: 40px;
+  justify-content: center;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--text-3);
+}
+
+/* Bloque de la medida elegida (meta, unidad o minutos): caja interna como las mini-stats. */
+.measure {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--radius-box-sm);
+  background: var(--surface-subtle);
+}
+
+/* Dentro de la caja, el chip apagado (--surface-soft) casi no se distingue del fondo: va en blanco. */
+.measure .boxChip:not([aria-pressed="true"]) { background: var(--surface); }
+
+.measure .boxChip:not([aria-pressed="true"]):hover:not(:disabled) { background: var(--hover-surface); }
+
+.goalInput { max-width: 160px; }

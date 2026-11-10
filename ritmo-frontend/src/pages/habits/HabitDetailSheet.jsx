@@ -1,20 +1,57 @@
 import DetailSheet from "../../ui/domain/DetailSheet";
-import { HABIT_STATUS_LABELS, isHabitDone } from "../../hooks/data/habitSelectors";
+import {
+  HABIT_STATUS_LABELS,
+  appliesToday,
+  describeProgress,
+  formatGoal,
+  getGoalType,
+  isHabitDone,
+  selectHabitProgress,
+} from "../../hooks/data/habitSelectors";
 import { formatTime12 } from "../../utils/time";
 
-// Detalle de un hábito con Editar, Duplicar, Marcar (o Desmarcar) hoy y Eliminar (DetailSheet):
-// los mismos datos que mostraba la hoja anterior (MobileItemDetails). Marcar desde aquí sirve
-// también para los hábitos de conteo, cuyo "+ 1" espera el conteo en la API (BACKEND_PENDIENTE #2).
-function HabitDetailSheet({ habit, onClose, onEdit, onDuplicate, onDelete, onToggle }) {
+const MEASURE_LABELS = { check: "Solo marcar", count: "Cantidad", duration: "Tiempo" };
+
+// Detalle de un hábito con Editar, Duplicar, Marcar (o Desmarcar) hoy y Eliminar (DetailSheet).
+// En los de cantidad o tiempo suma "Ajustar cantidad" o "Registrar tiempo" (onAdjust abre la hoja
+// de avance). Si el hábito no toca hoy no hay acciones del día (la API las rechaza).
+function HabitDetailSheet({ habit, onClose, onEdit, onDuplicate, onDelete, onToggle, onAdjust }) {
   const done = isHabitDone(habit);
+  const type = getGoalType(habit);
+  const progress = selectHabitProgress(habit);
+  const today = appliesToday(habit);
+  const goal = formatGoal(habit);
+
+  let todayValue = "No toca hoy";
+  if (today) todayValue = progress ? `${describeProgress(progress)}${done ? " · cumplido" : ""}` : HABIT_STATUS_LABELS[habit.status] || habit.status;
+
   const details = [
-    { label: "Frecuencia", value: habit.frequency },
-    { label: "Meta", value: habit.goal ? String(habit.goal) : "" },
+    { label: "Días", value: habit.frequency },
+    { label: "Cómo se mide", value: MEASURE_LABELS[type] },
+    { label: "Meta diaria", value: goal || "" },
+    { label: "Hoy", value: todayValue },
     { label: "Recordatorio adicional", value: habit.reminderTime ? formatTime12(habit.reminderTime) : "Sin configurar" },
-    { label: "Estado", value: HABIT_STATUS_LABELS[habit.status] || habit.status },
     { label: "Categoría", value: habit.category?.name || "Sin categoría" },
     { label: "Propósito", value: habit.category?.description || "" },
   ];
+
+  const extraActions = [];
+  if (today && progress && onAdjust) {
+    // Devuelve true para que la hoja de detalle se cierre y la página abra la de avance.
+    extraActions.push({
+      label: type === "duration" ? "Registrar tiempo" : "Ajustar cantidad",
+      onRun: async () => {
+        onAdjust(habit);
+        return true;
+      },
+    });
+  }
+  if (today) {
+    extraActions.push({
+      label: done ? (progress ? "Volver a 0 hoy" : "Desmarcar hoy") : "Marcar cumplido hoy",
+      onRun: () => onToggle(habit),
+    });
+  }
 
   return (
     <DetailSheet
@@ -25,7 +62,7 @@ function HabitDetailSheet({ habit, onClose, onEdit, onDuplicate, onDelete, onTog
       onEdit={() => onEdit(habit)}
       onDuplicate={() => onDuplicate(habit)}
       onDelete={() => onDelete(habit)}
-      extraAction={{ label: done ? "Desmarcar hoy" : "Marcar cumplido hoy", onRun: () => onToggle(habit) }}
+      extraActions={extraActions}
     />
   );
 }

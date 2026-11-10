@@ -23,6 +23,14 @@
   gap: 10px;
 }
 
+/* "No toca hoy" (Hábitos v2, decisión 8): encima de esos hábitos, al final de la lista. */
+.groupLabel {
+  margin: 6px 0 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
 .empty {
   display: flex;
   flex-direction: column;

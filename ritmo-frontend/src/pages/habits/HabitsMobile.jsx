@@ -3,7 +3,14 @@ import PillButton from "../../ui/primitives/PillButton";
 import WeekRings from "../../ui/charts/WeekRings";
 import HabitRow from "../../ui/domain/HabitRow";
 import NextReminderCard from "../../ui/domain/NextReminderCard";
-import { getHabitTint, isHabitDone, selectNextReminder, selectTodaySummary } from "../../hooks/data/habitSelectors";
+import {
+  getHabitTint,
+  isHabitDone,
+  selectHabitProgress,
+  selectNextReminder,
+  selectTodaySummary,
+  splitByToday,
+} from "../../hooks/data/habitSelectors";
 import { selectWeekDays } from "../../hooks/data/taskSelectors";
 import { parseDateKey, WEEKDAYS_SHORT } from "../../utils/dates";
 import { HABITS_PREVIEW } from "./habitsPreview";
@@ -13,11 +20,34 @@ const LETTERS = ["D", "L", "M", "M", "J", "V", "S"];
 const HABIT_ICON_FALLBACK = "heart-pulse";
 
 // Hábitos móvil (Habitos.dc.html). La barra superior (menú, + Nuevo hábito, campana) la pone MainLayout.
-function HabitsMobile({ habits, loading, error, now, counterOf, onToggle, onIncrement, isPending, onOpen, onEdit, onCreate, onStats }) {
+function HabitsMobile({ habits, loading, error, now, onToggle, onIncrement, onAdjust, isPending, onOpen, onEdit, onCreate, onStats }) {
   const P = HABITS_PREVIEW;
   const todayKey = now.dateKey;
   const summary = selectTodaySummary(habits);
   const next = selectNextReminder(habits, now.hours);
+  const groups = splitByToday(habits);
+
+  function renderRow(habit) {
+    const progress = selectHabitProgress(habit);
+    return (
+      <HabitRow
+        key={habit.id}
+        name={habit.name}
+        meta={habit.frequency}
+        icon={habit.category?.icon || HABIT_ICON_FALLBACK}
+        tint={getHabitTint(habit, "mobile", progress ? 28 : undefined)}
+        fillTint={progress ? getHabitTint(habit, "mobile", 90) : undefined}
+        done={isHabitDone(habit)}
+        progress={progress}
+        offDay={groups.offDay.includes(habit)}
+        disabled={isPending(habit.id)}
+        onToggle={() => onToggle(habit)}
+        onIncrement={() => onIncrement(habit)}
+        onAdjust={() => onAdjust(habit)}
+        onOpen={() => onOpen(habit)}
+      />
+    );
+  }
 
   // Hoy sale de status; los días anteriores no existen en la API (BACKEND_PENDIENTE #1).
   const week = selectWeekDays(todayKey).map((key, index) => {
@@ -54,25 +84,9 @@ function HabitsMobile({ habits, loading, error, now, counterOf, onToggle, onIncr
       ) : (
         <>
           <div className={styles.rows}>
-            {habits.map((habit) => {
-              const counter = counterOf(habit);
-              return (
-                <HabitRow
-                  key={habit.id}
-                  name={habit.name}
-                  meta={habit.frequency}
-                  icon={habit.category?.icon || HABIT_ICON_FALLBACK}
-                  tint={getHabitTint(habit, "mobile", counter ? 28 : undefined)}
-                  fillTint={counter ? getHabitTint(habit, "mobile", 90) : undefined}
-                  done={isHabitDone(habit)}
-                  counter={counter}
-                  disabled={isPending(habit.id)}
-                  onToggle={() => onToggle(habit)}
-                  onIncrement={onIncrement && counter ? () => onIncrement(habit) : undefined}
-                  onOpen={() => onOpen(habit)}
-                />
-              );
-            })}
+            {groups.today.map(renderRow)}
+            {groups.offDay.length > 0 && <h2 className={styles.groupLabel}>No toca hoy</h2>}
+            {groups.offDay.map(renderRow)}
             {habits.length === 0 && (
               <div className={styles.empty}>
                 <p className={styles.emptyText}>Aún no tienes hábitos. Registra el primero y márcalo cada día.</p>

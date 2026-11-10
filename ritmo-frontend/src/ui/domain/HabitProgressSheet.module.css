@@ -1,0 +1,121 @@
+/* Hoja de avance de un hábito: sin mockup propio. La cifra repite la de la tarjeta web
+   (44 / 300 / −1px con la unidad en 18) y las acciones las de DetailSheet. */
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--fs-body);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.goal {
+  font-weight: 400;
+  color: var(--text-3);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.value {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+/* El número se edita en su lugar: sin borde hasta el foco, ancho de 4 cifras. */
+.input {
+  width: 4.2ch;
+  box-sizing: content-box;
+  padding: 2px 6px;
+  border: none;
+  border-bottom: 2px solid var(--line-ring);
+  border-radius: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 44px;
+  font-weight: 300;
+  letter-spacing: -1px;
+  line-height: 1;
+  color: var(--text);
+  text-align: right;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.unit {
+  font-size: 18px;
+  color: var(--text-3);
+  white-space: nowrap;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.error {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-box-sm);
+  border: 1px solid var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.textButton {
+  height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.textButton:hover:not(:disabled) { background: var(--surface-soft); }
+
+.textButton:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.textButton:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}

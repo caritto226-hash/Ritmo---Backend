@@ -106,22 +106,34 @@
 /* Cumplido: el gris --text-3 ya es el atenuado; con 0.85 encima quedaba en 4:1. */
 .done .meta { opacity: 1; }
 
-.countBlock {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
+/* Cifra "4/8" (o "15/30 min"): abre la hoja de avance; área táctil de 44 px de alto. */
 .count {
+  min-height: var(--touch-min);
+  flex-shrink: 0;
+  padding: 0 4px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  font-family: inherit;
   font-size: 15px;
   font-weight: 600;
+  color: inherit;
+  white-space: nowrap;
+  cursor: pointer;
 }
 
-.noData {
-  color: var(--ink-on-light-2);
-  font-size: 11px;
+span.count {
+  display: flex;
+  align-items: center;
+  cursor: default;
 }
+
+.count:focus-visible {
+  outline: 2px solid var(--ink-on-light);
+  outline-offset: -2px;
+}
+
+.count:disabled { cursor: progress; }
 
 .plus {
   width: 44px;

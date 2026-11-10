@@ -15,8 +15,16 @@ async function update(id, habitData) {
   return response.data.data;
 }
 
-async function changeStatus(id, status) {
-  const response = await api.patch(`/habits/${id}/status`, { status });
+// date (YYYY-MM-DD) es opcional: sin ella la API usa hoy.
+async function changeStatus(id, status, date) {
+  const response = await api.patch(`/habits/${id}/status`, date ? { status, date } : { status });
+  return response.data.data;
+}
+
+// Avance del día en hábitos de cantidad o tiempo: { amount } fija el valor (0 lo borra) o
+// { delta } suma; date opcional como en changeStatus.
+async function updateProgress(id, progress) {
+  const response = await api.patch(`/habits/${id}/progress`, progress);
   return response.data.data;
 }
 
@@ -25,4 +33,4 @@ async function remove(id) {
   return response.data;
 }
 
-export default { getAll, create, update, changeStatus, remove };
+export default { getAll, create, update, changeStatus, updateProgress, remove };

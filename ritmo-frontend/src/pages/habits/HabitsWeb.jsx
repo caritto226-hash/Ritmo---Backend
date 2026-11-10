@@ -8,38 +8,29 @@ import ProgressRing from "../../ui/charts/ProgressRing";
 import HeatMap from "../../ui/charts/HeatMap";
 import ReminderLine from "../../ui/charts/ReminderLine";
 import {
+  DAY_LETTERS as LETTERS,
+  formatHabitMeta,
   getHabitTint,
   getHeatLevel,
   getTodayMessage,
   isHabitDone,
+  selectCardWeek,
+  selectHabitProgress,
   selectHabitWeekKeys,
   selectHeatKeys,
   selectNextReminder,
   selectReminderLine,
   selectTodaySummary,
+  splitByToday,
 } from "../../hooks/data/habitSelectors";
 import { formatHourLabel } from "../../utils/dates";
 import { HABITS_PREVIEW } from "./habitsPreview";
 import styles from "./HabitsWeb.module.css";
 
-const LETTERS = ["L", "M", "X", "J", "V", "S", "D"];
 const HABIT_ICON_FALLBACK = "heart-pulse";
 
-// Semana de la tarjeta: hoy sale de status; los días anteriores no existen en la API (#1).
-function selectCardWeek(weekKeys, todayKey, { done, counter, previewWeek }) {
-  return weekKeys.map((key, index) => {
-    let value;
-    if (key < todayKey) value = previewWeek ? previewWeek[index] : undefined;
-    else if (key === todayKey) {
-      if (done) value = 1;
-      else if (counter) value = counter.count === null ? undefined : counter.count / counter.goal;
-      else value = 0;
-    }
-    return { key, label: LETTERS[index], value, today: key === todayKey };
-  });
-}
-
-// "Recordatorios cada 3 horas" del mockup (vista previa): ya tomados según el conteo de agua.
+// "Recordatorios cada 3 horas" del mockup (vista previa): ya tomados según el conteo real del
+// primer hábito de cantidad (0 si no hay ninguno).
 function previewReminderLine(nowHours, count) {
   const pos = (hours) => 4 + ((hours - 7) / 12) * 92;
   return {
@@ -58,12 +49,44 @@ function previewReminderLine(nowHours, count) {
 }
 
 // Hábitos web (HabitosWeb.dc.html).
-function HabitsWeb({ habits, loading, error, now, counterOf, onToggle, onIncrement, isPending, onOpen, onEdit, onCreate, onStats }) {
+function HabitsWeb({ habits, loading, error, now, onToggle, onIncrement, onAdjust, isPending, onOpen, onEdit, onCreate, onStats }) {
   const P = HABITS_PREVIEW;
   const todayKey = now.dateKey;
   const summary = selectTodaySummary(habits);
   const weekKeys = selectHabitWeekKeys(todayKey);
   const next = selectNextReminder(habits, now.hours);
+  const groups = splitByToday(habits);
+
+  function renderCard(habit) {
+    const index = habits.indexOf(habit);
+    const done = isHabitDone(habit);
+    const offDay = groups.offDay.includes(habit);
+    const week = selectCardWeek(habit, weekKeys, todayKey, P?.weeks[index % P.weeks.length]);
+    const doneDays = week.filter((day) => day.value >= 1).length;
+    return (
+      <HabitCard
+        key={habit.id}
+        name={habit.name}
+        frequency={formatHabitMeta(habit)}
+        icon={habit.category?.icon || HABIT_ICON_FALLBACK}
+        tint={getHabitTint(habit, "web")}
+        done={done}
+        progress={selectHabitProgress(habit)}
+        offDay={offDay}
+        streak={P ? `${P.streaks[index % P.streaks.length] + (done ? 1 : 0)} días` : null}
+        week={week}
+        weekNoData={!P}
+        weekLabel={P
+          ? `Esta semana: ${doneDays} de 7 días cumplidos`
+          : `Esta semana: hoy ${offDay ? "no toca" : done ? "cumplido" : "pendiente"}; los días anteriores, próximamente`}
+        disabled={isPending(habit.id)}
+        onToggle={() => onToggle(habit)}
+        onIncrement={() => onIncrement(habit)}
+        onAdjust={() => onAdjust(habit)}
+        onOpen={() => onOpen(habit)}
+      />
+    );
+  }
 
   const titleStats = [
     { value: P?.stats.streak ?? null, delta: P?.stats.streakDelta ?? null, deltaTone: "positive", label: "Días de racha" },
@@ -72,8 +95,8 @@ function HabitsWeb({ habits, loading, error, now, counterOf, onToggle, onIncreme
     { value: P?.stats.best ?? null, delta: P?.stats.bestDelta ?? null, label: "Mejor racha" },
   ];
 
-  const firstCounter = habits.map(counterOf).find(Boolean);
-  const line = P ? previewReminderLine(now.hours, firstCounter?.count ?? P.count) : selectReminderLine(habits, now.hours);
+  const firstCount = habits.map(selectHabitProgress).find((progress) => progress?.type === "count");
+  const line = P ? previewReminderLine(now.hours, firstCount?.count ?? 0) : selectReminderLine(habits, now.hours);
   const reminderCount = line.points.length;
   const reminderMeta = P
     ? P.reminders.meta
@@ -113,33 +136,9 @@ function HabitsWeb({ habits, loading, error, now, counterOf, onToggle, onIncreme
         <div className={styles.layout}>
           <div className={styles.main}>
             <div className={styles.cards}>
-              {habits.map((habit, index) => {
-                const done = isHabitDone(habit);
-                const counter = counterOf(habit);
-                const week = selectCardWeek(weekKeys, todayKey, { done, counter, previewWeek: P?.weeks[index % P.weeks.length] });
-                const doneDays = week.filter((day) => day.value >= 1).length;
-                return (
-                  <HabitCard
-                    key={habit.id}
-                    name={habit.name}
-                    frequency={habit.frequency}
-                    icon={habit.category?.icon || HABIT_ICON_FALLBACK}
-                    tint={getHabitTint(habit, "web")}
-                    done={done}
-                    counter={counter}
-                    streak={P ? `${P.streaks[index % P.streaks.length] + (done ? 1 : 0)} días` : null}
-                    week={week}
-                    weekNoData={!P}
-                    weekLabel={P
-                      ? `Esta semana: ${doneDays} de 7 días cumplidos`
-                      : `Esta semana: hoy ${done ? "cumplido" : "pendiente"}; los días anteriores, próximamente`}
-                    disabled={isPending(habit.id)}
-                    onToggle={() => onToggle(habit)}
-                    onIncrement={onIncrement && counter ? () => onIncrement(habit) : undefined}
-                    onOpen={() => onOpen(habit)}
-                  />
-                );
-              })}
+              {groups.today.map(renderCard)}
+              {groups.offDay.length > 0 && <h2 className={styles.groupLabel}>No toca hoy</h2>}
+              {groups.offDay.map(renderCard)}
               {habits.length === 0 && (
                 <Card className={styles.emptyCard}>
                   <h2 className={styles.emptyTitle}>Aún no tienes hábitos</h2>
