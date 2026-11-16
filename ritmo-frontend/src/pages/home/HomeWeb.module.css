@@ -265,6 +265,9 @@
 .taskDone .taskTitle { color: var(--text-done); }
 .taskMeta { font-size: 12px; color: var(--text-2); }
 
+/* Tarea vencida: texto --danger, peso 600 (DESIGN_SPEC · Vencido). */
+.taskMetaLate { color: var(--danger); font-weight: 600; }
+
 /* ── Hábitos ── */
 .habits {
   flex: 1;

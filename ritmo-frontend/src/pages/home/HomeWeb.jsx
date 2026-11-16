@@ -114,7 +114,7 @@ function HomeWeb({
         onNext={() => shiftMonth(1)}
       />
     ),
-    tareas: () => <TasksWidget tasks={model.tasks} onToggle={onToggleTask} isPending={isPending} />,
+    tareas: () => <TasksWidget tasks={model.tasks} overdue={model.overdueTasks} todayKey={todayKey} onToggle={onToggleTask} isPending={isPending} />,
     habitos: () => (
       <HabitsWidget habits={model.habits} summary={model.ritmo.habits} onToggle={onToggleHabit} isPending={isPending} preview={HOME_PREVIEW} />
     ),

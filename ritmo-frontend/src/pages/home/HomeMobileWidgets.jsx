@@ -117,25 +117,32 @@ export function HabitsWidget({ summary }) {
   );
 }
 
-export function TasksWidget({ tasks, summary, nowHours }) {
+// "Por hacer" = pendientes de hoy + vencidas de días anteriores (como Pagos y cobros con los vencidos).
+export function TasksWidget({ tasks, overdue = [], summary, nowHours }) {
   const pending = tasks.filter((task) => !isTaskDone(task));
-  const next = pending.find((task) => (getTaskTimeRange(task)?.start ?? -1) > nowHours) || pending[0];
-  const left = summary.total - summary.done;
-  const nextLabel = summary.total === 0 ? "Sin tareas para hoy" : next ? `Sigue: ${next.title}` : "¡Todo listo!";
+  const nextToday = pending.find((task) => (getTaskTimeRange(task)?.start ?? -1) > nowHours) || pending[0];
+  const next = nextToday || overdue[0];
+  const total = summary.total + overdue.length;
+  const left = total - summary.done;
+  const nextLabel = total === 0 ? "Sin tareas para hoy" : next ? `Sigue: ${next.title}` : "¡Todo listo!";
+  const lateLabel = overdue.length > 0 ? plural(overdue.length, "vencida", "vencidas") : null;
 
   return (
     <>
       <WidgetHead icon="taskCircle" iconClass={styles.iconMuted} title="Tareas" />
       <HalfGauge
-        ratio={summary.total === 0 ? 0 : summary.done / summary.total}
+        ratio={total === 0 ? 0 : summary.done / total}
         value={left}
         caption="por hacer"
-        ariaLabel={`${summary.done} de ${summary.total} tareas hechas, ${left} por hacer`}
+        ariaLabel={`${summary.done} de ${total} tareas hechas, ${left} por hacer${lateLabel ? `, ${lateLabel}` : ""}`}
       />
       {/* En el mockup la cifra va en la cabecera, debajo del botón de abrir; aquí queda visible. */}
       <div className={styles.footRow}>
-        <span className={styles.metaClip}>{nextLabel}</span>
-        <span className={styles.meta}>{summary.done}/{summary.total}</span>
+        <span className={styles.metaClip}>
+          {lateLabel && <><span className={styles.lateText}>{lateLabel}</span> · </>}
+          {nextLabel}
+        </span>
+        <span className={styles.meta}>{summary.done}/{total}</span>
       </div>
     </>
   );

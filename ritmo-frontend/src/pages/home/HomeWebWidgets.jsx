@@ -15,6 +15,7 @@ import cx from "../../ui/cx";
 import { formatCurrency } from "../../utils/financeFormat";
 import { formatClockWithPeriod } from "../../utils/dates";
 import { getTaskTimeRange, isHabitDone, isTaskDone } from "../../hooks/data/todaySelectors";
+import { formatTaskWhen } from "../../hooks/data/taskSelectors";
 import styles from "./HomeWeb.module.css";
 
 export function RitmoWidget({ ritmo, quote, onNextQuote, onEditQuotes, streakDays }) {
@@ -112,17 +113,24 @@ export function CalendarWidget(props) {
   return <MonthMini {...props} />;
 }
 
-function taskMeta(task) {
+function taskMeta(task, lateText) {
   const range = getTaskTimeRange(task);
-  return [range ? formatClockWithPeriod(range.start) : "Sin hora", task.category?.name].filter(Boolean).join(" · ");
+  const when = lateText || (range ? formatClockWithPeriod(range.start) : "Sin hora");
+  return [when, task.category?.name].filter(Boolean).join(" · ");
 }
 
-export function TasksWidget({ tasks, onToggle, isPending }) {
-  if (tasks.length === 0) return <p className={styles.empty}>No tienes tareas para hoy.</p>;
+// Primero las vencidas (como la vista de hoy de Tareas) y luego las de hoy.
+export function TasksWidget({ tasks, overdue = [], todayKey, onToggle, isPending }) {
+  if (tasks.length === 0 && overdue.length === 0) return <p className={styles.empty}>No tienes tareas para hoy.</p>;
+
+  const rows = [
+    ...overdue.map((task) => ({ task, lateText: formatTaskWhen(task, todayKey).text })),
+    ...tasks.map((task) => ({ task, lateText: null })),
+  ];
 
   return (
     <div className={styles.taskList}>
-      {tasks.map((task) => {
+      {rows.map(({ task, lateText }) => {
         const done = isTaskDone(task);
         return (
           <button
@@ -138,7 +146,7 @@ export function TasksWidget({ tasks, onToggle, isPending }) {
             </span>
             <span className={styles.taskCopy}>
               <span className={styles.taskTitle}>{task.title}</span>
-              <span className={styles.taskMeta}>{taskMeta(task)}</span>
+              <span className={cx(styles.taskMeta, lateText && styles.taskMetaLate)}>{taskMeta(task, lateText)}</span>
             </span>
           </button>
         );

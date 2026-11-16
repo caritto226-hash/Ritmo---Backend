@@ -35,7 +35,7 @@ function HomeMobile({ model, now, firstName, loading, error, editing, onToggleEd
     ritmo: () => <ActivityWidget ritmo={ritmo} bars={previewActivityBars(ritmo.pct, now.hours)} />,
     eventos: () => <EventsWidget events={model.events} nowHours={now.hours} />,
     habitos: () => <HabitsWidget summary={ritmo.habits} />,
-    tareas: () => <TasksWidget tasks={model.tasks} summary={ritmo.tasks} nowHours={now.hours} />,
+    tareas: () => <TasksWidget tasks={model.tasks} overdue={model.overdueTasks} summary={ritmo.tasks} nowHours={now.hours} />,
     fin: () => <FinanceWidget finance={model.finance} monthBalance={model.monthBalance} />,
     pagos: () => <PaymentsWidget groups={reminders} today={model.todayKey} onSettle={onSettle} />,
     dia: () => <DayWidget tasks={model.tasks} events={model.events} nowHours={now.hours} />,

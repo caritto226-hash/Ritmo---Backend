@@ -15,6 +15,8 @@ import {
   selectRitmo,
   selectWeekExpenses,
 } from "../../hooks/data/todaySelectors";
+import { isTaskOverdue } from "../../hooks/data/taskSelectors";
+import { toDateKey } from "../../utils/dates";
 import { HOME_LAYOUT_KEY, MOBILE_DEFAULT, MOBILE_WIDGETS, WEB_DEFAULT, WEB_WIDGETS } from "./homeWidgets";
 import HomeWeb from "./HomeWeb";
 import HomeMobile from "./HomeMobile";
@@ -57,6 +59,11 @@ function HomePage() {
     todayKey,
     ritmo: selectRitmo(data, todayKey),
     tasks: selectDayTasks(data.tasks, todayKey),
+    // Pendientes de días anteriores, de la más antigua a la más reciente. La tarjeta de Tareas
+    // las suma a "por hacer", como Pagos y cobros con los vencidos; "Tu ritmo de hoy" no las cuenta.
+    overdueTasks: data.tasks
+      .filter((task) => isTaskOverdue(task, todayKey))
+      .sort((a, b) => toDateKey(a.dueDate).localeCompare(toDateKey(b.dueDate))),
     events: selectDayEvents(data.events, todayKey),
     habits: data.habits,
     reminders: selectReminderGroups(data.reminders),
